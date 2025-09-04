@@ -24,9 +24,9 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
         </FadeIn>
         
         <FadeIn delay={200}>
-          <div className="max-w-md mx-auto">
-            <div className="bg-white rounded-lg p-8 shadow-sm">
-              <form className="space-y-6">
+          <div className="max-w-sm mx-auto">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <form className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     Namn
