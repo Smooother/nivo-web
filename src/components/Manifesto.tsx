@@ -2,6 +2,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import FadeIn from './animations/FadeIn';
+import TextReveal from './animations/TextReveal';
 
 interface ManifestoProps {
   className?: string;
@@ -13,18 +14,20 @@ const Manifesto: React.FC<ManifestoProps> = ({ className, id }) => {
     <section id={id} className={cn('py-20 bg-white', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
-          <FadeIn>
+          <FadeIn delay={100} direction="up">
             <span className="text-sm md:text-base font-medium text-accent mb-2 inline-block">Om oss</span>
-            <h2 className="text-3xl md:text-4xl font-serif mb-10 text-center">Med djup erfarenhet driver Nivo hållbar tillväxt</h2>
           </FadeIn>
+          <TextReveal delay={200} duration={1000}>
+            <h2 className="text-3xl md:text-4xl font-serif mb-10 text-center">Med djup erfarenhet driver Nivo hållbar tillväxt</h2>
+          </TextReveal>
           
-          <FadeIn delay={100}>
+          <FadeIn delay={400} duration={900} direction="up">
             <p className="text-lg leading-relaxed mb-8 text-center">
               Vi är ett team med omfattande erfarenhet inom entreprenörskap, investeringar och företagsledning som arbetar med företagare för att skapa hållbara och konkurrenskraftiga företag.
             </p>
           </FadeIn>
           
-          <FadeIn delay={200}>
+          <FadeIn delay={600} duration={900} direction="up">
             <p className="text-lg leading-relaxed text-muted-foreground text-center">
               Med erfarenhet från att ha byggt några av Sveriges snabbast växande och mest lönsamma företag, har vi djup förståelse för vad som skapar framgång. Det handlar inte om fler strategiska presentationer, utan om att stödja målmedvetna entreprenörer som har produkter som möter marknadens behov och en förmåga att anpassa sig till en snabbt föränderlig omvärld.
             </p>

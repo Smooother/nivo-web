@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import FadeIn from './animations/FadeIn';
+import StaggeredContainer from './animations/StaggeredContainer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Settings, Zap, TrendingUp, Users } from 'lucide-react';
 
@@ -36,29 +37,30 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
   return (
     <section id={id} className={cn('py-20 bg-white', className)}>
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16 max-w-6xl mx-auto">
+        <StaggeredContainer 
+          staggerDelay={150} 
+          className="grid md:grid-cols-2 gap-12 md:gap-16 max-w-6xl mx-auto"
+        >
           {services.map((service, index) => {
             const IconComponent = service.icon;
             
             return (
-              <FadeIn key={index} delay={100 + index * 100}>
-                <Card className="border-0 shadow-none h-full">
-                  <CardContent className="p-0">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                        <IconComponent className="w-6 h-6 text-gray-800" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-3 font-serif">{service.title}</h3>
-                        <p className="text-muted-foreground leading-relaxed">{service.description}</p>
-                      </div>
+              <Card key={index} className="border-0 shadow-none h-full group hover:transform hover:scale-105 transition-all duration-500">
+                <CardContent className="p-0">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1 group-hover:bg-gray-200 transition-colors duration-300">
+                      <IconComponent className="w-6 h-6 text-gray-800 group-hover:scale-110 transition-transform duration-300" />
                     </div>
-                  </CardContent>
-                </Card>
-              </FadeIn>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold mb-3 font-serif group-hover:text-accent transition-colors duration-300">{service.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">{service.description}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             );
           })}
-        </div>
+        </StaggeredContainer>
       </div>
     </section>
   );
