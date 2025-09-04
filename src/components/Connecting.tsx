@@ -9,8 +9,8 @@ interface ConnectingProps {
 
 const Connecting: React.FC<ConnectingProps> = ({ className }) => {
   const founderTypes = [
-    "Female executives, researchers, business owners",
-    "First-time founders with significant experience outside tech (corporate, business owners)"
+    "Kvinnliga chefer, forskare, företagsägare",
+    "Förstagångsgrundare med betydande erfarenhet utanför teknik (företag, företagsägare)"
   ];
 
   return (
@@ -18,11 +18,11 @@ const Connecting: React.FC<ConnectingProps> = ({ className }) => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-12 text-center">Connecting</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-12 text-center">Kopplingar</h2>
           </FadeIn>
           
           <FadeIn delay={100}>
-            <h3 className="text-xl font-medium mb-6 text-center">Types of potential founders</h3>
+            <h3 className="text-xl font-medium mb-6 text-center">Typer av potentiella grundare</h3>
           </FadeIn>
           
           <div className="space-y-4 mb-16">

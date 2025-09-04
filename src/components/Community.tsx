@@ -11,12 +11,12 @@ interface CommunityProps {
 const Community: React.FC<CommunityProps> = ({ className }) => {
   const pillars = [
     {
-      title: "Community",
-      description: "Community before investing - connecting promising entrepreneurs with dedicated events"
+      title: "Gemenskap",
+      description: "Gemenskap före investering - koppla samman lovande entreprenörer med dedikerade evenemang"
     },
     {
       title: "Media",
-      description: "Media + content to build the narrative around technology and diverse teams - and help them build momentum"
+      description: "Media + innehåll för att bygga berättelsen kring teknik och mångfaldiga team - och hjälpa dem bygga momentum"
     }
   ];
 
@@ -25,13 +25,13 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Community and Media</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Gemenskap och Media</h2>
           </FadeIn>
           
           <FadeIn delay={100}>
             <p className="text-xl text-center mb-12">
-              We want to unlock new diverse team formation by bringing the powers of community and media.
-              With media and community events, we will be connecting with future entrepreneurs earlier.
+              Vi vill frigöra ny mångfaldig teambildning genom att samla kraften från gemenskap och media.
+              Med media och gemenskapsevenemang kommer vi att koppla samman med framtida entreprenörer tidigare.
             </p>
           </FadeIn>
         </div>

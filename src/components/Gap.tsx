@@ -16,9 +16,9 @@ const Gap: React.FC<GapProps> = ({ className }) => {
   const [email, setEmail] = useState('');
   
   const messages = [
-    "List of top 50 active Baltic early stage VCs",
-    "All Baltic female founders who raised capital 2024",
-    "AI-native Baltic startups that secured funding this year"
+    "Lista över de 50 mest aktiva baltiska tidiga VC:erna",
+    "Alla baltiska kvinnliga grundare som tagit in kapital 2024",
+    "AI-natives baltiska startups som säkrat finansiering i år"
   ];
   
   React.useEffect(() => {
@@ -42,23 +42,23 @@ const Gap: React.FC<GapProps> = ({ className }) => {
     if (email) {
       console.log('Subscribing email:', email);
       // Here you would typically send this to a backend
-      alert(`Thanks for subscribing with ${email}!`);
+      alert(`Tack för att du prenumererar med ${email}!`);
       setEmail('');
     }
   };
 
   const statistics = [
     {
-      title: "Stagnant Growth",
-      description: "Number of early stage rounds is not growing in the Baltics since 2021"
+      title: "Stillastående Tillväxt",
+      description: "Antalet tidiga finansieringsrundor växer inte i Baltikum sedan 2021"
     },
     {
-      title: "Limited Ecosystem",
-      description: "Total number of startups in Lithuania is stagnant for more than 5 years ~ 800"
+      title: "Begränsat Ekosystem",
+      description: "Totala antalet startups i Litauen har stått stilla i mer än 5 år ~ 800"
     },
     {
-      title: "Funding Inequality",
-      description: "90% of VC funding still goes to repeat founders and traditional tech backgrounds"
+      title: "Finansieringsobalans",
+      description: "90% av VC-finansiering går fortfarande till återkommande grundare och traditionella teknikbakgrunder"
     }
   ];
 
@@ -67,12 +67,12 @@ const Gap: React.FC<GapProps> = ({ className }) => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">The Gap</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Gapet</h2>
           </FadeIn>
           
           <FadeIn delay={100}>
             <p className="text-xl text-center mb-8">
-              Narrow founder pipeline - missed opportunities, slow growth
+              Smal grundarpipeline - missade möjligheter, långsam tillväxt
             </p>
           </FadeIn>
         </div>
@@ -105,7 +105,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
               {/* Centered newsletter box overlaid on the image */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-white/90 backdrop-blur-sm p-8 rounded-lg shadow-md max-w-md w-full mx-4">
-                  <h3 className="text-2xl font-serif mb-6 text-center">Subscribe for Updates</h3>
+                  <h3 className="text-2xl font-serif mb-6 text-center">Prenumerera på uppdateringar</h3>
                   
                   <div className="flex justify-center mb-6">
                     <Button 
@@ -124,7 +124,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                   <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
                     <Input 
                       type="email" 
-                      placeholder="Enter your email" 
+                      placeholder="Ange din e-post" 
                       className="text-gray-800 bg-gray-50/80 border-gray-200 focus-visible:ring-gray-500" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -134,7 +134,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                       type="submit" 
                       className="bg-gray-600 hover:bg-gray-700 text-white"
                     >
-                      Subscribe
+                      Prenumerera
                     </Button>
                   </form>
                 </div>

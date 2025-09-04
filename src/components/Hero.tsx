@@ -28,10 +28,10 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
           
           <FadeIn delay={300}>
             <p className="text-lg md:text-xl text-white/90 mb-4">
-              We believe founders with unfair advantages & domain expertise.
+              Vi tror på grundare med orättvisa fördelar och domänexpertis.
             </p>
             <p className="text-lg md:text-xl text-white/90 mb-8">
-              We back diverse teams and overlooked founders. First check, Baltic focus.
+              Vi stödjer mångfaldiga team och förbisedda grundare. Första check, fokus på Baltikum.
             </p>
           </FadeIn>
         </div>

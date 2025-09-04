@@ -134,19 +134,19 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection }) => (
       className="text-sm font-medium hover:text-orangery-500 transition-colors"
       onClick={() => scrollToSection('home')}
     >
-      Home
+      Hem
     </button>
     <button 
       className="text-sm font-medium hover:text-orangery-500 transition-colors"
       onClick={() => scrollToSection('thesis')}
     >
-      Thesis
+      Vårt synsätt
     </button>
     <button 
       className="text-sm font-medium hover:text-orangery-500 transition-colors"
       onClick={() => scrollToSection('investment')}
     >
-      Investment
+      Investering
     </button>
   </>
 );

@@ -11,12 +11,12 @@ interface InvestmentApproachProps {
 const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className }) => {
   const investmentTiers = [
     {
-      title: "Pre-Seed Accelerator Fund",
-      description: "€30K–€150K tickets, with teams participating in our 16-week acceleration program focused on validation and early traction."
+      title: "Pre-Seed Acceleratorfond",
+      description: "€30K–€150K biljetter, med team som deltar i vårt 16-veckors accelerationsprogram fokuserat på validering och tidig dragkraft."
     },
     {
-      title: "Seed Fund",
-      description: "€200K–€400K investments in 15+ startups to support scaling, market expansion, and team growth, with follow-on capital available."
+      title: "Seed-fond",
+      description: "€200K–€400K investeringar i 15+ startups för att stödja uppskalning, marknadsexpansion och teamtillväxt, med uppföljningskapital tillgängligt."
     }
   ];
 
@@ -25,11 +25,11 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className }) =>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Investment Approach</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Investeringsmetod</h2>
           </FadeIn>
           <FadeIn delay={100}>
             <p className="text-lg text-center text-muted-foreground mb-12">
-              We invest sector-agnostically in pre-seed and seed stage in companies run by overlooked founders - such as gender-diverse teams, academic researchers, business owners, and corporate professionals transitioning into tech entrepreneurship. Our thesis is that tremendous untapped talent in these categories can yield high-impact startups if given early support. We believe in domain expertise and unfair advantages these founders bring.
+              Vi investerar sektorsoberoende i pre-seed och seed-stadiet i företag som drivs av förbisedda grundare - såsom könsmångfaldiga team, akademiska forskare, företagsägare och företagsproffs som övergår till teknikentreprenörskap. Vår tes är att enorm outnyttjad talang i dessa kategorier kan ge upphov till högeffektiva startups om de ges tidigt stöd. Vi tror på domänexpertis och de orättvisa fördelar dessa grundare tillför.
             </p>
           </FadeIn>
         </div>
@@ -43,12 +43,12 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className }) =>
                   <p className="text-muted-foreground mb-4">{tier.description}</p>
                   {index === 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      <p className="text-sm font-medium">16-week acceleration program</p>
+                      <p className="text-sm font-medium">16-veckors accelerationsprogram</p>
                     </div>
                   )}
                   {index === 1 && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      <p className="text-sm font-medium">Follow-on capital available</p>
+                      <p className="text-sm font-medium">Uppföljningskapital tillgängligt</p>
                     </div>
                   )}
                 </CardContent>
