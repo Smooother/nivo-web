@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Manifesto from '@/components/Manifesto';
 import Services from '@/components/Services';
+import Entrepreneurs from '@/components/Entrepreneurs';
 import About from '@/components/About';
 import Community from '@/components/Community';
 import Footer from '@/components/Footer';
@@ -43,6 +44,7 @@ const Index = () => {
       <Hero />
       <Manifesto id="about-nivo" />
       <Services id="services" />
+      <Entrepreneurs id="entrepreneurs" />
       <About id="team" />
       <Community />
       <Footer />
