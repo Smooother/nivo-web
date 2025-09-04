@@ -49,13 +49,16 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <NavLink 
           to="/" 
-          className="text-xl font-serif font-medium tracking-tight transition-opacity hover:opacity-80"
+          className={cn(
+            "text-xl font-serif font-medium tracking-tight transition-all duration-300 hover:opacity-80",
+            isScrolled ? "text-foreground" : "text-white"
+          )}
         >
           Nivo
         </NavLink>
         
         <div className="hidden md:flex items-center space-x-8">
-          <NavLinks scrollToSection={scrollToSection} />
+          <NavLinks scrollToSection={scrollToSection} isScrolled={isScrolled} />
         </div>
         
         <button 
@@ -67,9 +70,9 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             "block w-6 transition-all duration-300",
             isMobileMenuOpen ? "opacity-0" : "opacity-100"
           )}>
-            <span className="block w-6 h-0.5 bg-foreground mb-1.5" />
-            <span className="block w-6 h-0.5 bg-foreground mb-1.5" />
-            <span className="block w-4 h-0.5 bg-foreground" />
+            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-white")} />
+            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-white")} />
+            <span className={cn("block w-4 h-0.5", isScrolled ? "bg-foreground" : "bg-white")} />
           </span>
         </button>
       </div>
@@ -144,9 +147,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
 
 interface NavLinksProps {
   scrollToSection: (id: string) => void;
+  isScrolled: boolean;
 }
 
-const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection }) => (
+const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
   <>
     <button 
       className="text-sm font-medium hover:text-orangery-500 transition-colors"
@@ -155,25 +159,37 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection }) => (
       Hem
     </button>
     <button 
-      className="text-sm font-medium hover:text-accent transition-colors"
+      className={cn(
+        "text-sm font-medium transition-colors",
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+      )}
       onClick={() => scrollToSection('about-nivo')}
     >
       Om Nivo
     </button>
     <button 
-      className="text-sm font-medium hover:text-accent transition-colors"
+      className={cn(
+        "text-sm font-medium transition-colors",
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+      )}
       onClick={() => scrollToSection('approach')}
     >
       Tillvägagångssätt
     </button>
     <button 
-      className="text-sm font-medium hover:text-accent transition-colors"
+      className={cn(
+        "text-sm font-medium transition-colors",
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+      )}
       onClick={() => scrollToSection('team')}
     >
       Team
     </button>
     <button 
-      className="text-sm font-medium hover:text-accent transition-colors"
+      className={cn(
+        "text-sm font-medium transition-colors",
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+      )}
       onClick={() => scrollToSection('contact')}
     >
       Kontakt
