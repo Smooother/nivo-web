@@ -32,7 +32,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
         <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <Link to="/" className="text-xl font-serif font-medium tracking-tight">
-              Project Nico
+              Nivo
             </Link>
           </div>
           
@@ -44,21 +44,33 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
               Hem
             </button>
             <button
-              onClick={() => scrollToSection('thesis')} 
-              className="text-sm hover:text-orangery-500 transition-colors"
+              onClick={() => scrollToSection('about-nivo')} 
+              className="text-sm hover:text-accent transition-colors"
             >
-              Vårt synsätt
+              Om Nivo
             </button>
             <button
-              onClick={() => scrollToSection('investment')} 
-              className="text-sm hover:text-orangery-500 transition-colors"
+              onClick={() => scrollToSection('approach')} 
+              className="text-sm hover:text-accent transition-colors"
             >
-              Våra tjänster
+              Tillvägagångssätt
+            </button>
+            <button
+              onClick={() => scrollToSection('team')} 
+              className="text-sm hover:text-accent transition-colors"
+            >
+              Team
+            </button>
+            <button
+              onClick={() => scrollToSection('contact')} 
+              className="text-sm hover:text-accent transition-colors"
+            >
+              Kontakt
             </button>
           </div>
           
           <div className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Project Nico. Alla rättigheter förbehållna.
+            &copy; {new Date().getFullYear()} Nivo. Alla rättigheter förbehållna.
           </div>
         </div>
       </div>

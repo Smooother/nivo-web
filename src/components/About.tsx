@@ -5,25 +5,26 @@ import FadeIn from './animations/FadeIn';
 
 interface AboutProps {
   className?: string;
+  id?: string;
 }
 
-const About: React.FC<AboutProps> = ({ className }) => {
+const About: React.FC<AboutProps> = ({ className, id }) => {
   return (
-    <section id="about" className={cn('py-20 md:py-32 bg-gray-50', className)}>
+    <section id={id} className={cn('py-20 md:py-32 bg-gray-50', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid md:grid-cols-12 gap-12 md:gap-20 items-start">
           <FadeIn className="md:col-span-5">
             <div className="flex flex-col space-y-6">
               <div>
-                <span className="text-sm md:text-base font-medium text-orangery-500 mb-2 inline-block">Om oss</span>
-                <h2 className="text-3xl md:text-5xl font-serif font-medium tracking-tight mb-6">Med djup erfarenhet driver Project Nico hållbar tillväxt</h2>
+                <span className="text-sm md:text-base font-medium text-accent mb-2 inline-block">Om Nivo</span>
+                <h2 className="text-3xl md:text-5xl font-serif font-medium tracking-tight mb-6">Ett team av erfarna företagsbyggare</h2>
               </div>
               
               <p className="text-lg text-muted-foreground">
-                Vi är ett team med omfattande erfarenhet inom entreprenörskap, investeringar och företagsledning som arbetar med företagare för att skapa hållbara och konkurrenskraftiga företag.
+                Bakom Nivo står ett team med gedigen erfarenhet från förvärv, företagsledning och utveckling av framgångsrika verksamheter. Vi förstår både möjligheterna och utmaningarna med att bygga företagsgrupper - eftersom vi själva har varit där.
               </p>
               <p className="text-lg text-muted-foreground">
-                Med erfarenhet från att ha byggt några av Sveriges mest lönsamma företag, har vi djup förståelse för vad som skapar framgång. Det handlar om att stödja målmedvetna entreprenörer som har produkter som möter marknadens behov och förmåga att anpassa sig till en snabbt föränderlig omvärld.
+                Vår styrka ligger i kombinationen av strategisk överblick och operativ fördjupning. Vi arbetar hands-on med våra portföljbolag och ser oss som partners snarare än enbart investerare.
               </p>
             </div>
           </FadeIn>

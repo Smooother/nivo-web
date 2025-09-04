@@ -43,11 +43,9 @@ const Index = () => {
     <main className="relative">
       <Header />
       <Hero />
-      <Manifesto />
-      <Gap />
-      <FoundersInSearch />
-      <InvestmentApproach />
-      <About />
+      <Manifesto id="about-nivo" />
+      <InvestmentApproach id="approach" />
+      <About id="team" />
       <Community />
       <Footer />
     </main>

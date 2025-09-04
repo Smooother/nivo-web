@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           to="/" 
           className="text-xl font-serif font-medium tracking-tight transition-opacity hover:opacity-80"
         >
-          Project Nico
+          Nivo
         </NavLink>
         
         <div className="hidden md:flex items-center space-x-8">
@@ -101,22 +101,40 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             Hem
           </NavLink>
           <button 
-            className="text-left hover:text-orangery-500 transition-colors"
+            className="text-left hover:text-accent transition-colors"
             onClick={() => {
-              scrollToSection('thesis');
+              scrollToSection('about-nivo');
               setIsMobileMenuOpen(false);
             }}
           >
-            Vårt synsätt
+            Om Nivo
           </button>
           <button 
-            className="text-left hover:text-orangery-500 transition-colors"
+            className="text-left hover:text-accent transition-colors"
             onClick={() => {
-              scrollToSection('investment');
+              scrollToSection('approach');
               setIsMobileMenuOpen(false);
             }}
           >
-            Våra tjänster
+            Tillvägagångssätt
+          </button>
+          <button 
+            className="text-left hover:text-accent transition-colors"
+            onClick={() => {
+              scrollToSection('team');
+              setIsMobileMenuOpen(false);
+            }}
+          >
+            Team
+          </button>
+          <button 
+            className="text-left hover:text-accent transition-colors"
+            onClick={() => {
+              scrollToSection('contact');
+              setIsMobileMenuOpen(false);
+            }}
+          >
+            Kontakt
           </button>
         </nav>
       </div>
@@ -137,16 +155,28 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection }) => (
       Hem
     </button>
     <button 
-      className="text-sm font-medium hover:text-orangery-500 transition-colors"
-      onClick={() => scrollToSection('thesis')}
+      className="text-sm font-medium hover:text-accent transition-colors"
+      onClick={() => scrollToSection('about-nivo')}
     >
-      Vårt synsätt
+      Om Nivo
     </button>
     <button 
-      className="text-sm font-medium hover:text-orangery-500 transition-colors"
-      onClick={() => scrollToSection('investment')}
+      className="text-sm font-medium hover:text-accent transition-colors"
+      onClick={() => scrollToSection('approach')}
     >
-      Våra tjänster
+      Tillvägagångssätt
+    </button>
+    <button 
+      className="text-sm font-medium hover:text-accent transition-colors"
+      onClick={() => scrollToSection('team')}
+    >
+      Team
+    </button>
+    <button 
+      className="text-sm font-medium hover:text-accent transition-colors"
+      onClick={() => scrollToSection('contact')}
+    >
+      Kontakt
     </button>
   </>
 );
