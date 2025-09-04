@@ -34,11 +34,6 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
             </p>
           </FadeIn>
           
-          <FadeIn delay={900} duration={700} scale>
-            <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-4 rounded-md font-medium text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg">
-              Börja samtalet
-            </button>
-          </FadeIn>
         </div>
       </div>
     </section>
