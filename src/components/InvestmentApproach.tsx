@@ -11,12 +11,20 @@ interface InvestmentApproachProps {
 const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className }) => {
   const investmentTiers = [
     {
-      title: "Pre-Seed Acceleratorfond",
-      description: "€30K–€150K biljetter, med team som deltar i vårt 16-veckors accelerationsprogram fokuserat på validering och tidig dragkraft."
+      title: "Operativ Optimering",
+      description: "Vi erbjuder skräddarsytt operationellt stöd efter varje företags specifika behov, med expertis inom processoptimering, kostnadseffektivisering, strategisk utveckling och AI-implementation."
     },
     {
-      title: "Seed-fond",
-      description: "€200K–€400K investeringar i 15+ startups för att stödja uppskalning, marknadsexpansion och teamtillväxt, med uppföljningskapital tillgängligt."
+      title: "Digital Acceleration",
+      description: "Effektivisering genom teknologi är en central del av vår strategi. Vi erbjuder datadrivna marknadsföringstjänster för att accelerera tillväxt genom CRM-, SEO- och konverteringsoptimering."
+    },
+    {
+      title: "Expansionskapital",
+      description: "Långsiktigt och fritt kapital för att driva tillväxt och lönsamhet genom internationell expansion, produktionseffektivisering, produktutveckling och företagsförvärv."
+    },
+    {
+      title: "Rekryteringstjänster",
+      description: "Vårt omfattande nätverk fungerar som en katalysator för tillväxt. Vi erbjuder rekryteringstjänster, från interimslösningar och konsulter till erfarna ledare och styrelsemedlemmar."
     }
   ];
 
@@ -25,32 +33,22 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className }) =>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Investeringsmetod</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Våra tjänster</h2>
           </FadeIn>
           <FadeIn delay={100}>
             <p className="text-lg text-center text-muted-foreground mb-12">
-              Vi investerar sektorsoberoende i pre-seed och seed-stadiet i företag som drivs av förbisedda grundare - såsom könsmångfaldiga team, akademiska forskare, företagsägare och företagsproffs som övergår till teknikentreprenörskap. Vår tes är att enorm outnyttjad talang i dessa kategorier kan ge upphov till högeffektiva startups om de ges tidigt stöd. Vi tror på domänexpertis och de orättvisa fördelar dessa grundare tillför.
+              Vi erbjuder ett komplett stödpaket för tillväxtföretag - från operativ optimering och digital acceleration till expansionskapital och rekryteringstjänster. Alltid med fokus på konkreta resultat och hållbart värdeskapande.
             </p>
           </FadeIn>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
           {investmentTiers.map((tier, index) => (
             <FadeIn key={index} delay={150 + index * 50}>
               <Card className="border-0 shadow-sm h-full">
                 <CardContent className="p-8">
                   <h3 className="text-xl font-medium mb-4 font-serif">{tier.title}</h3>
-                  <p className="text-muted-foreground mb-4">{tier.description}</p>
-                  {index === 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <p className="text-sm font-medium">16-veckors accelerationsprogram</p>
-                    </div>
-                  )}
-                  {index === 1 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <p className="text-sm font-medium">Uppföljningskapital tillgängligt</p>
-                    </div>
-                  )}
+                  <p className="text-muted-foreground">{tier.description}</p>
                 </CardContent>
               </Card>
             </FadeIn>

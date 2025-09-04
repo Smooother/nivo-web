@@ -11,12 +11,12 @@ interface CommunityProps {
 const Community: React.FC<CommunityProps> = ({ className }) => {
   const pillars = [
     {
-      title: "Gemenskap",
-      description: "Gemenskap före investering - koppla samman lovande entreprenörer med dedikerade evenemang"
+      title: "Entreprenöriell erfarenhet",
+      description: "Som företagare har vi själva erfarenheten av att balansera strategiska beslut med de personliga insatser som krävs för framgång."
     },
     {
-      title: "Media",
-      description: "Media + innehåll för att bygga berättelsen kring teknik och mångfaldiga team - och hjälpa dem bygga momentum"
+      title: "Långsiktigt engagemang",
+      description: "Denna kombination av erfarenhet och engagemang ger oss en unik förståelse för de dagliga beslut som formar långsiktig tillväxt, samtidigt som vi vårdar den entreprenöriella andan som är avgörande för att lyckas."
     }
   ];
 
@@ -25,13 +25,12 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Gemenskap och Media</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Vårt team</h2>
           </FadeIn>
           
           <FadeIn delay={100}>
             <p className="text-xl text-center mb-12">
-              Vi vill frigöra ny mångfaldig teambildning genom att samla kraften från gemenskap och media.
-              Med media och gemenskapsevenemang kommer vi att koppla samman med framtida entreprenörer tidigare.
+              Project Nico är ett engagerat team av erfarna företagare och investerare med djup insikt i vad som krävs för att bygga och expandera framgångsrika företag. Vår filosofi grundar sig på att skapa långsiktiga partnerskap, där framgång mäts i hållbara och varaktiga resultat.
             </p>
           </FadeIn>
         </div>

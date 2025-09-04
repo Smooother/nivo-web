@@ -22,16 +22,16 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
         <div className="max-w-3xl mx-auto text-center">
           <FadeIn delay={200}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium tracking-tight text-white leading-tight mb-6">
-              Orangery Ventures
+              Project Nico
             </h1>
           </FadeIn>
           
           <FadeIn delay={300}>
             <p className="text-lg md:text-xl text-white/90 mb-4">
-              Vi tror på grundare med orättvisa fördelar och domänexpertis.
+              Partnerskap som driver framgång - tillväxt som består
             </p>
             <p className="text-lg md:text-xl text-white/90 mb-8">
-              Vi stödjer mångfaldiga team och förbisedda grundare. Första check, fokus på Baltikum.
+              Vi är operationellt aktiva investerare i svenska bolag som vill ta nästa steg på sin tillväxtresa.
             </p>
           </FadeIn>
         </div>

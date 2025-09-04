@@ -16,9 +16,9 @@ const Gap: React.FC<GapProps> = ({ className }) => {
   const [email, setEmail] = useState('');
   
   const messages = [
-    "Lista över de 50 mest aktiva baltiska tidiga VC:erna",
-    "Alla baltiska kvinnliga grundare som tagit in kapital 2024",
-    "AI-natives baltiska startups som säkrat finansiering i år"
+    "Vill du diskutera framtida projekt eller möjligheter?",
+    "Är du redo att ta nästa steg på din tillväxtresa?",
+    "Låt oss utforska hur vi kan skapa värde tillsammans"
   ];
   
   React.useEffect(() => {
@@ -42,23 +42,23 @@ const Gap: React.FC<GapProps> = ({ className }) => {
     if (email) {
       console.log('Subscribing email:', email);
       // Here you would typically send this to a backend
-      alert(`Tack för att du prenumererar med ${email}!`);
+      alert(`Tack för ditt meddelande! Vi hör av oss till ${email} snart.`);
       setEmail('');
     }
   };
 
   const statistics = [
     {
-      title: "Stillastående Tillväxt",
-      description: "Antalet tidiga finansieringsrundor växer inte i Baltikum sedan 2021"
+      title: "Tillväxtfokus",
+      description: "Vi fokuserar på konkreta resultat och hållbart värdeskapande för svenska tillväxtföretag"
     },
     {
-      title: "Begränsat Ekosystem",
-      description: "Totala antalet startups i Litauen har stått stilla i mer än 5 år ~ 800"
+      title: "Operativt engagemang",
+      description: "Genom operationellt stöd skapar vi värde bortom traditionell kapitalinvestering"
     },
     {
-      title: "Finansieringsobalans",
-      description: "90% av VC-finansiering går fortfarande till återkommande grundare och traditionella teknikbakgrunder"
+      title: "Långsiktiga partnerskap",
+      description: "Vår filosofi bygger på att skapa partnerskap som varar och framgångar som står sig över tid"
     }
   ];
 
@@ -67,12 +67,12 @@ const Gap: React.FC<GapProps> = ({ className }) => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Gapet</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Låt oss diskutera</h2>
           </FadeIn>
           
           <FadeIn delay={100}>
             <p className="text-xl text-center mb-8">
-              Smal grundarpipeline - missade möjligheter, långsam tillväxt
+              Vi på Project Nico är ständigt på jakt efter spännande samarbeten och nya möjligheter
             </p>
           </FadeIn>
         </div>
@@ -105,7 +105,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
               {/* Centered newsletter box overlaid on the image */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-white/90 backdrop-blur-sm p-8 rounded-lg shadow-md max-w-md w-full mx-4">
-                  <h3 className="text-2xl font-serif mb-6 text-center">Prenumerera på uppdateringar</h3>
+                  <h3 className="text-2xl font-serif mb-6 text-center">Kontakta oss</h3>
                   
                   <div className="flex justify-center mb-6">
                     <Button 
@@ -124,7 +124,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                   <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
                     <Input 
                       type="email" 
-                      placeholder="Ange din e-post" 
+                      placeholder="Ange din e-post för kontakt" 
                       className="text-gray-800 bg-gray-50/80 border-gray-200 focus-visible:ring-gray-500" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -134,7 +134,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                       type="submit" 
                       className="bg-gray-600 hover:bg-gray-700 text-white"
                     >
-                      Prenumerera
+                      Skicka
                     </Button>
                   </form>
                 </div>

@@ -32,7 +32,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
         <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <Link to="/" className="text-xl font-serif font-medium tracking-tight">
-              Orangery Ventures
+              Project Nico
             </Link>
           </div>
           
@@ -53,12 +53,12 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
               onClick={() => scrollToSection('investment')} 
               className="text-sm hover:text-orangery-500 transition-colors"
             >
-              Investering
+              Våra tjänster
             </button>
           </div>
           
           <div className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Orangery Ventures. All rights reserved.
+            &copy; {new Date().getFullYear()} Project Nico. Alla rättigheter förbehållna.
           </div>
         </div>
       </div>

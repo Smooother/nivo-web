@@ -16,14 +16,14 @@ const About: React.FC<AboutProps> = ({ className }) => {
             <div className="flex flex-col space-y-6">
               <div>
                 <span className="text-sm md:text-base font-medium text-orangery-500 mb-2 inline-block">Om oss</span>
-                <h2 className="text-3xl md:text-5xl font-serif font-medium tracking-tight mb-6">Vi startade 2025 med ett enda uppdrag</h2>
+                <h2 className="text-3xl md:text-5xl font-serif font-medium tracking-tight mb-6">Med djup erfarenhet driver Project Nico hållbar tillväxt</h2>
               </div>
               
               <p className="text-lg text-muted-foreground">
-                Att föra in ett nytt perspektiv i det baltiska riskkapitalekosystemet.
+                Vi är ett team med omfattande erfarenhet inom entreprenörskap, investeringar och företagsledning som arbetar med företagare för att skapa hållbara och konkurrenskraftiga företag.
               </p>
               <p className="text-lg text-muted-foreground">
-                Vi är grundardrivna och omfamnar mångfald. Orangery bidrar med ett inkluderande förhållningssätt till riskkapital, inbjuder och inspirerar förstagångsgrundare att pröva teknikentreprenörskap.
+                Med erfarenhet från att ha byggt några av Sveriges mest lönsamma företag, har vi djup förståelse för vad som skapar framgång. Det handlar om att stödja målmedvetna entreprenörer som har produkter som möter marknadens behov och förmåga att anpassa sig till en snabbt föränderlig omvärld.
               </p>
             </div>
           </FadeIn>
