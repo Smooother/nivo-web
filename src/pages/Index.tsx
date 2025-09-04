@@ -42,9 +42,9 @@ const Index = () => {
     <main className="relative">
       <Header />
       <Hero />
+      <Entrepreneurs id="entrepreneurs" />
       <Manifesto id="about-nivo" />
       <Services id="services" />
-      <Entrepreneurs id="entrepreneurs" />
       <About id="team" />
       <Community />
       <Footer />
