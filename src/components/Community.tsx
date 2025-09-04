@@ -18,7 +18,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
               Är ditt företag redo för nästa steg?
             </h2>
             <p className="text-lg text-secondary-foreground/80 mb-12">
-              Söker du långsiktigt kapital och operationell expertis för att ta ditt företag till nästa nivå? Låt oss diskutera hur vi kan skapa framgång tillsammans.
+              Nivo är ständigt på jakt efter kvalitetsföretag och intressanta förvärvsmöjligheter. Om du är företagare som funderar på nästa steg för ditt bolag, eller om du är branschexpert med insikter om potentiella förvärv, tveka inte att höra av dig! Vi ser fram emot att höra från dig och utforska hur vi tillsammans kan utveckla framgångsrika verksamheter.
             </p>
           </div>
         </FadeIn>
