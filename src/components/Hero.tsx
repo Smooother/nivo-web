@@ -22,19 +22,19 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
         <div className="max-w-3xl mx-auto text-center">
           <FadeIn delay={200}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white leading-tight mb-6">
-              Bygger framtidens företagsgrupper - ett förvärv i taget
+              Partnerskap som varar - framgång som består
             </h1>
           </FadeIn>
           
           <FadeIn delay={300}>
             <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
-              Vi skapar värde genom strategiska förvärv av etablerade nordiska företag och utvecklar dem tillsammans mot gemensam framgång.
+              Vi är operationellt aktiva investerare i nordiska bolag som vill ta nästa steg på sin tillväxtresa.
             </p>
           </FadeIn>
           
           <FadeIn delay={400}>
             <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-4 rounded-md font-medium text-lg transition-colors">
-              Utforska möjligheter
+              Börja samtalet
             </button>
           </FadeIn>
         </div>

@@ -93,16 +93,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </button>
         
         <nav className="flex flex-col space-y-6 text-lg">
-          <NavLink 
-            to="/" 
-            className={({ isActive }) => cn(
-              "hover:text-orangery-500 transition-colors",
-              isActive && "text-orangery-500 font-semibold"
-            )}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Hem
-          </NavLink>
           <button 
             className="text-left hover:text-accent transition-colors"
             onClick={() => {
@@ -110,16 +100,16 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
               setIsMobileMenuOpen(false);
             }}
           >
-            Om Nivo
+            Om oss
           </button>
           <button 
             className="text-left hover:text-accent transition-colors"
             onClick={() => {
-              scrollToSection('approach');
+              scrollToSection('services');
               setIsMobileMenuOpen(false);
             }}
           >
-            Tillvägagångssätt
+            Tjänster
           </button>
           <button 
             className="text-left hover:text-accent transition-colors"
@@ -153,28 +143,22 @@ interface NavLinksProps {
 const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
   <>
     <button 
-      className="text-sm font-medium hover:text-orangery-500 transition-colors"
-      onClick={() => scrollToSection('home')}
-    >
-      Hem
-    </button>
-    <button 
       className={cn(
         "text-sm font-medium transition-colors",
         isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
       )}
       onClick={() => scrollToSection('about-nivo')}
     >
-      Om Nivo
+      Om oss
     </button>
     <button 
       className={cn(
         "text-sm font-medium transition-colors",
         isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
       )}
-      onClick={() => scrollToSection('approach')}
+      onClick={() => scrollToSection('services')}
     >
-      Tillvägagångssätt
+      Tjänster
     </button>
     <button 
       className={cn(

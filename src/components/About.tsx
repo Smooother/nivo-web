@@ -16,15 +16,15 @@ const About: React.FC<AboutProps> = ({ className, id }) => {
           <FadeIn className="md:col-span-5">
             <div className="flex flex-col space-y-6">
               <div>
-                <span className="text-sm md:text-base font-medium text-accent mb-2 inline-block">Om Nivo</span>
+                <span className="text-sm md:text-base font-medium text-accent mb-2 inline-block">Vårt team</span>
                 <h2 className="text-3xl md:text-5xl font-serif font-medium tracking-tight mb-6">Ett team av erfarna företagsbyggare</h2>
               </div>
               
               <p className="text-lg text-muted-foreground">
-                Bakom Nivo står ett team med gedigen erfarenhet från förvärv, företagsledning och utveckling av framgångsrika verksamheter. Vi förstår både möjligheterna och utmaningarna med att bygga företagsgrupper - eftersom vi själva har varit där.
+                Nivo erbjuder nordiska bolag en möjlighet att accelerera tillväxt och lönsamhet genom ett operationellt engagerat team och långsiktigt kapital. Alltid med fokus på konkreta resultat och hållbart värdeskapande.
               </p>
               <p className="text-lg text-muted-foreground">
-                Vår styrka ligger i kombinationen av strategisk överblick och operativ fördjupning. Vi arbetar hands-on med våra portföljbolag och ser oss som partners snarare än enbart investerare.
+                Vi värdesätter schysst företagande, enkelhet och samarbeten med människor som delar våra värderingar. Vår filosofi är att bygga partnerskap som varar och skapa framgångar som står sig över tid, med en stark grund i våra gemensamma ambitioner och långsiktiga visioner.
               </p>
             </div>
           </FadeIn>

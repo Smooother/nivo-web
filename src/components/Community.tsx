@@ -18,7 +18,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
               Är ditt företag redo för nästa steg?
             </h2>
             <p className="text-lg text-secondary-foreground/80 mb-12">
-              Vi söker ständigt efter nya möjligheter och intressanta samarbeten. Om du driver ett etablerat nordiskt företag och funderar på framtiden, eller om du är en branschexpert som vill diskutera möjligheter, hör gärna av dig.
+              Söker du långsiktigt kapital och operationell expertis för att ta ditt företag till nästa nivå? Låt oss diskutera hur vi kan skapa framgång tillsammans.
             </p>
           </div>
         </FadeIn>

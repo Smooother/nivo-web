@@ -38,22 +38,16 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
           
           <div className="flex space-x-6 mb-4 md:mb-0">
             <button
-              onClick={() => scrollToSection('home')} 
-              className="text-sm hover:text-orangery-500 transition-colors"
-            >
-              Hem
-            </button>
-            <button
               onClick={() => scrollToSection('about-nivo')} 
               className="text-sm hover:text-accent transition-colors"
             >
-              Om Nivo
+              Om oss
             </button>
             <button
-              onClick={() => scrollToSection('approach')} 
+              onClick={() => scrollToSection('services')} 
               className="text-sm hover:text-accent transition-colors"
             >
-              Tillvägagångssätt
+              Tjänster
             </button>
             <button
               onClick={() => scrollToSection('team')} 
