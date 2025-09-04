@@ -24,13 +24,13 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
         <div className="max-w-3xl mx-auto text-center">
           <TextReveal delay={200} duration={1000} stagger>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white leading-tight mb-6">
-              Partnerskap som varar - framgång som består
+              Förvärv som skapar värde - tillväxt som består
             </h1>
           </TextReveal>
           
           <FadeIn delay={600} duration={900} direction="up">
             <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
-              Vi är operationellt aktiva investerare i nordiska bolag som vill ta nästa steg på sin tillväxtresa.
+              Vi förvärvar och utvecklar nordiska företag genom operationell excellens och modern teknologi.
             </p>
           </FadeIn>
           
