@@ -26,19 +26,13 @@ const Entrepreneurs: React.FC<EntrepreneursProps> = ({ className, id }) => {
           <div className="space-y-8">
             <FadeIn delay={400} duration={900} direction="up">
               <p className="text-lg md:text-xl leading-relaxed text-muted-foreground">
-                Entreprenöriella verksamheter är ryggraden i nordiska lokalsamhällen och skapar arbetstillfällen och ekonomisk tillväxt. Många framgångsrika små och medelstora företag når dock en punkt där de behöver nya resurser och expertis för att ta nästa steg i sin utveckling.
+                Entreprenöriella verksamheter är ryggraden i nordiska lokalsamhällen och skapar arbetstillfällen och ekonomisk tillväxt. Många framgångsrika små och medelstora företag når dock en punkt där de behöver nya resurser och expertis för att ta nästa steg i sin utveckling. Med vårt långsiktiga ägarperspektiv, djup operationell kunskap och avancerad AI-kompetens, strävar Nivo efter att vara den partner som möjliggör denna utveckling.
               </p>
             </FadeIn>
             
             <FadeIn delay={600} duration={900} direction="up">
               <p className="text-lg md:text-xl leading-relaxed text-muted-foreground">
-                Med vårt långsiktiga ägarperspektiv, djup operationell kunskap och avancerad AI-kompetens, strävar Nivo efter att vara den partner som möjliggör denna utveckling.
-              </p>
-            </FadeIn>
-            
-            <FadeIn delay={800} duration={900} direction="up">
-              <p className="text-lg md:text-xl leading-relaxed text-muted-foreground">
-                Genom fokuserade förvärv och systematisk utveckling hjälper vi etablerade nordiska företag att modernisera sina verksamheter och nå sin fulla tillväxtpotential.
+                Genom fokuserade förvärv av marknadsledande företag som genererar stabila kassaflöden och bidrar till positiv samhällsutveckling, hjälper vi etablerade nordiska verksamheter att modernisera sina processer och nå sin fulla tillväxtpotential. Vi söker specifikt efter välskötta företag inom sina respektive segment som redan skapar värde och har potential för ytterligare utveckling genom operationell optimering och teknologisk innovation.
               </p>
             </FadeIn>
           </div>
