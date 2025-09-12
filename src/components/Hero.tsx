@@ -13,17 +13,12 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
     <section className={cn('relative min-h-screen flex items-center overflow-hidden', className)}>
       <ParallaxSection speed={0.3} className="absolute inset-0 -z-10">
         <video 
-          src="/lovable-uploads/your-video.mov" 
+          src="/lovable-uploads/hero-video.mp4" 
           className="w-full h-full object-cover scale-105"
           autoPlay
           muted
           loop
           playsInline
-          ref={(video) => {
-            if (video) {
-              video.playbackRate = 0.5; // Slow motion (0.5x speed)
-            }
-          }}
         />
         <div className="absolute inset-0 bg-black/30"></div>
       </ParallaxSection>
