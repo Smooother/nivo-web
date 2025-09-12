@@ -19,6 +19,9 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
           muted
           loop
           playsInline
+          onError={(e) => console.error('Video error:', e)}
+          onLoadStart={() => console.log('Video load started')}
+          onCanPlay={() => console.log('Video can play')}
         />
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
