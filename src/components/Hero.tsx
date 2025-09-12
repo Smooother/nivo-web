@@ -10,20 +10,20 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ className }) => {
   return (
-    <section className={cn('relative min-h-screen flex items-center overflow-hidden', className)}>
-      <ParallaxSection speed={0.3} className="absolute inset-0 -z-10">
+    <section className={cn('relative w-full overflow-hidden', className)}>
+      <div className="relative w-full">
         <video 
           src="/lovable-uploads/hero-video.mp4" 
-          className="w-full h-full object-cover scale-105"
+          className="w-full h-auto"
           autoPlay
           muted
           loop
           playsInline
         />
         <div className="absolute inset-0 bg-black/30"></div>
-      </ParallaxSection>
+      </div>
       
-      <div className="container mx-auto px-4 md:px-6 py-20 md:py-32 relative z-10 max-w-4xl">
+      <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="max-w-3xl mx-auto text-center">
           <TextReveal delay={200} duration={1000} stagger>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white leading-tight mb-6">
