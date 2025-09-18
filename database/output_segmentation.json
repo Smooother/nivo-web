@@ -1,0 +1,1259 @@
+{
+    "pageProps": {
+        "product": {
+            "id": 1123,
+            "type": "SegmentationDownload",
+            "name": "Allabolag Export",
+            "discountPriceInCent": 99000,
+            "priceInCent": 199000,
+            "vatInPercent": 25,
+            "description": "Exporten är begränsad till 5000 företag",
+            "isSubscription": false,
+            "subscriptionPaymentPlanId": 1,
+            "requiresStrongAuth": false
+        },
+        "limits": {
+            "employees": {
+                "min": 0,
+                "max": 100000
+            },
+            "profit": {
+                "min": -12153147,
+                "max": 87067716
+            },
+            "revenue": {
+                "min": -336604,
+                "max": 302609000
+            }
+        },
+        "companies": [
+            {
+                "companyId": "5590472980",
+                "organisationNumber": "5590472980",
+                "businessUnitId": null,
+                "name": "ÜBB AB",
+                "visitorAddress": {
+                    "addressLine": "Hantverkarvägen 23 d",
+                    "zipCode": "136 44",
+                    "postPlace": "Handen"
+                },
+                "postalAddress": {
+                    "addressLine": "BILXTRA Hantverkarvägen 23 d",
+                    "zipCode": "136 44",
+                    "postPlace": "Handen"
+                },
+                "email": null,
+                "homePage": null,
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Stockholm",
+                    "municipality": "Haninge",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 18.1515176345596,
+                            "ycoordinate": 59.1715994807681
+                        }
+                    ]
+                },
+                "phoneNumbers": null,
+                "marketingProtection": false,
+                "displayName": "ÜBB AB",
+                "naceCategories": [
+                    "45204 Däckservice"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10001228",
+                        "name": "Bilar"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "32348",
+                "profit": "1702",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2023",
+                "foundationYear": "2016",
+                "foundationDate": "14.01.2016",
+                "numberOfEmployees": "8",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Claes Jonas Hoffsten",
+                        "title": "Ordförande",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10650182",
+                        "birthDate": "21.05.1971",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Ingrid Hanna Cerine Hoffsten",
+                        "title": "Verkställande direktör",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13176220",
+                        "birthDate": "23.02.1997",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Claes Olof Hoffsten",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10315850",
+                        "birthDate": "13.07.1976",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Claes Jonas Hoffsten",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10650182",
+                        "birthDate": "21.05.1971",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Ingrid Hanna Cerine Hoffsten",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13176220",
+                        "birthDate": "23.02.1997",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Daniel Willi Olof John",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "14291081",
+                        "birthDate": "29.09.1992",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Carl-Wilhelm Robin Ericsson",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13144856",
+                        "birthDate": "28.04.1987",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Pia Caroline Ståhle",
+                        "title": "Revisorssuppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11124838",
+                        "birthDate": "30.09.1987",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5592919079",
+                "organisationNumber": "5592919079",
+                "businessUnitId": null,
+                "name": "Öö Gård Lantbruk AB",
+                "visitorAddress": {
+                    "addressLine": "Björsäter Öö Gård",
+                    "zipCode": "597 94",
+                    "postPlace": "Åtvidaberg"
+                },
+                "postalAddress": {
+                    "addressLine": "Björsäter Öö Gård",
+                    "zipCode": "597 94",
+                    "postPlace": "Åtvidaberg"
+                },
+                "email": null,
+                "homePage": null,
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Östergötland",
+                    "municipality": "Åtvidaberg",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 15.96741911,
+                            "ycoordinate": 58.34432822
+                        }
+                    ]
+                },
+                "phoneNumbers": null,
+                "marketingProtection": false,
+                "displayName": "Öö Gård Lantbruk AB",
+                "naceCategories": [
+                    "01500 Blandat jordbruk"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10241623",
+                        "name": "Jordbruk"
+                    },
+                    {
+                        "code": "10241628",
+                        "name": "Jordbruk - odling och djurhållning"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "15860",
+                "profit": "1328",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "2020",
+                "foundationDate": "18.12.2020",
+                "numberOfEmployees": "4",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Inga-Britt Maria Karlsson",
+                        "title": "Ordförande",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12658619",
+                        "birthDate": "05.02.1956",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Björn Gunnar Henriksson",
+                        "title": "Verkställande direktör",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12302523",
+                        "birthDate": "06.11.1954",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Inga-Britt Maria Karlsson",
+                        "title": "Vice verkställande direktör",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12658619",
+                        "birthDate": "05.02.1956",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Björn Gunnar Henriksson",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12302523",
+                        "birthDate": "06.11.1954",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Inga-Britt Maria Karlsson",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12658619",
+                        "birthDate": "05.02.1956",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Britta Edith Linnea Henriksson",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13350251",
+                        "birthDate": "03.10.1996",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Daniel Kenneth Önell",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13037559",
+                        "birthDate": "21.04.1979",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5569771651",
+                "organisationNumber": "5569771651",
+                "businessUnitId": null,
+                "name": "Özpa Gruppen AB",
+                "visitorAddress": null,
+                "postalAddress": {
+                    "addressLine": "özsoy Kakelstigen 37",
+                    "zipCode": "196 38",
+                    "postPlace": "Kungsängen"
+                },
+                "email": null,
+                "homePage": null,
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Stockholm",
+                    "municipality": "Upplands-Bro",
+                    "coordinates": []
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "0736202610",
+                    "mobilePhone": null,
+                    "faxNumber": null
+                },
+                "marketingProtection": false,
+                "displayName": "Özpa Gruppen AB",
+                "naceCategories": [
+                    "49410 Vägtransport, godstrafik"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10007803",
+                        "name": "Transportförmedling"
+                    },
+                    {
+                        "code": "10008687",
+                        "name": "Åkerier"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "60694",
+                "profit": "568",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "2014",
+                "foundationDate": "08.07.2014",
+                "numberOfEmployees": "26",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": "Konkurs inledd",
+                    "statusDate": "2025-02-26"
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Kemal Özsoy",
+                        "title": "Verkställande direktör",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11118339",
+                        "birthDate": "20.02.1987",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Kemal Özsoy",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11118339",
+                        "birthDate": "20.02.1987",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5563971273",
+                "organisationNumber": "5563971273",
+                "businessUnitId": null,
+                "name": "Övägen Lantbruks Aktiebolag",
+                "visitorAddress": {
+                    "addressLine": "Övägen 14",
+                    "zipCode": "294 76",
+                    "postPlace": "Sölvesborg"
+                },
+                "postalAddress": {
+                    "addressLine": "Övägen 14",
+                    "zipCode": "294 76",
+                    "postPlace": "Sölvesborg"
+                },
+                "email": null,
+                "homePage": null,
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Blekinge",
+                    "municipality": "Sölvesborg",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 14.66758861,
+                            "ycoordinate": 56.11577017
+                        }
+                    ]
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "045631057",
+                    "mobilePhone": null,
+                    "faxNumber": null
+                },
+                "marketingProtection": false,
+                "displayName": "Övägen Lantbruks Aktiebolag",
+                "naceCategories": [
+                    "01250 Odling av andra frukter och bär samt nötter"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10241623",
+                        "name": "Jordbruk"
+                    },
+                    {
+                        "code": "10241627",
+                        "name": "Jordbruk - odling"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "55301",
+                "profit": "5898",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "1990",
+                "foundationDate": "23.05.1990",
+                "numberOfEmployees": "7",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [
+                    {
+                        "name": "Revisionsbyrån Andersson & Co i Karlshamn AB",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "companyId": "5567347587"
+                    }
+                ],
+                "personRoles": [
+                    {
+                        "name": "Mats Göran Stefan Gustavsson",
+                        "title": "Ordförande",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10427207",
+                        "birthDate": "01.08.1956",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Bengt Anders Nicklas Nilsson",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10288855",
+                        "birthDate": "12.12.1966",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Mats Göran Stefan Gustavsson",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10427207",
+                        "birthDate": "01.08.1956",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Per-Åke Ingman Nilsson",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12589217",
+                        "birthDate": "22.04.1964",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Ernst Bengt-Åke Nilsson",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10415957",
+                        "birthDate": "10.02.1944",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Per Håkan Joel Nilsson",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13455479",
+                        "birthDate": "11.07.1994",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Carl Johannes Niclas Nilsson",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "13455480",
+                        "birthDate": "11.05.1996",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Jan Christer Persson",
+                        "title": "Huvudansvarig revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10675916",
+                        "birthDate": "02.03.1963",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5565740478",
+                "organisationNumber": "5565740478",
+                "businessUnitId": null,
+                "name": "ÖvreAllt AB",
+                "visitorAddress": {
+                    "addressLine": "Tokarp Södergård",
+                    "zipCode": "556 28",
+                    "postPlace": "Jönköping"
+                },
+                "postalAddress": {
+                    "addressLine": "Tokarp Södergård",
+                    "zipCode": "556 28",
+                    "postPlace": "Jönköping"
+                },
+                "email": null,
+                "homePage": "https://www.ovreallt.se",
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Jönköping",
+                    "municipality": "Jönköping",
+                    "coordinates": []
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "0707506946",
+                    "mobilePhone": null,
+                    "faxNumber": "036-20999"
+                },
+                "marketingProtection": false,
+                "displayName": "ÖvreAllt AB",
+                "naceCategories": [
+                    "49410 Vägtransport, godstrafik",
+                    "10822 Tillverkning av choklad och chokladkonfektyrer"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10004989",
+                        "name": "Livsmedel"
+                    },
+                    {
+                        "code": "10007803",
+                        "name": "Transportförmedling"
+                    },
+                    {
+                        "code": "10008687",
+                        "name": "Åkerier"
+                    },
+                    {
+                        "code": "10241664",
+                        "name": "Livsmedel - tillverkning"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "43975",
+                "profit": "2833",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "1999",
+                "foundationDate": "23.07.1999",
+                "numberOfEmployees": "29",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Lars Henrik Rapp",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10388684",
+                        "birthDate": "05.08.1970",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Maria Christina Lööv",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11416965",
+                        "birthDate": "05.11.1973",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Martin Erik Holger Knuthsson",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10276997",
+                        "birthDate": "22.10.1971",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5563203941",
+                "organisationNumber": "5563203941",
+                "businessUnitId": null,
+                "name": "Övraby Lantbruk AB",
+                "visitorAddress": {
+                    "addressLine": "Övraby 110",
+                    "zipCode": "385 50",
+                    "postPlace": "Söderåkra"
+                },
+                "postalAddress": {
+                    "addressLine": "Övraby 110",
+                    "zipCode": "385 50",
+                    "postPlace": "Söderåkra"
+                },
+                "email": null,
+                "homePage": "https://ovgard.se",
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Kalmar",
+                    "municipality": "Torsås",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 16.05226868,
+                            "ycoordinate": 56.44749358
+                        }
+                    ]
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "048621020",
+                    "mobilePhone": null,
+                    "faxNumber": null
+                },
+                "marketingProtection": false,
+                "displayName": "Övraby Lantbruk AB",
+                "naceCategories": [
+                    "01500 Blandat jordbruk",
+                    "45400 Handel med och service av motorcyklar inklusive reservdelar och tillbehör",
+                    "01610 Service till växtodling",
+                    "46210 Partihandel med spannmål, råtobak, utsäde och djurfoder"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10001228",
+                        "name": "Bilar"
+                    },
+                    {
+                        "code": "10004989",
+                        "name": "Livsmedel"
+                    },
+                    {
+                        "code": "10005397",
+                        "name": "MC, mopeder, skotrar"
+                    },
+                    {
+                        "code": "10008770",
+                        "name": "Lantbruk, lantbrukare"
+                    },
+                    {
+                        "code": "10241596",
+                        "name": "Grossister"
+                    },
+                    {
+                        "code": "10241623",
+                        "name": "Jordbruk"
+                    },
+                    {
+                        "code": "10241624",
+                        "name": "Jordbruk - andra tjänster"
+                    },
+                    {
+                        "code": "10241628",
+                        "name": "Jordbruk - odling och djurhållning"
+                    },
+                    {
+                        "code": "10241683",
+                        "name": "Motorcykel, ATV och mopeder - detaljister"
+                    },
+                    {
+                        "code": "10241734",
+                        "name": "Spannmål, råtobak, utsäde och djurfoder - grossister"
+                    },
+                    {
+                        "code": "10241778",
+                        "name": "Detaljhandel"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "25421",
+                "profit": "2083",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "1988",
+                "foundationDate": "29.02.1988",
+                "numberOfEmployees": "5",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Erik Robert Andreas Övgård",
+                        "title": "Ordförande",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12446356",
+                        "birthDate": "15.02.1990",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Ingela Marie Övgård",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10423945",
+                        "birthDate": "11.04.1962",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Karl-Erik Vilhelm Övgård",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10463257",
+                        "birthDate": "24.11.1953",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Erik Robert Andreas Övgård",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "12446356",
+                        "birthDate": "15.02.1990",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Bruno Roger Tagesson",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10402585",
+                        "birthDate": "15.11.1974",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5569954604",
+                "organisationNumber": "5569954604",
+                "businessUnitId": null,
+                "name": "Överväxeln i Eskilstuna AB",
+                "visitorAddress": {
+                    "addressLine": null,
+                    "zipCode": null,
+                    "postPlace": "Avesta"
+                },
+                "postalAddress": {
+                    "addressLine": "Box 33",
+                    "zipCode": "774 21",
+                    "postPlace": "Avesta"
+                },
+                "email": null,
+                "homePage": null,
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Dalarna",
+                    "municipality": "Avesta",
+                    "coordinates": []
+                },
+                "phoneNumbers": null,
+                "marketingProtection": false,
+                "displayName": "Överväxeln i Eskilstuna AB",
+                "naceCategories": [
+                    "45110 Handel med personbilar och lätta motorfordon",
+                    "68203 Uthyrning och förvaltning av egna eller arrenderade, andra lokaler"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10001228",
+                        "name": "Bilar"
+                    },
+                    {
+                        "code": "10002331",
+                        "name": "Fastighetsbolag, lokaler"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "27605",
+                "profit": "1169",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2023",
+                "foundationYear": "2014",
+                "foundationDate": "11.12.2014",
+                "numberOfEmployees": "0",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Rolf Hugo Landrin",
+                        "title": "Verkställande direktör",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10518848",
+                        "birthDate": "13.05.1951",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Rolf Hugo Landrin",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10518848",
+                        "birthDate": "13.05.1951",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Rolf Rikard Landrin",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11368933",
+                        "birthDate": "26.06.1991",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Thomas Andreas Nielsen",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10638560",
+                        "birthDate": "12.12.1979",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Jenny Ulrika Barksjö Forslund",
+                        "title": "Revisorssuppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10631540",
+                        "birthDate": "25.10.1981",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5566842414",
+                "organisationNumber": "5566842414",
+                "businessUnitId": null,
+                "name": "Övervakningsbutiken On Net Gbg AB",
+                "visitorAddress": {
+                    "addressLine": "Gruvgatan 35 b",
+                    "zipCode": "421 30",
+                    "postPlace": "Västra Frölunda"
+                },
+                "postalAddress": {
+                    "addressLine": "Gruvgatan 35 b",
+                    "zipCode": "421 30",
+                    "postPlace": "Västra Frölunda"
+                },
+                "email": null,
+                "homePage": "https://www.overvakningsbutiken.se",
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Västra Götaland",
+                    "municipality": "Göteborg",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 11.9453798205456,
+                            "ycoordinate": 57.665282097638
+                        }
+                    ]
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "031125600",
+                    "mobilePhone": null,
+                    "faxNumber": null
+                },
+                "marketingProtection": false,
+                "displayName": "Övervakningsbutiken On Net Gbg AB",
+                "naceCategories": [
+                    "46432 Partihandel med ljud- och bildanläggningar samt videoutrustning",
+                    "68202 Uthyrning och förvaltning av egna eller arrenderade industrilokaler"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10002331",
+                        "name": "Fastighetsbolag, lokaler"
+                    },
+                    {
+                        "code": "10006560",
+                        "name": "Radio, TV-programbolag"
+                    },
+                    {
+                        "code": "10241596",
+                        "name": "Grossister"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "22097",
+                "profit": "2394",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "2005",
+                "foundationDate": "01.08.2005",
+                "numberOfEmployees": "7",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Jens Alexander Svärdh",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10416409",
+                        "birthDate": "09.03.1981",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Adam Aliceus",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10271163",
+                        "birthDate": "02.02.1981",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Erik Robert Albertson",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11086871",
+                        "birthDate": "09.04.1979",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5562547421",
+                "organisationNumber": "5562547421",
+                "businessUnitId": null,
+                "name": "Övertorneå Järnhandel Aktiebolag",
+                "visitorAddress": {
+                    "addressLine": "Järnvägsgatan 3",
+                    "zipCode": "957 31",
+                    "postPlace": "Övertorneå"
+                },
+                "postalAddress": {
+                    "addressLine": "Järnvägsgatan 3",
+                    "zipCode": "957 31",
+                    "postPlace": "Övertorneå"
+                },
+                "email": null,
+                "homePage": null,
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Norrbotten",
+                    "municipality": "Övertorneå",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 23.6598126428,
+                            "ycoordinate": 66.3886558885
+                        }
+                    ]
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "092710009",
+                    "mobilePhone": null,
+                    "faxNumber": null
+                },
+                "marketingProtection": false,
+                "displayName": "Övertorneå Järnhandel Aktiebolag",
+                "naceCategories": [
+                    "47522 Specialiserad butikshandel med järn- och VVS-varor"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10008480",
+                        "name": "VVS-arbeten, material och produkter"
+                    },
+                    {
+                        "code": "10241769",
+                        "name": "Butikshandel"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "21991",
+                "profit": "2177",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "1985",
+                "foundationDate": "06.02.1985",
+                "numberOfEmployees": "4",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Krister Axel Ingemar Sandström",
+                        "title": "Ordförande",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10694187",
+                        "birthDate": "28.02.1961",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Lars-Erik Edmund Sandström",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10025164",
+                        "birthDate": "01.11.1957",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Krister Axel Ingemar Sandström",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10694187",
+                        "birthDate": "28.02.1961",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Hans Ingvar Sandström",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10229862",
+                        "birthDate": "23.07.1964",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Monika Cecilia Åström",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10338385",
+                        "birthDate": "16.08.1968",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            },
+            {
+                "companyId": "5568008261",
+                "organisationNumber": "5568008261",
+                "businessUnitId": null,
+                "name": "Överste M's Restaurang AB",
+                "visitorAddress": {
+                    "addressLine": "Stora Torget 8",
+                    "zipCode": "582 19",
+                    "postPlace": "Linköping"
+                },
+                "postalAddress": {
+                    "addressLine": "Stora Torget 8",
+                    "zipCode": "582 19",
+                    "postPlace": "Linköping"
+                },
+                "email": "info@overstemorner.se",
+                "homePage": "https://www.overstemorner.se",
+                "location": {
+                    "countryPart": "Hela Sverige",
+                    "county": "Östergötland",
+                    "municipality": "Linköping",
+                    "coordinates": [
+                        {
+                            "coordinateSystem": "EPSG:4326",
+                            "xcoordinate": 15.6216690779469,
+                            "ycoordinate": 58.4112034675865
+                        }
+                    ]
+                },
+                "phoneNumbers": {
+                    "telephoneNumber": "013310647",
+                    "mobilePhone": null,
+                    "faxNumber": null
+                },
+                "marketingProtection": false,
+                "displayName": "Överste M's Restaurang AB",
+                "naceCategories": [
+                    "56100 Restaurangverksamhet"
+                ],
+                "proffIndustries": [
+                    {
+                        "code": "10006755",
+                        "name": "Restauranger"
+                    }
+                ],
+                "proffNames": [],
+                "revenue": "29421",
+                "profit": "1098",
+                "currency": "SEK",
+                "companyAccountsLastUpdatedDate": "2024",
+                "foundationYear": "2010",
+                "foundationDate": "15.02.2010",
+                "numberOfEmployees": "21",
+                "status": {
+                    "status": "ACTIVE",
+                    "description": null,
+                    "statusDate": null
+                },
+                "companyRoles": [],
+                "personRoles": [
+                    {
+                        "name": "Andreas Adnan Özbek",
+                        "title": "Ledamot",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10707417",
+                        "birthDate": "20.01.1970",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Lars Magnus Westerberg",
+                        "title": "Suppleant",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "10678494",
+                        "birthDate": "12.05.1983",
+                        "businessPerson": true
+                    },
+                    {
+                        "name": "Hans Jakob Furland",
+                        "title": "Revisor",
+                        "elector": null,
+                        "responsibility": null,
+                        "personId": "11302702",
+                        "birthDate": "05.05.1983",
+                        "businessPerson": true
+                    }
+                ],
+                "mainOffice": null,
+                "secretData": null
+            }
+        ],
+        "numberOfHits": 28577,
+        "pagination": {
+            "previous": null,
+            "next": 2,
+            "pageSize": 10,
+            "currentPage": 1,
+            "numberOfAvailablePages": 1000,
+            "nearbyPages": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11
+            ]
+        },
+        "sortOptions": [
+            "companyNameAsc",
+            "naceIndustryName",
+            "numEmployeesAsc",
+            "numEmployeesDesc",
+            "postNumber",
+            "profitAsc",
+            "profitDesc",
+            "registrationDateAsc",
+            "registrationDateDesc",
+            "relevance",
+            "revenueAsc",
+            "revenueDesc"
+        ],
+        "currentSort": "relevance",
+        "filters": {
+            "profit": {
+                "min": 500,
+                "max": 87067716
+            },
+            "revenue": {
+                "min": 15000,
+                "max": 150000
+            },
+            "companyType": [
+                "AB"
+            ]
+        }
+    },
+    "hydrationData": {
+        "appStore": {
+            "site": "allabolag.se",
+            "siteName": "Allabolag.se",
+            "languages": [
+                "sv"
+            ],
+            "defaultLanguage": "sv",
+            "theme": "allabolag",
+            "country": "SE",
+            "defaultDataSource": "UC",
+            "baseUrl": "https://www.allabolag.se",
+            "defaultSEO": {
+                "twitter": {
+                    "handle": "@allabolag"
+                },
+                "noindex": false,
+                "nofollow": false
+            },
+            "recaptchaSiteKey": "6Lcml1IpAAAAAJqIk107_blbYBC9dboXoOMX66xW",
+            "googleMapsApiKey": "AIzaSyBTO1M39p0Ztoe0rMK1KTfUmGkdyhQ1GYs",
+            "lang": "sv",
+            "siteOwner": {
+                "name": "UC Affärsinformation",
+                "address": "Klarabergsviadukten 63",
+                "zipcode": "111 64",
+                "city": "Stockholm"
+            },
+            "activeCustomer": null
+        }
+    },
+    "i18n": {
+        "serverInstance": null,
+        "initialLanguage": "sv",
+        "initialStore": null
+    },
+    "__N_SSP": true
+}

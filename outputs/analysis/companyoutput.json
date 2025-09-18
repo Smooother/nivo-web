@@ -1,0 +1,2238 @@
+{
+    "pageProps": {
+        "company": {
+            "mainOffice": null,
+            "name": "Stockholms Bränneri AB",
+            "orgnr": "5590097589",
+            "businessUnitId": null,
+            "companyId": "2KG76WLI5YFWD",
+            "listingId": "2KG76WLI5YFWD",
+            "customerId": "5590097589",
+            "phone": "0704995061",
+            "phone2": null,
+            "mobile": null,
+            "mobile2": null,
+            "faxNumber": null,
+            "homePage": null,
+            "email": null,
+            "marketingProtection": false,
+            "industries": [
+                {
+                    "code": "10004989",
+                    "name": "Livsmedel",
+                    "description": null,
+                    "style": null,
+                    "companyId": "2KG76WLI5YFWD",
+                    "salesRank": null
+                },
+                {
+                    "code": "10241664",
+                    "name": "Livsmedel - tillverkning",
+                    "description": null,
+                    "style": null,
+                    "companyId": "2KG76WLI63IIO",
+                    "salesRank": null
+                },
+                {
+                    "code": "10241780",
+                    "name": "Dryckesvaror",
+                    "description": null,
+                    "style": null,
+                    "companyId": "2KG76WLI63ILW",
+                    "salesRank": null
+                },
+                {
+                    "code": "10241715",
+                    "name": "Producenter",
+                    "description": null,
+                    "style": null,
+                    "companyId": "2KG76WLI63IK3",
+                    "salesRank": null
+                },
+                {
+                    "code": "10008467",
+                    "name": "Vinagenturer, spritagenturer",
+                    "description": null,
+                    "style": null,
+                    "companyId": "2KG76WLI5YIKZ",
+                    "salesRank": null
+                }
+            ],
+            "location": {
+                "countryPart": "Hela Sverige",
+                "county": "Stockholm",
+                "municipality": "Stockholm",
+                "coordinates": [
+                    {
+                        "coordinateSystem": "EPSG:4326",
+                        "xcoordinate": 18.0889832846693,
+                        "ycoordinate": 59.3154240712596
+                    }
+                ]
+            },
+            "currentIndustry": {
+                "code": "10004989",
+                "name": "Livsmedel",
+                "description": null,
+                "companyId": null
+            },
+            "visitorAddress": {
+                "addressLine": "Folkungagatan 136 a Bv",
+                "boxAddressLine": null,
+                "zipCode": "116 30",
+                "postPlace": "Stockholm"
+            },
+            "postalAddress": {
+                "addressLine": "c/o Carl Wikner Gamla Allén 8",
+                "boxAddressLine": null,
+                "zipCode": "131 50",
+                "postPlace": "Saltsjö-Duvnäs"
+            },
+            "description": null,
+            "advertType": null,
+            "logo": null,
+            "searchResultImage": null,
+            "legalName": "Stockholms Bränneri AB",
+            "revenue": "26575",
+            "currency": "SEK",
+            "profit": "2213",
+            "companyAccountsLastUpdatedDate": "2024",
+            "employees": "14",
+            "contactPerson": {
+                "type": "Person",
+                "name": "Anna Margareta Linnea Wikner",
+                "role": "Verkställande direktör",
+                "id": "12655854",
+                "birthDate": "02.04.1985",
+                "businessPerson": true
+            },
+            "status": {
+                "status": "ACTIVE",
+                "statusDate": null,
+                "description": null
+            },
+            "statusRemarks": [],
+            "certificates": [],
+            "rating": null,
+            "ratingSettings": null,
+            "searchHighlights": null,
+            "purpose": "Bolaget skall bedriva hantverksmässig tillverkning och försäljning av alkoholhaltiga drycker, restaurangverksamhet, förvaltning av och handel med värdepapper och fastigheter samt därmed förenlig verksamhet.",
+            "naceIndustries": [
+                "11010 Destillering, rening och tillblandning av spritdrycker"
+            ],
+            "companyType": {
+                "code": "Aktiebolag",
+                "name": "Aktiebolag",
+                "parentCode": "AB"
+            },
+            "legalPhone": "0704995061",
+            "contactFormUrl": null,
+            "webshopUrl": null,
+            "legalVisitorAddress": {
+                "addressLine": "Folkungagatan 136 a Bv",
+                "boxAddressLine": null,
+                "zipCode": "116 30",
+                "postPlace": "Stockholm"
+            },
+            "legalPostalAddress": {
+                "addressLine": "c/o Carl Wikner Gamla Allén 8",
+                "boxAddressLine": null,
+                "zipCode": "131 50",
+                "postPlace": "Saltsjö-Duvnäs"
+            },
+            "corporateStructure": null,
+            "registrationDate": "2015-04-07",
+            "foundationDate": "07.04.2015",
+            "foundationYear": "2015",
+            "numberOfEmployees": "14",
+            "shareCapital": 50,
+            "estimatedTurnover": "20000 - 49999",
+            "turnoverYear": 2024,
+            "registryStatusEntries": [
+                {
+                    "label": "registeredForVat",
+                    "value": true
+                },
+                {
+                    "label": "registeredForPrepayment",
+                    "value": true
+                },
+                {
+                    "label": "registeredForPayrollTax",
+                    "value": true
+                }
+            ],
+            "centralApproval": null,
+            "roles": {
+                "numberOfRoles": 7,
+                "roleGroups": [
+                    {
+                        "name": "Management",
+                        "roles": [
+                            {
+                                "type": "Person",
+                                "name": "Anna Margareta Linnea Wikner",
+                                "role": "Verkställande direktör",
+                                "id": "12655854",
+                                "birthDate": "02.04.1985",
+                                "businessPerson": true
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Board",
+                        "roles": [
+                            {
+                                "type": "Person",
+                                "name": "Anna Margareta Linnea Wikner",
+                                "role": "Ordförande",
+                                "id": "12655854",
+                                "birthDate": "02.04.1985",
+                                "businessPerson": true
+                            },
+                            {
+                                "type": "Person",
+                                "name": "Anna Margareta Linnea Wikner",
+                                "role": "Ledamot",
+                                "id": "12655854",
+                                "birthDate": "02.04.1985",
+                                "businessPerson": true
+                            },
+                            {
+                                "type": "Person",
+                                "name": "Carl Mauritz Anders Wikner",
+                                "role": "Ledamot",
+                                "id": "12655855",
+                                "birthDate": "23.05.1985",
+                                "businessPerson": true
+                            },
+                            {
+                                "type": "Person",
+                                "name": "Carl Olof Lennart Bachmann",
+                                "role": "Suppleant",
+                                "id": "10203065",
+                                "birthDate": "09.06.1986",
+                                "businessPerson": true
+                            },
+                            {
+                                "type": "Person",
+                                "name": "Yana Dinkova Augustsson",
+                                "role": "Suppleant",
+                                "id": "12792489",
+                                "birthDate": "15.07.1985",
+                                "businessPerson": true
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Revision",
+                        "roles": [
+                            {
+                                "type": "Person",
+                                "name": "Ester Maria Elisabeth Carlstedt",
+                                "role": "Revisor",
+                                "id": "10246976",
+                                "birthDate": "14.11.1965",
+                                "businessPerson": true
+                            }
+                        ]
+                    }
+                ],
+                "chairman": {
+                    "type": "Person",
+                    "name": "Anna Margareta Linnea Wikner",
+                    "role": "Ordförande",
+                    "id": "12655854",
+                    "birthDate": "02.04.1985",
+                    "businessPerson": true
+                },
+                "manager": {
+                    "type": "Person",
+                    "name": "Anna Margareta Linnea Wikner",
+                    "role": "Verkställande direktör",
+                    "id": "12655854",
+                    "birthDate": "02.04.1985",
+                    "businessPerson": true
+                }
+            },
+            "signatories": [
+                "Firman tecknas av styrelsen",
+                "Firman tecknas var för sig av",
+                "ledamöterna"
+            ],
+            "procuration": [],
+            "companyAccounts": [
+                {
+                    "year": "2024",
+                    "period": "2024-02",
+                    "periodStart": "2023-03-01",
+                    "periodEnd": "2024-02-28",
+                    "length": "12",
+                    "combined": false,
+                    "currency": "SEK",
+                    "remark": null,
+                    "referenceUrl": null,
+                    "accounts": [
+                        {
+                            "code": "ADI",
+                            "amount": "531"
+                        },
+                        {
+                            "code": "ADK",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "ADR",
+                            "amount": "531"
+                        },
+                        {
+                            "code": "AK",
+                            "amount": "50"
+                        },
+                        {
+                            "code": "ANT",
+                            "amount": "14"
+                        },
+                        {
+                            "code": "avk_eget_kapital",
+                            "amount": "11.9"
+                        },
+                        {
+                            "code": "avk_totalt_kapital",
+                            "amount": "9.5"
+                        },
+                        {
+                            "code": "RPE",
+                            "amount": "1928"
+                        },
+                        {
+                            "code": "CPE",
+                            "amount": "567"
+                        },
+                        {
+                            "code": "DR",
+                            "amount": "2213"
+                        },
+                        {
+                            "code": "EK",
+                            "amount": "-1681"
+                        },
+                        {
+                            "code": "EKA",
+                            "amount": "79.4"
+                        },
+                        {
+                            "code": "FI",
+                            "amount": "537"
+                        },
+                        {
+                            "code": "FK",
+                            "amount": "-7"
+                        },
+                        {
+                            "code": "GG",
+                            "amount": "0.3"
+                        },
+                        {
+                            "code": "KBP",
+                            "amount": "22237"
+                        },
+                        {
+                            "code": "LG",
+                            "amount": "572"
+                        },
+                        {
+                            "code": "loner_ovriga",
+                            "amount": null
+                        },
+                        {
+                            "code": "loner_styrelse_vd",
+                            "amount": null
+                        },
+                        {
+                            "code": "ORS",
+                            "amount": "2860"
+                        },
+                        {
+                            "code": "resultat_e_avskrivningar",
+                            "amount": "3229"
+                        },
+                        {
+                            "code": "resultat_e_finansnetto",
+                            "amount": "3759"
+                        },
+                        {
+                            "code": "RG",
+                            "amount": "430.0"
+                        },
+                        {
+                            "code": "SAP",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SDI",
+                            "amount": "26575"
+                        },
+                        {
+                            "code": "SED",
+                            "amount": "39682"
+                        },
+                        {
+                            "code": "SI",
+                            "amount": "26044"
+                        },
+                        {
+                            "code": "SEK",
+                            "amount": "23820"
+                        },
+                        {
+                            "code": "SF",
+                            "amount": "2169"
+                        },
+                        {
+                            "code": "SFA",
+                            "amount": "9137"
+                        },
+                        {
+                            "code": "SGE",
+                            "amount": "39682"
+                        },
+                        {
+                            "code": "SIA",
+                            "amount": "1013"
+                        },
+                        {
+                            "code": "SIK",
+                            "amount": "23770"
+                        },
+                        {
+                            "code": "SKG",
+                            "amount": "6237"
+                        },
+                        {
+                            "code": "SKGKI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SKO",
+                            "amount": "-647"
+                        },
+                        {
+                            "code": "SLG",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SOM",
+                            "amount": "30545"
+                        },
+                        {
+                            "code": "SUB",
+                            "amount": "1000"
+                        },
+                        {
+                            "code": "summa_finansiella_anltillg",
+                            "amount": "4865"
+                        },
+                        {
+                            "code": "summa_langfristiga_skulder",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "summa_rorelsekostnader",
+                            "amount": "-23768"
+                        },
+                        {
+                            "code": "SV",
+                            "amount": "3725"
+                        },
+                        {
+                            "code": "SVD",
+                            "amount": "3259"
+                        },
+                        {
+                            "code": "UTR",
+                            "amount": "9625"
+                        },
+                        {
+                            "code": "FSD",
+                            "amount": "-899"
+                        },
+                        {
+                            "code": "KB",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "AWA",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "IAC",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "MIN",
+                            "amount": null
+                        },
+                        {
+                            "code": "BE",
+                            "amount": "422"
+                        },
+                        {
+                            "code": "TR",
+                            "amount": "14.2"
+                        }
+                    ],
+                    "accIncompleteCode": null,
+                    "accIncompleteDesc": null
+                },
+                {
+                    "year": "2023",
+                    "period": "2023-02",
+                    "periodStart": "2022-03-01",
+                    "periodEnd": "2023-02-28",
+                    "length": "12",
+                    "combined": false,
+                    "currency": "SEK",
+                    "remark": null,
+                    "referenceUrl": null,
+                    "accounts": [
+                        {
+                            "code": "ADI",
+                            "amount": "401"
+                        },
+                        {
+                            "code": "ADK",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "ADR",
+                            "amount": "401"
+                        },
+                        {
+                            "code": "AK",
+                            "amount": "50"
+                        },
+                        {
+                            "code": "ANT",
+                            "amount": "11"
+                        },
+                        {
+                            "code": "avk_eget_kapital",
+                            "amount": "27.8"
+                        },
+                        {
+                            "code": "avk_totalt_kapital",
+                            "amount": "22.4"
+                        },
+                        {
+                            "code": "RPE",
+                            "amount": "2531"
+                        },
+                        {
+                            "code": "CPE",
+                            "amount": "544"
+                        },
+                        {
+                            "code": "DR",
+                            "amount": "4920"
+                        },
+                        {
+                            "code": "EK",
+                            "amount": "-1317"
+                        },
+                        {
+                            "code": "EKA",
+                            "amount": "80.7"
+                        },
+                        {
+                            "code": "FI",
+                            "amount": "72"
+                        },
+                        {
+                            "code": "FK",
+                            "amount": "-5"
+                        },
+                        {
+                            "code": "GG",
+                            "amount": "0.2"
+                        },
+                        {
+                            "code": "KBP",
+                            "amount": "18787"
+                        },
+                        {
+                            "code": "LG",
+                            "amount": "1023"
+                        },
+                        {
+                            "code": "loner_ovriga",
+                            "amount": null
+                        },
+                        {
+                            "code": "loner_styrelse_vd",
+                            "amount": null
+                        },
+                        {
+                            "code": "ORS",
+                            "amount": "6159"
+                        },
+                        {
+                            "code": "resultat_e_avskrivningar",
+                            "amount": "8145"
+                        },
+                        {
+                            "code": "resultat_e_finansnetto",
+                            "amount": "8212"
+                        },
+                        {
+                            "code": "RG",
+                            "amount": "453.6"
+                        },
+                        {
+                            "code": "SAP",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SDI",
+                            "amount": "28052"
+                        },
+                        {
+                            "code": "SED",
+                            "amount": "36659"
+                        },
+                        {
+                            "code": "SI",
+                            "amount": "27651"
+                        },
+                        {
+                            "code": "SEK",
+                            "amount": "22607"
+                        },
+                        {
+                            "code": "SF",
+                            "amount": "4487"
+                        },
+                        {
+                            "code": "SFA",
+                            "amount": "8664"
+                        },
+                        {
+                            "code": "SGE",
+                            "amount": "36659"
+                        },
+                        {
+                            "code": "SIA",
+                            "amount": "1272"
+                        },
+                        {
+                            "code": "SIK",
+                            "amount": "22557"
+                        },
+                        {
+                            "code": "SKG",
+                            "amount": "5326"
+                        },
+                        {
+                            "code": "SKGKI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SKO",
+                            "amount": "-1239"
+                        },
+                        {
+                            "code": "SLG",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SOM",
+                            "amount": "27995"
+                        },
+                        {
+                            "code": "SUB",
+                            "amount": "1000"
+                        },
+                        {
+                            "code": "summa_finansiella_anltillg",
+                            "amount": "3755"
+                        },
+                        {
+                            "code": "summa_langfristiga_skulder",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "summa_rorelsekostnader",
+                            "amount": "-19695"
+                        },
+                        {
+                            "code": "SV",
+                            "amount": "3839"
+                        },
+                        {
+                            "code": "SVD",
+                            "amount": "3637"
+                        },
+                        {
+                            "code": "UTR",
+                            "amount": "8726"
+                        },
+                        {
+                            "code": "FSD",
+                            "amount": "-2053"
+                        },
+                        {
+                            "code": "KB",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "AWA",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "IAC",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "MIN",
+                            "amount": null
+                        },
+                        {
+                            "code": "BE",
+                            "amount": "-212"
+                        },
+                        {
+                            "code": "TR",
+                            "amount": "29.3"
+                        }
+                    ],
+                    "accIncompleteCode": null,
+                    "accIncompleteDesc": null
+                },
+                {
+                    "year": "2022",
+                    "period": "2022-02",
+                    "periodStart": "2021-03-01",
+                    "periodEnd": "2022-02-28",
+                    "length": "12",
+                    "combined": false,
+                    "currency": "SEK",
+                    "remark": null,
+                    "referenceUrl": null,
+                    "accounts": [
+                        {
+                            "code": "ADI",
+                            "amount": "476"
+                        },
+                        {
+                            "code": "ADK",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "ADR",
+                            "amount": "476"
+                        },
+                        {
+                            "code": "AK",
+                            "amount": "50"
+                        },
+                        {
+                            "code": "ANT",
+                            "amount": "7"
+                        },
+                        {
+                            "code": "avk_eget_kapital",
+                            "amount": "45.1"
+                        },
+                        {
+                            "code": "avk_totalt_kapital",
+                            "amount": "34.8"
+                        },
+                        {
+                            "code": "RPE",
+                            "amount": "3843"
+                        },
+                        {
+                            "code": "CPE",
+                            "amount": "510"
+                        },
+                        {
+                            "code": "DR",
+                            "amount": "6365"
+                        },
+                        {
+                            "code": "EK",
+                            "amount": "-1083"
+                        },
+                        {
+                            "code": "EKA",
+                            "amount": "77.1"
+                        },
+                        {
+                            "code": "FI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "FK",
+                            "amount": "-1"
+                        },
+                        {
+                            "code": "GG",
+                            "amount": "0.3"
+                        },
+                        {
+                            "code": "KBP",
+                            "amount": "19632"
+                        },
+                        {
+                            "code": "LG",
+                            "amount": "751"
+                        },
+                        {
+                            "code": "loner_ovriga",
+                            "amount": null
+                        },
+                        {
+                            "code": "loner_styrelse_vd",
+                            "amount": null
+                        },
+                        {
+                            "code": "ORS",
+                            "amount": "8029"
+                        },
+                        {
+                            "code": "resultat_e_avskrivningar",
+                            "amount": "10997"
+                        },
+                        {
+                            "code": "resultat_e_finansnetto",
+                            "amount": "10995"
+                        },
+                        {
+                            "code": "RG",
+                            "amount": "409.1"
+                        },
+                        {
+                            "code": "SAP",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SDI",
+                            "amount": "26668"
+                        },
+                        {
+                            "code": "SED",
+                            "amount": "31609"
+                        },
+                        {
+                            "code": "SI",
+                            "amount": "26192"
+                        },
+                        {
+                            "code": "SEK",
+                            "amount": "19047"
+                        },
+                        {
+                            "code": "SF",
+                            "amount": "3049"
+                        },
+                        {
+                            "code": "SFA",
+                            "amount": "4612"
+                        },
+                        {
+                            "code": "SGE",
+                            "amount": "31609"
+                        },
+                        {
+                            "code": "SIA",
+                            "amount": "1530"
+                        },
+                        {
+                            "code": "SIK",
+                            "amount": "18997"
+                        },
+                        {
+                            "code": "SKG",
+                            "amount": "5889"
+                        },
+                        {
+                            "code": "SKGKI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SKO",
+                            "amount": "-1664"
+                        },
+                        {
+                            "code": "SLG",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SOM",
+                            "amount": "26997"
+                        },
+                        {
+                            "code": "SUB",
+                            "amount": "1360"
+                        },
+                        {
+                            "code": "summa_finansiella_anltillg",
+                            "amount": "353"
+                        },
+                        {
+                            "code": "summa_langfristiga_skulder",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "summa_rorelsekostnader",
+                            "amount": "-15906"
+                        },
+                        {
+                            "code": "SV",
+                            "amount": "2903"
+                        },
+                        {
+                            "code": "SVD",
+                            "amount": "2729"
+                        },
+                        {
+                            "code": "UTR",
+                            "amount": "6673"
+                        },
+                        {
+                            "code": "FSD",
+                            "amount": "-2966"
+                        },
+                        {
+                            "code": "KB",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "AWA",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "IAC",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "MIN",
+                            "amount": null
+                        },
+                        {
+                            "code": "BE",
+                            "amount": "235"
+                        },
+                        {
+                            "code": "TR",
+                            "amount": "41.2"
+                        }
+                    ],
+                    "accIncompleteCode": null,
+                    "accIncompleteDesc": null
+                },
+                {
+                    "year": "2021",
+                    "period": "2021-02",
+                    "periodStart": "2020-03-01",
+                    "periodEnd": "2021-02-28",
+                    "length": "12",
+                    "combined": false,
+                    "currency": "SEK",
+                    "remark": null,
+                    "referenceUrl": null,
+                    "accounts": [
+                        {
+                            "code": "ADI",
+                            "amount": "103"
+                        },
+                        {
+                            "code": "ADK",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "ADR",
+                            "amount": "103"
+                        },
+                        {
+                            "code": "AK",
+                            "amount": "50"
+                        },
+                        {
+                            "code": "ANT",
+                            "amount": "5"
+                        },
+                        {
+                            "code": "avk_eget_kapital",
+                            "amount": "78.3"
+                        },
+                        {
+                            "code": "avk_totalt_kapital",
+                            "amount": "47.7"
+                        },
+                        {
+                            "code": "RPE",
+                            "amount": "5411"
+                        },
+                        {
+                            "code": "CPE",
+                            "amount": "605"
+                        },
+                        {
+                            "code": "DR",
+                            "amount": "7470"
+                        },
+                        {
+                            "code": "EK",
+                            "amount": "-654"
+                        },
+                        {
+                            "code": "EKA",
+                            "amount": "61.0"
+                        },
+                        {
+                            "code": "FI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "FK",
+                            "amount": "-6"
+                        },
+                        {
+                            "code": "GG",
+                            "amount": "0.6"
+                        },
+                        {
+                            "code": "KBP",
+                            "amount": "16920"
+                        },
+                        {
+                            "code": "LG",
+                            "amount": "1767"
+                        },
+                        {
+                            "code": "loner_ovriga",
+                            "amount": null
+                        },
+                        {
+                            "code": "loner_styrelse_vd",
+                            "amount": null
+                        },
+                        {
+                            "code": "ORS",
+                            "amount": "9475"
+                        },
+                        {
+                            "code": "resultat_e_avskrivningar",
+                            "amount": "13094"
+                        },
+                        {
+                            "code": "resultat_e_finansnetto",
+                            "amount": "13088"
+                        },
+                        {
+                            "code": "RG",
+                            "amount": "211.2"
+                        },
+                        {
+                            "code": "SAP",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SDI",
+                            "amount": "26718"
+                        },
+                        {
+                            "code": "SED",
+                            "amount": "27440"
+                        },
+                        {
+                            "code": "SI",
+                            "amount": "26615"
+                        },
+                        {
+                            "code": "SEK",
+                            "amount": "13762"
+                        },
+                        {
+                            "code": "SF",
+                            "amount": "2653"
+                        },
+                        {
+                            "code": "SFA",
+                            "amount": "4119"
+                        },
+                        {
+                            "code": "SGE",
+                            "amount": "27440"
+                        },
+                        {
+                            "code": "SIA",
+                            "amount": "1482"
+                        },
+                        {
+                            "code": "SIK",
+                            "amount": "13712"
+                        },
+                        {
+                            "code": "SKG",
+                            "amount": "9972"
+                        },
+                        {
+                            "code": "SKGKI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SKO",
+                            "amount": "-2005"
+                        },
+                        {
+                            "code": "SLG",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SOM",
+                            "amount": "23321"
+                        },
+                        {
+                            "code": "SUB",
+                            "amount": "1080"
+                        },
+                        {
+                            "code": "summa_finansiella_anltillg",
+                            "amount": "278"
+                        },
+                        {
+                            "code": "summa_langfristiga_skulder",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "summa_rorelsekostnader",
+                            "amount": "-13963"
+                        },
+                        {
+                            "code": "SV",
+                            "amount": "2261"
+                        },
+                        {
+                            "code": "SVD",
+                            "amount": "2360"
+                        },
+                        {
+                            "code": "UTR",
+                            "amount": "3707"
+                        },
+                        {
+                            "code": "FSD",
+                            "amount": "-3612"
+                        },
+                        {
+                            "code": "KB",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "AWA",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "IAC",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "MIN",
+                            "amount": null
+                        },
+                        {
+                            "code": "BE",
+                            "amount": "337"
+                        },
+                        {
+                            "code": "TR",
+                            "amount": "49.0"
+                        }
+                    ],
+                    "accIncompleteCode": null,
+                    "accIncompleteDesc": null
+                },
+                {
+                    "year": "2020",
+                    "period": "2020-02",
+                    "periodStart": "2019-03-01",
+                    "periodEnd": "2020-02-28",
+                    "length": "12",
+                    "combined": false,
+                    "currency": "SEK",
+                    "remark": "NO_AUDITOR_REPORT",
+                    "referenceUrl": null,
+                    "accounts": [
+                        {
+                            "code": "ADI",
+                            "amount": "22"
+                        },
+                        {
+                            "code": "ADK",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "ADR",
+                            "amount": "22"
+                        },
+                        {
+                            "code": "AK",
+                            "amount": "50"
+                        },
+                        {
+                            "code": "ANT",
+                            "amount": "4"
+                        },
+                        {
+                            "code": "avk_eget_kapital",
+                            "amount": "82.7"
+                        },
+                        {
+                            "code": "avk_totalt_kapital",
+                            "amount": "48.8"
+                        },
+                        {
+                            "code": "RPE",
+                            "amount": "3552"
+                        },
+                        {
+                            "code": "CPE",
+                            "amount": "504"
+                        },
+                        {
+                            "code": "DR",
+                            "amount": "5137"
+                        },
+                        {
+                            "code": "EK",
+                            "amount": "-419"
+                        },
+                        {
+                            "code": "EKA",
+                            "amount": "59.0"
+                        },
+                        {
+                            "code": "FI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "FK",
+                            "amount": "-6"
+                        },
+                        {
+                            "code": "GG",
+                            "amount": "0.7"
+                        },
+                        {
+                            "code": "KBP",
+                            "amount": "7427"
+                        },
+                        {
+                            "code": "LG",
+                            "amount": "343"
+                        },
+                        {
+                            "code": "loner_ovriga",
+                            "amount": null
+                        },
+                        {
+                            "code": "loner_styrelse_vd",
+                            "amount": null
+                        },
+                        {
+                            "code": "ORS",
+                            "amount": "6575"
+                        },
+                        {
+                            "code": "resultat_e_avskrivningar",
+                            "amount": "6677"
+                        },
+                        {
+                            "code": "resultat_e_finansnetto",
+                            "amount": "6671"
+                        },
+                        {
+                            "code": "RG",
+                            "amount": "196.4"
+                        },
+                        {
+                            "code": "SAP",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SDI",
+                            "amount": "14050"
+                        },
+                        {
+                            "code": "SED",
+                            "amount": "13677"
+                        },
+                        {
+                            "code": "SI",
+                            "amount": "14028"
+                        },
+                        {
+                            "code": "SEK",
+                            "amount": "7991"
+                        },
+                        {
+                            "code": "SF",
+                            "amount": "1834"
+                        },
+                        {
+                            "code": "SFA",
+                            "amount": "1863"
+                        },
+                        {
+                            "code": "SGE",
+                            "amount": "13677"
+                        },
+                        {
+                            "code": "SIA",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SIK",
+                            "amount": "7941"
+                        },
+                        {
+                            "code": "SKG",
+                            "amount": "5590"
+                        },
+                        {
+                            "code": "SKGKI",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SKO",
+                            "amount": "-1438"
+                        },
+                        {
+                            "code": "SLG",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "SOM",
+                            "amount": "11814"
+                        },
+                        {
+                            "code": "SUB",
+                            "amount": "1700"
+                        },
+                        {
+                            "code": "summa_finansiella_anltillg",
+                            "amount": "278"
+                        },
+                        {
+                            "code": "summa_langfristiga_skulder",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "summa_rorelsekostnader",
+                            "amount": "-7532"
+                        },
+                        {
+                            "code": "SV",
+                            "amount": "838"
+                        },
+                        {
+                            "code": "SVD",
+                            "amount": "1585"
+                        },
+                        {
+                            "code": "UTR",
+                            "amount": "95"
+                        },
+                        {
+                            "code": "FSD",
+                            "amount": "-95"
+                        },
+                        {
+                            "code": "KB",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "AWA",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "IAC",
+                            "amount": "0"
+                        },
+                        {
+                            "code": "MIN",
+                            "amount": null
+                        },
+                        {
+                            "code": "BE",
+                            "amount": "158"
+                        },
+                        {
+                            "code": "TR",
+                            "amount": "47.5"
+                        }
+                    ],
+                    "accIncompleteCode": null,
+                    "accIncompleteDesc": null
+                }
+            ],
+            "corporateAccounts": [],
+            "companyCacheFlows": [],
+            "corporateCacheFlows": [],
+            "openingHours": null,
+            "keywords": [],
+            "financialComments": null,
+            "keyFigureComments": null,
+            "isCustomer": false,
+            "externalLinks": [],
+            "references": null,
+            "distributors": null,
+            "contactPersons": [],
+            "socialMediaLinks": null,
+            "certifications": [],
+            "coverImage": null,
+            "backgroundImage": null,
+            "slideShow": [],
+            "tagLine": null,
+            "announcements": [
+                {
+                    "id": "5aabe90523fe41a046ecf12ba310d24ef017f28b",
+                    "date": "26.06.2024",
+                    "text": "Årsredovisning",
+                    "type": "REGISTERED_ANNUAL_REPORT"
+                },
+                {
+                    "id": "fd78e27843b83fe6b30656acf33071fc4c8c2ca8",
+                    "date": "04.08.2023",
+                    "text": "Verksamhet",
+                    "type": "BUSINESS_DESCRIPTION"
+                },
+                {
+                    "id": "5c940a1c311bc606eef7ea62164f51d0a80d97c9",
+                    "date": "21.06.2023",
+                    "text": "Årsredovisning",
+                    "type": "REGISTERED_ANNUAL_REPORT"
+                },
+                {
+                    "id": "15dbf811e44d796aa7111204d953cb3bbb3ff69c",
+                    "date": "28.09.2022",
+                    "text": "Årsredovisning",
+                    "type": "REGISTERED_ANNUAL_REPORT"
+                }
+            ],
+            "gaselle": false,
+            "shareholders": [],
+            "totalShareholders": null,
+            "shareholdersLastUpdatedDate": null,
+            "proffListingId": "2KG76WLI5YFWD",
+            "proffListingIds": [],
+            "businessUnitIds": [],
+            "mortgages": false,
+            "registeredAsEnterprise": null,
+            "registeredForVat": true,
+            "registeredForNav": false,
+            "registeredForVoluntary": false,
+            "registeredForPayrollTax": true,
+            "registeredForVatDescription": "Ja, registrerad för F-skatt",
+            "proffNames": [],
+            "annualReports": [
+                {
+                    "period": "2024-02",
+                    "fingerprint": "41053991d4efb19a355b6d4d114a479d6c519369"
+                },
+                {
+                    "period": "2023-02",
+                    "fingerprint": "bca209a3f10422f208f5ae689b80ad72012bf87f"
+                },
+                {
+                    "period": "2022-02",
+                    "fingerprint": "b3660b7ce75b729b717c037d820b64541ce5ff9c"
+                },
+                {
+                    "period": "2021-02",
+                    "fingerprint": "3f9d1d03d4ecf83bec3911b2fc41aa661c5238fe"
+                },
+                {
+                    "period": "2020-02",
+                    "fingerprint": "9c3ff2bdefc7f2a49651f43e197f58475a012bc2"
+                }
+            ],
+            "vehicles": {
+                "numberOfVehicles": 2
+            },
+            "mergers": [],
+            "openVacancies": null,
+            "availableReports": {
+                "BV_REGISTRATION_CERTIFICATE": true,
+                "BV_REPORT": true,
+                "GROUP_VALUATION": false,
+                "COMPANY_VALUATION": true
+            },
+            "latestPublicAccountingPeriod": null,
+            "videos": [],
+            "hidePropertyInfo": false,
+            "businessUnits": [
+                {
+                    "name": "Stockholms Bränneri AB",
+                    "companyId": "56119084",
+                    "details": {
+                        "rel": "related",
+                        "href": "http://proff-api/ecs/rest/companies/register/SE/56119084"
+                    }
+                }
+            ],
+            "alternativeNames": []
+        },
+        "relatedCompanies": {
+            "companies": [
+                {
+                    "mainOffice": null,
+                    "name": "Majonnäsfabriken Skåne-Finkost AB",
+                    "orgnr": "5563747764",
+                    "businessUnitId": null,
+                    "companyId": "2K0IF90I5YFWD",
+                    "listingId": "3540062",
+                    "customerId": "2098312",
+                    "phone": "031-3047400",
+                    "phone2": null,
+                    "mobile": "031-3047400",
+                    "mobile2": null,
+                    "faxNumber": null,
+                    "homePage": "http://www.majonnasfabriken.se",
+                    "email": "martin@majonnasfabriken.se",
+                    "marketingProtection": false,
+                    "industries": [
+                        {
+                            "code": "10004989",
+                            "name": "Livsmedel",
+                            "description": "Sedan 1937 har vi tillverkat vår egen ”Skåne Finkost´s äkta röda” enligt samma goda recep",
+                            "style": "PRIPAKKO",
+                            "companyId": "2K0IF90I5YFWD",
+                            "salesRank": 600
+                        },
+                        {
+                            "code": "10241664",
+                            "name": "Livsmedel - tillverkning",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K0IF90I63IIO",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241715",
+                            "name": "Producenter",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K0IF90I63IK3",
+                            "salesRank": null
+                        }
+                    ],
+                    "location": {
+                        "countryPart": "Hela Sverige",
+                        "county": "Västra Götaland",
+                        "municipality": "Partille",
+                        "coordinates": [
+                            {
+                                "coordinateSystem": "EPSG:4326",
+                                "xcoordinate": 12.12466112,
+                                "ycoordinate": 57.74341838
+                            }
+                        ]
+                    },
+                    "currentIndustry": {
+                        "code": "10004989",
+                        "name": "Livsmedel",
+                        "description": "Sedan 1937 har vi tillverkat vår egen ”Skåne Finkost´s äkta röda” enligt samma goda recep",
+                        "companyId": null
+                    },
+                    "visitorAddress": {
+                        "addressLine": "Laxfiskevägen 12",
+                        "boxAddressLine": null,
+                        "zipCode": "43338",
+                        "postPlace": "Partille"
+                    },
+                    "postalAddress": {
+                        "addressLine": "Laxfiskevägen 12",
+                        "boxAddressLine": null,
+                        "zipCode": "43338",
+                        "postPlace": "Partille"
+                    },
+                    "description": "Sedan 1937 har vi tillverkat vår egen ”Skåne Finkost´s äkta röda” enligt samma goda recep",
+                    "advertType": "PRIPAKKO",
+                    "logo": {
+                        "imageId": "6978960"
+                    },
+                    "searchResultImage": null,
+                    "legalName": "Majonnäsfabriken Skåne-Finkost Aktiebolag",
+                    "revenue": "319184",
+                    "currency": "SEK",
+                    "profit": "-8971",
+                    "companyAccountsLastUpdatedDate": "2024-04",
+                    "employees": "56",
+                    "contactPerson": {
+                        "type": "Person",
+                        "name": "Lars Crister Haglund",
+                        "role": "Verkställande direktör",
+                        "id": "10708191",
+                        "birthDate": "03.04.1961",
+                        "businessPerson": true
+                    },
+                    "status": null,
+                    "statusRemarks": [],
+                    "certificates": [
+                        {
+                            "type": "UC_SIGILL",
+                            "subType": "3",
+                            "startDate": "2025-05-22"
+                        },
+                        {
+                            "type": "UC_GROWTH_CERTIFICATE",
+                            "subType": null,
+                            "startDate": "2024-04-01"
+                        }
+                    ],
+                    "rating": null,
+                    "ratingSettings": null,
+                    "searchHighlights": null
+                },
+                {
+                    "mainOffice": null,
+                    "name": "Bama Fresh Cuts AB",
+                    "orgnr": "5561153429",
+                    "businessUnitId": null,
+                    "companyId": "2JYYTG5I5YFWD",
+                    "listingId": "3558423",
+                    "customerId": "2060392",
+                    "phone": "042 249600",
+                    "phone2": null,
+                    "mobile": "042 249600",
+                    "mobile2": null,
+                    "faxNumber": null,
+                    "homePage": "https://bama.se/om-bama-nordic/",
+                    "email": null,
+                    "marketingProtection": false,
+                    "industries": [
+                        {
+                            "code": "10241663",
+                            "name": "Livsmedel - agenturer och grossister",
+                            "description": "Vi förser svensk dagligvaruhandel med färsk frukt, blommor, bananer och färdigskuren sallad",
+                            "style": "PRIPAKKO",
+                            "companyId": "2JYYTG5I63IIN",
+                            "salesRank": 600
+                        },
+                        {
+                            "code": "10004989",
+                            "name": "Livsmedel",
+                            "description": "Vi förser svensk dagligvaruhandel med färsk frukt, blommor, bananer och färdigskuren sallad",
+                            "style": "PRIPAKKO",
+                            "companyId": "2JYYTG5I5YFWD",
+                            "salesRank": 600
+                        },
+                        {
+                            "code": "10241664",
+                            "name": "Livsmedel - tillverkning",
+                            "description": null,
+                            "style": "PRIPAKKO",
+                            "companyId": "2JYYTG5I63IIO",
+                            "salesRank": 600
+                        },
+                        {
+                            "code": "10241581",
+                            "name": "Frukt, bär och grönsaker - grossister",
+                            "description": null,
+                            "style": "PRIPAKKO",
+                            "companyId": "2JYYTG5I63IGD",
+                            "salesRank": 600
+                        },
+                        {
+                            "code": "10002736",
+                            "name": "Fruktleveranser, vattenleveranser",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2JYYTG5I5YE5S",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241715",
+                            "name": "Producenter",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2JYYTG5I63IK3",
+                            "salesRank": null
+                        }
+                    ],
+                    "location": {
+                        "countryPart": "Hela Sverige",
+                        "county": "Skåne",
+                        "municipality": "Helsingborg",
+                        "coordinates": [
+                            {
+                                "coordinateSystem": "EPSG:4326",
+                                "xcoordinate": 12.77058813,
+                                "ycoordinate": 56.00729151
+                            }
+                        ]
+                    },
+                    "currentIndustry": {
+                        "code": "10004989",
+                        "name": "Livsmedel",
+                        "description": "Vi förser svensk dagligvaruhandel med färsk frukt, blommor, bananer och färdigskuren sallad",
+                        "companyId": null
+                    },
+                    "visitorAddress": {
+                        "addressLine": "Torbornav. 13 B",
+                        "boxAddressLine": null,
+                        "zipCode": "250 15",
+                        "postPlace": "Helsingborg"
+                    },
+                    "postalAddress": {
+                        "addressLine": "Box 15073",
+                        "boxAddressLine": null,
+                        "zipCode": "250 15",
+                        "postPlace": "Helsingborg"
+                    },
+                    "description": "Vi förser svensk dagligvaruhandel med färsk frukt, blommor, bananer och färdigskuren sallad",
+                    "advertType": "PRIPAKKO",
+                    "logo": {
+                        "imageId": "7000980"
+                    },
+                    "searchResultImage": null,
+                    "legalName": "Bama Fresh Cuts AB",
+                    "revenue": "438687",
+                    "currency": "SEK",
+                    "profit": "-21530",
+                    "companyAccountsLastUpdatedDate": "2023-12",
+                    "employees": "187",
+                    "contactPerson": {
+                        "type": "Person",
+                        "name": "Amelie Viveka Charlotte De Geer",
+                        "role": "Ordförande",
+                        "id": "10290838",
+                        "birthDate": "09.11.1978",
+                        "businessPerson": true
+                    },
+                    "status": null,
+                    "statusRemarks": [],
+                    "certificates": [],
+                    "rating": null,
+                    "ratingSettings": null,
+                    "searchHighlights": null
+                },
+                {
+                    "mainOffice": null,
+                    "name": "Greatlife Group AB",
+                    "orgnr": "5568992605",
+                    "businessUnitId": null,
+                    "companyId": "2K3MU71I5YFWD",
+                    "listingId": "3552315",
+                    "customerId": "2177903",
+                    "phone": null,
+                    "phone2": null,
+                    "mobile": null,
+                    "mobile2": null,
+                    "faxNumber": null,
+                    "homePage": "https://www.greatlife.se/",
+                    "email": "info@greatlife.se",
+                    "marketingProtection": false,
+                    "industries": [
+                        {
+                            "code": "10004989",
+                            "name": "Livsmedel",
+                            "description": null,
+                            "style": "PRIPAKST",
+                            "companyId": "2K3MU71I5YFWD",
+                            "salesRank": 400
+                        },
+                        {
+                            "code": "10004162",
+                            "name": "Hälsokost, naturläkemedel",
+                            "description": null,
+                            "style": "PRIPAKST",
+                            "companyId": "2K3MU71I5YF9E",
+                            "salesRank": 400
+                        },
+                        {
+                            "code": "10241663",
+                            "name": "Livsmedel - agenturer och grossister",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K3MU71I63IIN",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241596",
+                            "name": "Grossister",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K3MU71I63IGS",
+                            "salesRank": null
+                        }
+                    ],
+                    "location": null,
+                    "currentIndustry": {
+                        "code": "10004989",
+                        "name": "Livsmedel",
+                        "description": null,
+                        "companyId": null
+                    },
+                    "visitorAddress": null,
+                    "postalAddress": {
+                        "addressLine": "Rosengatan 8",
+                        "boxAddressLine": null,
+                        "zipCode": "17270",
+                        "postPlace": "Sundbyberg"
+                    },
+                    "description": null,
+                    "advertType": "PRIPAKST",
+                    "logo": {
+                        "imageId": "7026071"
+                    },
+                    "searchResultImage": null,
+                    "legalName": "Greatlife Group AB",
+                    "revenue": "33623",
+                    "currency": "SEK",
+                    "profit": "338",
+                    "companyAccountsLastUpdatedDate": "2023-12",
+                    "employees": "3",
+                    "contactPerson": {
+                        "type": "Person",
+                        "name": "Patrick William Wahlberg",
+                        "role": "Ordförande",
+                        "id": "10600001",
+                        "birthDate": "24.03.1974",
+                        "businessPerson": true
+                    },
+                    "status": null,
+                    "statusRemarks": [],
+                    "certificates": [],
+                    "rating": null,
+                    "ratingSettings": null,
+                    "searchHighlights": null
+                },
+                {
+                    "mainOffice": null,
+                    "name": "Annas Pepparkakor AB",
+                    "orgnr": "5561499145",
+                    "businessUnitId": null,
+                    "companyId": "2JZ687DI5YFWD",
+                    "listingId": "3554386",
+                    "customerId": "2052467",
+                    "phone": "08 4487070",
+                    "phone2": null,
+                    "mobile": "08 4487070",
+                    "mobile2": null,
+                    "faxNumber": null,
+                    "homePage": "http://www.annas.se",
+                    "email": null,
+                    "marketingProtection": false,
+                    "industries": [
+                        {
+                            "code": "10000705",
+                            "name": "Bagerier - Brödindustri",
+                            "description": null,
+                            "style": "PRIPAKST",
+                            "companyId": "2JZ687DI5YCLD",
+                            "salesRank": 400
+                        },
+                        {
+                            "code": "10004989",
+                            "name": "Livsmedel",
+                            "description": null,
+                            "style": "PRIPAKST",
+                            "companyId": "2JZ687DI5YFWD",
+                            "salesRank": 400
+                        },
+                        {
+                            "code": "10241664",
+                            "name": "Livsmedel - tillverkning",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2JZ687DI63IIO",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241663",
+                            "name": "Livsmedel - agenturer och grossister",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2JZ687DI63IIN",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241596",
+                            "name": "Grossister",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2JZ687DI63IGS",
+                            "salesRank": null
+                        }
+                    ],
+                    "location": {
+                        "countryPart": "Hela Sverige",
+                        "county": "Stockholm",
+                        "municipality": "Tyresö",
+                        "coordinates": [
+                            {
+                                "coordinateSystem": "EPSG:4326",
+                                "xcoordinate": 18.2115832701145,
+                                "ycoordinate": 59.2407194816943
+                            }
+                        ]
+                    },
+                    "currentIndustry": {
+                        "code": "10004989",
+                        "name": "Livsmedel",
+                        "description": null,
+                        "companyId": null
+                    },
+                    "visitorAddress": {
+                        "addressLine": "Radiov. 23",
+                        "boxAddressLine": null,
+                        "zipCode": "135 48",
+                        "postPlace": "Tyresö"
+                    },
+                    "postalAddress": null,
+                    "description": null,
+                    "advertType": "PRIPAKST",
+                    "logo": {
+                        "imageId": "6970658"
+                    },
+                    "searchResultImage": null,
+                    "legalName": "Aktiebolaget Annas Pepparkakor",
+                    "revenue": "216152",
+                    "currency": "SEK",
+                    "profit": "16383",
+                    "companyAccountsLastUpdatedDate": "2023-12",
+                    "employees": "29",
+                    "contactPerson": {
+                        "type": "Person",
+                        "name": "Ignace Maurice J Heyman",
+                        "role": "Ordförande",
+                        "id": "12840960",
+                        "birthDate": "04.02.1970",
+                        "businessPerson": true
+                    },
+                    "status": null,
+                    "statusRemarks": [],
+                    "certificates": [],
+                    "rating": null,
+                    "ratingSettings": null,
+                    "searchHighlights": null
+                },
+                {
+                    "mainOffice": null,
+                    "name": "Nordic Spice AB",
+                    "orgnr": "5566522057",
+                    "businessUnitId": null,
+                    "companyId": "2K25VWPI5YFWD",
+                    "listingId": "3549948",
+                    "customerId": "2960015",
+                    "phone": "016-10 86 40",
+                    "phone2": null,
+                    "mobile": "016-10 86 40",
+                    "mobile2": null,
+                    "faxNumber": null,
+                    "homePage": "https://nordicspice.se/",
+                    "email": "info@nordicspice.se",
+                    "marketingProtection": false,
+                    "industries": [
+                        {
+                            "code": "10004989",
+                            "name": "Livsmedel",
+                            "description": "Nordic Spice – kryddor med kvalitet och kärlek. Beställ smidigt online och njut av exklusiva smaker för både vardag och fest!",
+                            "style": "PRIPAKST",
+                            "companyId": "2K25VWPI5YFWD",
+                            "salesRank": 400
+                        },
+                        {
+                            "code": "10241664",
+                            "name": "Livsmedel - tillverkning",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K25VWPI63IIO",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241715",
+                            "name": "Producenter",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K25VWPI63IK3",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241663",
+                            "name": "Livsmedel - agenturer och grossister",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K25VWPI63IIN",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10000924",
+                            "name": "Agenturer",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K25VWPI5YCRG",
+                            "salesRank": null
+                        }
+                    ],
+                    "location": {
+                        "countryPart": "Hela Sverige",
+                        "county": "Södermanland",
+                        "municipality": "Eskilstuna",
+                        "coordinates": [
+                            {
+                                "coordinateSystem": "EPSG:4326",
+                                "xcoordinate": 16.4833857937686,
+                                "ycoordinate": 59.3471599221533
+                            }
+                        ]
+                    },
+                    "currentIndustry": {
+                        "code": "10004989",
+                        "name": "Livsmedel",
+                        "description": "Nordic Spice – kryddor med kvalitet och kärlek. Beställ smidigt online och njut av exklusiva smaker för både vardag och fest!",
+                        "companyId": null
+                    },
+                    "visitorAddress": {
+                        "addressLine": "Hejargatan 20",
+                        "boxAddressLine": null,
+                        "zipCode": "632 29",
+                        "postPlace": "Eskilstuna"
+                    },
+                    "postalAddress": null,
+                    "description": "Nordic Spice – kryddor med kvalitet och kärlek. Beställ smidigt online och njut av exklusiva smaker för både vardag och fest!",
+                    "advertType": "PRIPAKST",
+                    "logo": {
+                        "imageId": "7075977"
+                    },
+                    "searchResultImage": null,
+                    "legalName": "Nordic Spice AB",
+                    "revenue": "37514",
+                    "currency": "SEK",
+                    "profit": "829",
+                    "companyAccountsLastUpdatedDate": "2024-08",
+                    "employees": "19",
+                    "contactPerson": {
+                        "type": "Person",
+                        "name": "Anna Kristina Ström Harryson",
+                        "role": "Verkställande direktör",
+                        "id": "10215063",
+                        "birthDate": "21.08.1972",
+                        "businessPerson": true
+                    },
+                    "status": null,
+                    "statusRemarks": [],
+                    "certificates": [],
+                    "rating": null,
+                    "ratingSettings": null,
+                    "searchHighlights": null
+                },
+                {
+                    "mainOffice": null,
+                    "name": "Matlaget Foodteam AB",
+                    "orgnr": "5563776789",
+                    "businessUnitId": null,
+                    "companyId": "2K0J1N9I5YFWD",
+                    "listingId": "3546586",
+                    "customerId": "2815652",
+                    "phone": "021-109860",
+                    "phone2": null,
+                    "mobile": "021-109860",
+                    "mobile2": null,
+                    "faxNumber": null,
+                    "homePage": "https://www.foodteam.se/",
+                    "email": "kontakt@matlaget.nu",
+                    "marketingProtection": false,
+                    "industries": [
+                        {
+                            "code": "10004989",
+                            "name": "Livsmedel",
+                            "description": "Välkommen till Matlaget Foodteam AB! Vi arbetar kostnadseffektivt och använder så få transporter som möjligt ut mot vår kund.",
+                            "style": "PRIPAKST",
+                            "companyId": "2K0J1N9I5YFWD",
+                            "salesRank": 400
+                        },
+                        {
+                            "code": "10241655",
+                            "name": "Kött-, slakteriprodukter - grossist",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K0J1N9I63IIF",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10004756",
+                            "name": "Köttprodukter, slakteriprodukter",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K0J1N9I5YFPW",
+                            "salesRank": null
+                        },
+                        {
+                            "code": "10241596",
+                            "name": "Grossister",
+                            "description": null,
+                            "style": null,
+                            "companyId": "2K0J1N9I63IGS",
+                            "salesRank": null
+                        }
+                    ],
+                    "location": {
+                        "countryPart": "Hela Sverige",
+                        "county": "Västmanland",
+                        "municipality": "Västerås",
+                        "coordinates": [
+                            {
+                                "coordinateSystem": "EPSG:4326",
+                                "xcoordinate": 16.5345831314812,
+                                "ycoordinate": 59.6364279602025
+                            }
+                        ]
+                    },
+                    "currentIndustry": {
+                        "code": "10004989",
+                        "name": "Livsmedel",
+                        "description": "Välkommen till Matlaget Foodteam AB! Vi arbetar kostnadseffektivt och använder så få transporter som möjligt ut mot vår kund.",
+                        "companyId": null
+                    },
+                    "visitorAddress": {
+                        "addressLine": "Slånbärsgatan 8",
+                        "boxAddressLine": null,
+                        "zipCode": "722 23",
+                        "postPlace": "Västerås"
+                    },
+                    "postalAddress": {
+                        "addressLine": "Slånbärsgatan 8",
+                        "boxAddressLine": null,
+                        "zipCode": "722 23",
+                        "postPlace": "Västerås"
+                    },
+                    "description": "Välkommen till Matlaget Foodteam AB! Vi arbetar kostnadseffektivt och använder så få transporter som möjligt ut mot vår kund.",
+                    "advertType": "PRIPAKST",
+                    "logo": {
+                        "imageId": "7040664"
+                    },
+                    "searchResultImage": null,
+                    "legalName": "Matlaget Foodteam AB",
+                    "revenue": "28876",
+                    "currency": "SEK",
+                    "profit": "1161",
+                    "companyAccountsLastUpdatedDate": "2024-08",
+                    "employees": "2",
+                    "contactPerson": {
+                        "type": "Person",
+                        "name": "Carl Erik Rollne",
+                        "role": "Ordförande",
+                        "id": "10382410",
+                        "birthDate": "02.05.1963",
+                        "businessPerson": true
+                    },
+                    "status": null,
+                    "statusRemarks": [],
+                    "certificates": [
+                        {
+                            "type": "UC_SIGILL",
+                            "subType": "5",
+                            "startDate": "2025-05-22"
+                        }
+                    ],
+                    "rating": null,
+                    "ratingSettings": null,
+                    "searchHighlights": null
+                }
+            ],
+            "hits": 29005,
+            "pages": 1666,
+            "currentPage": 1,
+            "filters": [
+                {
+                    "displayName": "samplerFilter",
+                    "name": null,
+                    "filterType": "specialNeeds",
+                    "filters": []
+                }
+            ],
+            "sorting": {
+                "currentSort": "relevance",
+                "sorts": [
+                    {
+                        "active": true,
+                        "sortType": "relevance"
+                    },
+                    {
+                        "active": false,
+                        "sortType": "revenueAsc"
+                    },
+                    {
+                        "active": false,
+                        "sortType": "revenueDesc"
+                    },
+                    {
+                        "active": false,
+                        "sortType": "numEmployeesAsc"
+                    },
+                    {
+                        "active": false,
+                        "sortType": "numEmployeesDesc"
+                    }
+                ]
+            }
+        },
+        "trademarks": {
+            "hits": 0,
+            "filters": [],
+            "trademarks": [],
+            "pages": 0,
+            "currentPage": 1
+        },
+        "hydrationData": {
+            "searchStore": {
+                "query": "Stockholms Bränneri AB"
+            },
+            "settingsStore": {
+                "accountingFigureDirection": "left"
+            }
+        }
+    },
+    "hydrationData": {
+        "appStore": {
+            "site": "allabolag.se",
+            "siteName": "Allabolag.se",
+            "languages": [
+                "sv"
+            ],
+            "defaultLanguage": "sv",
+            "theme": "allabolag",
+            "country": "SE",
+            "defaultDataSource": "UC",
+            "baseUrl": "https://www.allabolag.se",
+            "defaultSEO": {
+                "twitter": {
+                    "handle": "@allabolag"
+                },
+                "noindex": false,
+                "nofollow": false
+            },
+            "recaptchaSiteKey": "6Lcml1IpAAAAAJqIk107_blbYBC9dboXoOMX66xW",
+            "googleMapsApiKey": "AIzaSyBTO1M39p0Ztoe0rMK1KTfUmGkdyhQ1GYs",
+            "lang": "sv",
+            "siteOwner": {
+                "name": "UC Affärsinformation",
+                "address": "Klarabergsviadukten 63",
+                "zipcode": "111 64",
+                "city": "Stockholm"
+            },
+            "activeCustomer": null
+        }
+    },
+    "i18n": {
+        "serverInstance": null,
+        "initialLanguage": "sv",
+        "initialStore": null
+    },
+    "__N_SSP": true
+}

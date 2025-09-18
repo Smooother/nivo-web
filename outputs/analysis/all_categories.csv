@@ -1,0 +1,709 @@
+code,name
+10000872,Adressregister
+10000882,Advokatbyråer
+10000898,Affärsinformation
+10000911,Affärssystem
+10000924,Agenturer
+10241783,Agenturhandel-övrig
+10000937,"Aluminium, produkter"
+10000958,"Ambassader, konsulat och handelskontor i Sverige"
+10241784,Andra affärsmässiga tjänster
+10241785,Annan utrustning - reparation
+10000959,"Antenner, paraboler"
+10241786,Antikviteter
+10000973,"Apoteksvaror, läkemedel - Distribution"
+10241787,"Apoteksvaror, läkemedel - Partihandel"
+10241788,Arbetskraftstjänster
+10001006,"Arbetsmarknadsmyndigheter och näringslivsmyndigheter, bransch"
+10241789,Arbetstagarorganisationer
+10000625,Arkitekter
+10000641,"Artister, nöjen"
+10000654,"Asfalt, asfaltarbeten"
+10241790,Auktioner
+10000666,Automater
+10241791,Avfall - grossister
+10241876,Avfallshantering
+10000692,"Badrumsinredningar, badrumsrenoveringar"
+10000705,Bagerier - Brödindustri
+10000718,Balkonger
+10000731,Banker
+10000757,Batterier
+10241792,Batterier - produktion
+10241793,Begravningsbyråer och krematorier
+10000778,"Behållare, kärl"
+10000791,Belysningsarmatur
+10000804,Belysningsarmatur - Komponenter
+10000817,Bemanningsföretag
+10241794,Bensinstationer
+10000838,"Besiktning, provning"
+10000859,Beslag
+10001176,Beslutsstödssystem
+10001189,"Betong, betongvaror"
+10241795,"Betong, betongvaror - produktion"
+10001202,Betonghåltagning
+10001215,Bevakningsföretag
+10239364,Bevattningsutrustningar
+10241796,Bibliotek- och arkivverksamhet
+10241797,Bijouteri
+10241553,Bijouteri - tillverkning
+10001228,Bilar
+10241554,Bilar - tillverkning
+10001294,"Billackering, bilplåtarbeten"
+10001314,Bilreparationer
+10001335,Bilreservdelar
+10001349,Bilskrot
+10001362,Biltillbehör
+10001377,"Biluthyrning, bussuthyrning"
+10001390,Bilvård
+10001405,Bioenergi
+10241555,Biografer
+10001418,Bioteknik
+10001443,Blästring
+10001456,Bokbinderier
+10001469,Bokförlag
+10242082,Bokhandlare
+10001491,Borrningsarbeten
+10001504,"Borstar, penslar"
+10241659,"Borstar, penslar - tillverkning"
+10241660,Boskap
+10241763,Bostadsrättsförening
+10241764,Bostäder
+10241765,Botaniska och zoologiska trädgårdar
+10001517,"Brandredskap, brandskydd"
+10001530,"Branschorganisationer, näringslivsorganisationer"
+10001543,Bredband
+10001576,Bryggeriprodukter
+10001589,Bryggor
+10241766,Brytning och gruvdrift
+10241767,Brytning och gruvdrift - tjänster
+10241768,Bränsle - grossist och detaljist
+10001602,Budservice
+10001615,Bulkgodshantering
+10001628,"Busstrafik, biltrafik"
+10241769,Butikshandel
+10241770,Butikshandel -övrigt
+10001641,"Butiksinredningar, butiksutrustningar"
+10001669,"Butiksmaskiner, butiksutrustningar"
+10001682,Byggentreprenader-Infrastruktur
+10001695,"Byggmaskiner, arbetsmaskiner"
+10001708,Byggmaterial
+10241771,Byggmaterial - grossist
+10001729,Byggmästare
+10001750,Byggnadsglas
+10001823,"Bärgning, transporter"
+10001763,"Båtar, båtmotorer"
+10001776,"Båttillbehör, båtutrustningar"
+10001797,Båttrafik
+10001810,"Båtvarv, båtbyggare"
+10241772,"Böcker, papper, tidningar och reklamblad"
+10001853,CAD/CAM-system
+10001866,"CallCenters, teleservice"
+10001879,Catering
+10001905,Certifiering
+10001918,Containrar
+10001931,Cyklar
+10241773,Dagbarnvård
+10241774,Daghem - arrangemang
+10001965,Data - Programvaror
+10001979,Data- och TV-spel
+10002017,Data/IT-konsulter . Branschspecialister
+10001991,"Databaser, arkiv, bibliotek"
+10002004,Datacenters
+10002029,Datakommunikation
+10002043,Datakonsulter
+10002063,Dataservice
+10002076,Datasäkerhet
+10002102,"Datautbildning, dataprogram, systemutveckling"
+10002115,"Datautveckling, systemutveckling, programutveckling"
+10001020,Datorer - Installationer
+10001033,Datorer - Kringutrustningar
+10001046,Datorer - Persondatorer
+10001059,Datorer - Service
+10241776,Datorer och kringutrustningar - Partihandel
+10241777,Datorer och kringutrustningar - tillverkning
+10001097,Dekoratörer
+10001136,"Designers, formgivare"
+10241778,Detaljhandel
+10241779,Detaljhandel - annat
+10001149,Diamantverktyg
+10001162,Direktmarknadsföring
+10002141,Distribution
+10002154,"Djurartiklar, djurfoder"
+10002175,"Dokumentation, information"
+10002188,Dryckesautomater
+10241780,Dryckesvaror
+10241781,Dryckesvaror - grossist
+10002201,"Dykeri, dykeriarbeten"
+10002214,Däck
+10002227,"Dörrar, portar"
+10002370,E-handel
+10002383,"E-handel - Program, system"
+10241782,Efterforskning
+10241556,Eldfast material
+10241557,Elektrisk installationsmaterial - tillverkning
+10002420,Elektromekaniska verkstäder
+10002433,Elektronik - Komponenter
+10002446,Elektronik - Legotillverkning
+10002459,Elektronik - Produktionsutrustningar
+10002472,Elektronik - Systemkomponenter
+10241558,Elektronik - Tillverkning
+10241559,Elektronik- och telekommunikationsutrustning
+10241560,Elektronik- och telekommunikationsutrustning - grossist
+10002498,Elinstallationer
+10241561,Elmaterial - reparationer
+10002519,Elmateriel
+10002540,Elmateriel - Komponenter
+10002558,"Elmotorer, generatorer"
+10241562,"Elmotorer, generatorer - produktion"
+10002571,Energieffektivisering
+10002584,Energiförsörjning
+10241563,Energihandel
+10241564,Energihandel - annat
+10002605,Entreprenadmaskiner
+10002619,Entreprenadmaskinsarbeten
+10241565,Entreprenörer
+10002253,"Ergonomi - Konsulter, utrustningar"
+10002265,"Etiketter, etikettutrustningar"
+10002292,Evenemangsproduktioner
+10241566,"Facklig, vetenskaplig och teknisk verksamhet"
+10241567,Fackskolor
+10002306,"Fartyg, varv"
+10002318,Fasadbehandling
+10002331,"Fastighetsbolag, lokaler"
+10239411,Fastighetsförvaltning
+10002344,"Fastighetsförvaltning, fastighetsskötsel"
+10002357,Fastighetsmäklare
+10002806,Fastighetsutveckling
+10002819,"Fastighetsvärderingar, besiktningar"
+10002832,Fiberoptik
+10002845,"Film, musik-, Distribution"
+10002857,Filter
+10002878,"Finansbolag, finansiella tjänster"
+10002891,Finanssystem och handelssystem
+10002903,"Fisk, skaldjur"
+10002918,"Fisk, skaldjur - Grossister"
+10241568,"Fisk-, skaldjursodling - produktion"
+10002937,Fiskeredskap
+10002950,"Fiskodling, skaldjursodling, sportfiske"
+10002963,Fjädrar
+10241570,Fjärrvärme
+10002976,"Flaggor, flaggstänger"
+10002989,"Flygfrakt, flygresor"
+10003002,"Flygplan, utrustningar"
+10241571,"Flygplan, utrustningar - reparationer och underhåll"
+10241572,"Flygplan, utrustningar - tillverkning"
+10003015,Flygplatser
+10241573,Flyktingförläggning
+10003028,Flyttfirmor
+10003041,Fläktar
+10003054,Fodermedel
+10003066,Fordonsreparationer
+10002632,"Fordonsutrustningar, bilverkstadsutrustningar"
+10002645,"Formverktyg, pressverktyg"
+10002658,Forskning
+10002679,Forskning och utveckling
+10002685,Fotografer
+10002710,Fotoutrustningar
+10241577,Frisörer
+10241578,Fritidsbåtar och utrustning
+10241580,Fritidsverksamhet
+10241581,"Frukt, bär och grönsaker - grossister"
+10002736,"Fruktleveranser, vattenleveranser"
+10002745,"Färger, lacker, tapeter"
+10241582,"Färger, lacker, tapeter - grossist"
+10241583,"Färger, lacker, tapeter - tillverkning"
+10002759,Fästelement
+10002772,Fönster
+10241584,Föreningar
+10002786,"Företagarcentrum, näringslivsbolag"
+10003115,"Företagshälsovård, arbetsmiljökonsulter"
+10003144,Företagsprofilering
+10003157,"Företagsservice, facilities management"
+10003170,Företagsutveckling
+10003183,Förlagsbyråer
+10241585,Förpackningar
+10003345,"Förpackningar - Handel, konsument, kontor"
+10003358,Förpackningar - Industrin
+10003379,Förpackningar - Transportförpackningar
+10003392,Förpackningsmaskiner
+10241586,Förskolor
+10003405,Försvaret
+10003406,Försäkringar
+10241587,Försäkringskassan
+10003421,"Garner, vävnader"
+10003434,"Gaser, utrustningar"
+10241590,Gasproduktion
+10241591,Gatukök
+10241593,"Gipsprodukter, gips och kalk"
+10241594,"Gipsprodukter, gips och kalk - tillverkning"
+10003447,"Gjuterier, gjutgods"
+10003473,"Glas, glasvaror"
+10003486,Glasarbeten
+10003499,Glass
+10242083,Golfbanor
+10003524,Golfutrustningar
+10003536,Golvbeläggningar
+10003549,Golvinläggningar
+10003562,"Golvslipning, golvvård"
+10003209,"Gravyrer, gravyrutrustningar"
+10241595,Grisuppfödning
+10241596,Grossister
+10241597,Grundskolor
+10003222,Grönsaker
+10241598,Guider
+10003235,"Guld, silver, ädelstenar"
+10241599,Guldsmeder
+10241600,Gummi och plastprodukter - tillverkning
+10003249,Gummivaror
+10241602,Gödningsmedel
+10241603,Gödningsmedel - produktion
+10003262,Hallbyggnader
+10003275,Hamnar
+10003307,Handikapputrustningar
+10241607,Havs- och kustfiske
+10003333,Hemservice
+10004018,"Hissar, rulltrappor"
+10241608,Historiska minnesmärken och byggnader
+10241609,Holdingbolag
+10239424,Hotell
+10004049,"Hotellbokning, konferensbokning"
+10241610,Hudvårdsprodukter
+10004062,"Human resources, HR"
+10004075,Hus
+10241612,Hushållsnära tjänster
+10004115,"Hushållsutrustningar, vitvaror"
+10241613,"Hushållsutrustningar, vitvaror - grossister"
+10241614,"Hushållsutrustningar, vitvaror - tillverkning"
+10004129,"Husvagnar, husbilar"
+10004141,Hydraulik
+10004162,"Hälsokost, naturläkemedel"
+10241615,Hälsotjänster
+10241616,Hästhållning
+10004175,Hästsportartiklar
+10004196,"Högskolor, universitet"
+10004197,Högtrycksutrustningar
+10241621,IT - övrigt
+10241617,Idrottslag och klubbar
+10004223,Inbrottsskydd
+10004236,Industriautomation
+10004257,Industridesigners
+10004270,Industriellt underhåll
+10004283,Industriförnödenheter
+10004296,"Informationskonsulter, kommunikationskonsulter"
+10004310,Ingenjör
+10004323,"Ingenjörer - Byggnadsteknik, samhällsplanering"
+10004336,Ingenjörer - Elektroteknik
+10004349,Ingenjörer - Mätteknik
+10004365,"Ingenjörer - VVS-, miljöteknik"
+10004378,"Ingenjörer, ingenjörsbyråer"
+10004391,"Inkassoverksamhet, kreditupplysningsverksamhet"
+10004417,Inredning - Offentlig miljö
+10004431,Inredningar
+10241618,Insatsvaror
+10241619,Insatsvaror - grossister
+10004443,Instrument
+10241620,Internationella organisationer
+10004457,"Internet - Konsulter, operatörer"
+10004470,Internet-Affärsportaler
+10004496,Internetbyråer
+10004508,"Investmentbanker, Investmentbolag"
+10004520,Isoleringsentreprenörer
+10004533,Isoleringsmaterial
+10241622,"Jakt, vilt och naturvård"
+10241623,Jordbruk
+10241624,Jordbruk - andra tjänster
+10241625,Jordbruk - boskap och djurhållning
+10241626,Jordbruk - mjölkproduktion
+10241627,Jordbruk - odling
+10241628,Jordbruk - odling och djurhållning
+10241629,"Jordbruksprodukter, textilråvaror och djur - agentur"
+10004560,Juridiska byråer
+10003587,"Järn, stål"
+10241631,"Järn, stål - produktion"
+10241630,Järn- och metallbrytning
+10003600,"Järnkonstruktioner, metallkonstruktioner"
+10003613,Järnvaror
+10003626,Järnvägstrafik
+10003639,"Järnvägsutrustningar, spårvägsutrustningar"
+10241632,"Järnvägsutrustningar, spårvägsutrustningar - tillverkning"
+10241633,Kablar och kraftledningar
+10241634,Kablar och kraftledningar - tillverkning
+10241635,Kaffe och te - agenturer
+10241636,Kakel - tillverkning
+10003665,"Kakel, klinker"
+10003690,"Kaminer, öppna spisar"
+10241637,Karosserifabriker och verkstäder
+10003714,"Kassaskåp, värdeskåp"
+10241638,"Kemikalier, industrikemikaleier - grossist"
+10003740,"Kemikalier, industrikemikalier"
+10241639,"Kemikalier, industrikemikalier - tillverkning"
+10003761,"Kemiska, kemisk-tekniska produkter"
+10003775,Keramiska produkter
+10003788,"Klockor, ur"
+10241640,"Klockor, ur - produktion"
+10003801,Kläder
+10241641,Kläder - produktion
+10241642,"Kläder, skor"
+10241643,Kol- och raffinerade petroleumprodukter - tillverkning
+10003829,Kommuner
+10003830,"Kommuner, näringslivskontor"
+10003851,Kompetensutveckling
+10241644,Konfektion
+10003864,"Konfektyrer, Choklad,"
+10003877,Konferensarrangörer
+10003890,"Konferenslokaler, kurslokaler, konferensgårdar"
+10003903,"Konferensutrustningar, presentationsutrustningar"
+10003937,Konst
+10241645,Konstnärer
+10003950,Konsulter
+10241646,Kontor- och teletjänster
+10241647,"Kontors-, kopieringsmaskiner"
+10241648,"Kontors-, kopieringsmaskiner - tillverkning"
+10003964,"Kontorshotell, industrihotell"
+10003976,Kontorsinredningar
+10004586,Kontorsmaskiner
+10004612,Kontorsmateriel
+10241649,Kontorstjänster
+10004625,"Kopieringsarbeten, grafisk produktion"
+10241650,Kosmetik - tillverkare och grossister
+10241651,"Kosmetik, parfym och frisörartiklar"
+10004638,"Kosmetika, hygienartiklar"
+10241652,Kulturskolor och undervisning
+10004652,Kurirverksamhet
+10004717,Kvalitetsledningssystem
+10241653,"Kyl-, frysanläggningar - tillverkning"
+10004730,"Kylanläggningar, frysanläggningar"
+10004743,Köksinredningar
+10241654,Köksinredningar - agentur och grossist
+10241655,"Kött-, slakteriprodukter - grossist"
+10004756,"Köttprodukter, slakteriprodukter"
+10004769,Laboratorieanalyser
+10004782,Laboratorieutrustningar
+10004795,Lackeringsarbeten
+10004808,Lager
+10004821,"Lagerinredning, förrådsinredning"
+10008770,"Lantbruk, lantbrukare"
+10004835,"Lantbruksmaskiner, förnödenheter"
+10241657,"Lantbruksmaskiner, förnödenheter - grossist"
+10004851,"Larm, övervakningsutrustningar"
+10004864,"Laserarbeten, utrustningar"
+10004878,"Lastbilar, släpfordon"
+10004891,"Lastkajer, dockningsanläggningar"
+10241658,Lastning och lossning
+10004903,"Lastpallar, lastmateriel"
+10004929,Legoarbeten
+10004950,"Leksaker, hobbyartiklar"
+10241661,Levande djur
+10241662,Levande djur - grossist
+10004976,"Lim, tätningsmedel"
+10004989,Livsmedel
+10241663,Livsmedel - agenturer och grossister
+10241664,Livsmedel - tillverkning
+10005002,Livsmedelsindustrimaskiner
+10005015,"Ljudanläggningar, ljusanläggningar, bildanläggningar"
+10005028,"Ljudproduktion, musikproduktion"
+10005054,Logistik
+10005067,"Lyftanordningar, lyftutrustningar"
+10241666,Läder och lädervaror
+10241667,Läder och lädervaror - tillverkning
+10241668,"Läder, skor, inredning, reseeffekter och textilier"
+10241669,Läkare
+10004703,Läkemedel
+10005201,Läromedel
+10005088,Lås
+10241665,Lås  och beslag - tillverkning
+10004677,Låssmeder
+10005397,"MC, mopeder, skotrar"
+10005214,"Magasinering, lagring"
+10005227,Magneter
+10005240,"Malmer, industrimineraler"
+10005253,Managementkonsulter
+10005279,"Markentreprenörer, anläggningsentreprenörer"
+10005293,Markiser
+10005305,Marknadsföringskonsulter
+10005318,Marknadsundersökningar
+10241670,"Maskiner, produktion, fartyg och flygplan - agentur"
+10005331,"Maskiner, verktyg - begagnat service"
+10005344,Maskinförnödenheter
+10241671,Maskinförnödenheter - reparationer
+10241672,Maskinförnödenheter - tillverkning
+10005370,"Materialhantering - Maskiner, utrustningar"
+10005384,Mattor
+10005410,Medicinteknisk utrustning
+10241673,Medicinteknisk utrustning - produktion
+10005431,Medieförmedling
+10005443,"Medieförmedling, -reklamförsäljning"
+10005456,Mejerivaror
+10241674,Mejerivaror - grossist
+10005469,Mekaniska verkstäder
+10005503,"Metaller, legeringar"
+10241676,"Metaller, legeringar - Produktion"
+10241677,"Metaller, legeringar - Reparation"
+10241675,"Metaller, legeringar - grossist"
+10005516,Metallglaspartier
+10005529,Metalltråd
+10241678,Metallurgisk industri
+10005555,Miljöteknik
+10005567,"Miljövård, miljökonsulter"
+10241679,Mineraler - tillverkning
+10241680,Mineralförädling
+10242084,Mineralvatten
+10241681,Mjölkproduktion
+10242085,Motorbanor
+10241682,"Motorcykel, ATV och mopeder - agenturer och grossister"
+10241683,"Motorcykel, ATV och mopeder - detaljister"
+10241684,"Motorcykel, ATV och mopedverkstäder"
+10005653,Motorer
+10005666,Motorrenoveringar
+10005679,Multimediaproduktioner
+10241685,Mur- och tegelsten
+10241686,Mur- och tegelsten - tillverkning
+10008788,Murare
+10241687,Museer
+10241688,Musik
+10005705,Musikinstrument
+10005747,"Myndigheter, verk och nämnder"
+10241689,Mynt och medaljer
+10241690,Mynt och medaljer - tillverkning
+10005761,Märkningsutrustningar
+10005774,"Mässor, utställningar"
+10005787,"Mässprodukter, utställningsproduktion"
+10005808,"Mätinstrument, testutrustningar"
+10005748,Måleriarbeten
+10005835,Möbler
+10241691,Möbler - Produktion
+10241692,"Möbler, hushållsartiklar och järnvaror - agentur"
+10241694,Nyhetsservice och telegrambyråer
+10005870,"Nätverk, kluster"
+10241695,Nöjesparker
+10241696,Odling av potatis
+10241697,Odling av socker
+10241698,Odling av svamp
+10241700,Offentlig administration
+10241701,"Oljor, oljeprodukt - tjänster"
+10005895,"Oljor, oljeprodukter"
+10241702,Omvårdnad och omsorg
+10241703,Optik och optisk utrustning
+10241704,Optik och optisk utrustning - Produktion
+10005946,Organisationer
+10005959,Organisationskonsulter
+10005972,Organisationskonsulter - Administration
+10005149,"Packningar, tätningar"
+10241705,Paketering
+10005162,"Papper, massa"
+10005175,Pappersindustrimaskiner
+10005188,Pappersvaror
+10241706,Pappersvaror - Partihandel
+10241707,Pappersvaror - Produktion
+10241708,Parkanläggningar
+10241709,Parkering
+10239445,Parkeringsprodukter
+10241710,Partipolitiska organisationer
+10241711,Passagerartransporter
+10006019,Passersystem
+10006032,Patentbyråer
+10006075,"Persienner, gardiner"
+10006088,Personaluthyrning
+10241712,Pipeline
+10006297,Plastbearbetning
+10006310,"Plaster- Helfabrikat, beställningsarbeten"
+10006331,"Plaster- Råvaror, halvfabrikat"
+10006357,Plåt
+10006370,Plåtslagerier
+10006383,Polisämbetet
+10004483,Postorder/e-handel
+10006384,"Presenningar, kapell, tält"
+10006397,Presentartiklar
+10006410,"Presentreklam, reklamartiklar"
+10241714,Privat tjänsteutövning
+10241715,Producenter
+10006457,Profilkläder
+10006470,Projektledning
+10006499,Pumpar
+10241716,Pälsvaror
+10006520,Påsar
+10006546,"Radio TV, video"
+10006560,"Radio, TV-programbolag"
+10006113,Rederier
+10006126,"Redovisning, bokföring"
+10239389,Rehabilitering
+10006148,Reklambyråer
+10006169,Rekrytering
+10006182,"Relationsmarknadsföring, CRM"
+10241717,Religösa organisationer
+10006206,Rengöringsprodukter
+10241718,Rengöringsprodukter - Agentur- och partihandel
+10006219,"Renhållningsentreprenörer, avfallshantering"
+10241719,Reparatörer
+10241720,Reproduktion
+10006245,Reproutrustningar
+10241721,Reseeffekter
+10006258,Reservkraft
+10006271,Resor
+10006284,Resor - Internetbokning
+10006755,Restauranger
+10006767,"Restaurangutrustningar, storköksutrustningar"
+10006791,Revision
+10006804,Riskkapitalbolag
+10006817,Rivningsarbeten
+10006830,Robotar
+10006843,Rostfria arbeten
+10006856,"Rostskyddsmedel, - rostskyddsbehandling"
+10241722,Rymdfart
+10006880,Rättsväsendet
+10006881,"Rör, rördelar"
+10006894,Rörarbeten
+10006920,Sanering
+10006933,Screentryckerier
+10241725,Sjukvård
+10006946,Sjukvårdsartiklar
+10006972,Sjöentreprenader
+10241727,Skatterådgivning
+10006989,"Skeppsklarerare, skeppsmäklare"
+10242086,Skidsportanläggningar
+10241728,"Skinn, läder och pälsvaror"
+10241729,"Skinn, läder och pälsvaror - grossister"
+10007002,Skogsmaskiner
+10007014,Skogstjänster
+10241730,Skolor och utbildning
+10007026,Skor
+10241732,Skor - detaljister
+10241733,Skor och tillbehör - produktion
+10007039,Skorstensbyggare
+10007053,"Skorstensrengöring, underhåll"
+10007079,Skyddsutrustningar
+10007092,"Skyltar, skyltställ"
+10007108,"Skyltar, skyltsystem - Digitala"
+10007127,Skyltmaterial
+10007140,Slangar
+10007161,"Slipmaterial, polermaterial, verktyg"
+10007174,"Släpfordon, trailers"
+10007187,Smidesverkstäder
+10007200,"Smycken, accessoarer"
+10007234,Snickeriarbeten
+10007248,Snickeriprodukter
+10007261,"Social omsorg, entreprenader"
+10007285,Solskydd
+10241734,"Spannmål, råtobak, utsäde och djurfoder - grossister"
+10007313,"Spannmål, spannmålsprodukter"
+10007325,Spedition
+10007344,"Spel, nöjesanläggningsutrustningar"
+10241736,"Spel, nöjesanläggningsutrustningar - tillverkning"
+10007357,"Spelutrustningar, lotteriutrustningar"
+10007381,"Spisar, hällar"
+10007394,Sport
+10241737,Sport - grossist
+10241738,Sport - produktion
+10241739,Sportanläggningar
+10007420,Sprängningsarbeten
+10007445,Sten
+10007458,"Sten, sand, singel, makadam"
+10006572,Stenarbeten
+10006598,"Streckkoder, utrustningar"
+10006611,Stugor
+10006622,"Styrteknik, reglerteknik"
+10006635,Städmaskiner
+10006648,Städredskap
+10006661,Städservice
+10006674,Ställningar
+10006702,"Stängsel, stängselnät"
+10006716,"Svetsning, skärningsarbeten"
+10006729,"Svetsutrustningar, skärutrustningar"
+10006742,"Swimming-, bubbelpooler, SPA-utrustning"
+10007495,"Säkerhetssystem, säkerhetskonsulter"
+10007482,Sågverk
+10007546,Takarbeten
+10007560,Takbeläggningar
+10007572,"Talare, föredragshållare"
+10241740,Tandläkare
+10007585,Tandtekniska arbeten
+10241741,Tapeter
+10007599,Tapetserare
+10241742,Taxi
+10007610,"Tegel, tegelprodukter"
+10007623,Tejper
+10007636,Teknikkonsulter
+10241743,Teknisk provning och analys
+10007671,Tekniska installationer
+10007684,"Telefoner, utrustningar"
+10007697,Telefonsystem
+10007710,Teleinstallationer
+10007723,"Telekommunikation, teleoperatörer"
+10007736,Telekonsulter
+10007750,Telemarketing
+10241744,Textilbehandling
+10007763,Textilier
+10241745,Textilier - Agentur
+10241746,Textilier - Partihandel
+10241747,Textilier - Produktion
+10008060,"Textilmaskiner, konfektionsmaskiner"
+10008074,Tidningar
+10008101,Tidregistreringssystem
+10008114,Toaletter
+10008127,Tobak
+10241748,Tobak - grossist
+10241749,Torghandel
+10008798,"Torv, Jord"
+10008179,Trafikskolor
+10008191,"Transformatorer, växelriktare, kondensatorer"
+10008204,Transmissioner
+10007790,Transportbilar
+10007803,Transportförmedling
+10007816,Trappor
+10242087,Trav- och  galoppbanor
+10007828,Truckar
+10007841,Tryckerier
+10007867,Tryckluftsutrustningar
+10241750,Trä och byggvaror - grossist
+10007880,Träbearbetningsutrustningar
+10007893,Trädgårdsanläggningar
+10007905,"Trädgårdsmaskiner, trädgårdsredskap"
+10007931,"Trädgårdsväxter, plantskolor"
+10007944,Trävaror
+10241751,Trävaror - produktion
+10241752,Tull
+10007982,Tvätterier
+10008007,"Tyger, sybehör"
+10008021,Ugnar
+10008047,"Undertak, undertaksarbeten"
+10241753,Urmakare
+10008217,Utbildning
+10008251,Uthyrning
+10008272,Utomhusreklam
+10008480,"VVS-arbeten, material och produkter"
+10008298,Vapen
+10241756,Vapen - tillverkning
+10008324,Vattenbehandlingsutrustningar
+10008337,"Ventilation, luftbehandling"
+10008350,"Ventiler, kopplingar"
+10008363,Verkstadsinredningar
+10008376,Verktyg - Elverktyg
+10008389,Verktyg - Handverktyg
+10008402,Verktyg - Tryckluft
+10241757,Verktyg och redskap
+10241758,Verktyg och redskap - tillverkning
+10008415,"Verktygsmaskiner, maskinverktyg"
+10008428,"Verktygsslipning, sliperier"
+10241759,Veterinärer
+10008441,"Video, film - Inspelning, produktion"
+10008454,"Videokameror, filmkameror"
+10008467,"Vinagenturer, spritagenturer"
+10008506,"Väganordningar, trafikanordningar, vägarbeten"
+10008519,"Väggar, väggsystem"
+10008544,Värdepappershandel
+10008532,Värdepappershandel - Internetmäklare
+10008558,Värderingar
+10008571,"Värmebehandling, härdning"
+10008584,"Värmepumpar, värmeväxlare"
+10008597,"Värmeutrustningar, torkutrustningar"
+10008623,"Växtservice, kontorsservice"
+10008493,Vågar
+10008661,Ytbehandling
+10008674,"Ytbehandlingsutrustningar, tillbehör"
+10241760,Zoologiska tjänster
+10008729,Äventyrsupplevelser
+10008687,Åkerier
+10008716,Återvinning
+10008742,Översättningar
+10241761,Övrig tillverkning
+10241762,Övriga fordon

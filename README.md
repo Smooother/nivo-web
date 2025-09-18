@@ -1,69 +1,209 @@
-# Welcome to your Lovable project
+# Nivo - Swedish Company Intelligence Platform
 
-## Project info
+A comprehensive platform for analyzing Swedish companies, combining a beautiful marketing website with powerful data analysis capabilities.
 
-**URL**: https://lovable.dev/projects/f34e3a91-e821-4705-9e65-257dcf59254e
+## 🏗️ Project Structure
 
-## How can I edit this code?
+```
+nivo-web/
+├── 📁 src/                    # Frontend (Vite + React + TypeScript)
+│   ├── components/            # React components
+│   ├── pages/                # Application pages
+│   ├── hooks/                # Custom React hooks
+│   └── lib/                  # Utilities and configurations
+├── 📁 backend/               # Python data processing & analysis
+│   ├── *.py                  # Scraping, analysis, and migration scripts
+│   ├── requirements.txt      # Python dependencies
+│   └── .env                  # Environment variables
+├── 📁 database/              # Database schemas and migrations
+│   ├── supabase_create_tables.sql
+│   └── *.json                # Configuration files
+├── 📁 outputs/               # Analysis results and reports
+├── 📁 public/                # Static assets
+└── 📄 package.json           # Node.js dependencies
+```
 
-There are several ways of editing your application.
+## 🚀 Features
 
-**Use Lovable**
+### Frontend (Vite + React)
+- **Modern Landing Page**: Beautiful marketing website for Nivo
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Interactive Components**: Built with shadcn-ui components
+- **Animations**: Smooth transitions and effects
+- **SEO Optimized**: Meta tags and structured data
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f34e3a91-e821-4705-9e65-257dcf59254e) and start prompting.
+### Backend (Python)
+- **Data Scraping**: Automated scraping from Allabolag.se
+- **Financial Analysis**: KPI calculations and company metrics
+- **Data Processing**: Company segmentation and filtering
+- **Database Migration**: SQLite to Supabase migration tools
+- **AI Analysis**: Company potential scoring and risk assessment
 
-Changes made via Lovable will be committed automatically to this repo.
+### Database (Supabase)
+- **PostgreSQL**: Scalable cloud database
+- **Real-time**: Live data updates
+- **Authentication**: Built-in user management
+- **API**: RESTful API for data access
 
-**Use your preferred IDE**
+## 📊 Data Overview
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Companies**: 8,734+ Swedish companies
+- **Financial Data**: 35,409+ financial records
+- **KPIs**: Comprehensive financial metrics
+- **Segmentation**: Industry and growth analysis
+- **AI Insights**: Automated company scoring
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Setup Instructions
 
-Follow these steps:
+### Prerequisites
+- Node.js 16+
+- Python 3.8+
+- Supabase account
+- Git
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Frontend Setup (Marketing Website)
+```bash
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Start development server
+npm run dev
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Build for production
+npm run build
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Backend Setup (Data Analysis)
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Add your Supabase credentials to .env
+```
+
+### Database Setup
+1. Create a Supabase project
+2. Run the SQL migration: `database/supabase_create_tables.sql`
+3. Configure environment variables with your Supabase credentials
+
+## 🚀 Deployment
+
+### Frontend (Vercel)
+The frontend is automatically deployed to Vercel via Lovable:
+- **Lovable**: https://lovable.dev/projects/f34e3a91-e821-4705-9e65-257dcf59254e
+- **Vercel**: Automatically deployed from this repository
+
+### Backend (Local/Server)
+```bash
+cd backend
+# Run data processing scripts
+python fetch_allabolag.py
+python analyze_top_companies.py
+```
+
+### Database (Supabase)
+- Database is automatically deployed to Supabase cloud
+- Configure Row Level Security (RLS) policies as needed
+
+## 🔧 Configuration
+
+### Environment Variables
+
+#### Backend (.env)
+```
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+#### Frontend (if needed)
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
+
+## 📊 Key Database Tables
+
+- `companies`: Main company information
+- `company_accounts_by_id`: Financial data
+- `company_kpis_by_id`: Calculated KPIs
+- `segmentation_companies_raw`: Industry segmentation
+- `ai_company_analysis`: AI-powered insights
+- `website_fit_scores`: Website analysis
+
+## 🎨 Frontend Technologies
+
+- **Vite**: Fast build tool and dev server
+- **React**: UI library
+- **TypeScript**: Type safety
+- **Tailwind CSS**: Utility-first CSS framework
+- **shadcn/ui**: Beautiful UI components
+- **Framer Motion**: Animations (if used)
+
+## 🤝 Development Workflow
+
+### Using Lovable (Recommended)
+1. Visit the [Lovable Project](https://lovable.dev/projects/f34e3a91-e821-4705-9e65-257dcf59254e)
+2. Make changes via prompts
+3. Changes are automatically committed to this repository
+
+### Local Development
+```bash
+# Clone the repository
+git clone https://github.com/smooother/nivo-web.git
+cd nivo-web
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Backend Development
+```bash
+cd backend
+source venv/bin/activate
+python your_script.py
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📈 Usage
 
-**Use GitHub Codespaces**
+### Data Analysis
+```bash
+cd backend
+python fetch_allabolag.py      # Scrape new data
+python analyze_top_companies.py # Analyze companies
+python database_manager.py      # Manage database
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Website Development
+```bash
+npm run dev    # Start development server
+npm run build  # Build for production
+npm run preview # Preview production build
+```
 
-## What technologies are used for this project?
+## 🆘 Support
 
-This project is built with .
+For issues and questions:
+1. Check the documentation above
+2. Review existing issues in the repository
+3. Create a new issue with detailed information
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📄 License
 
-## How can I deploy this project?
+This project is for educational and research purposes.
 
-Simply open [Lovable](https://lovable.dev/projects/f34e3a91-e821-4705-9e65-257dcf59254e) and click on Share -> Publish.
+---
 
-## I want to use a custom domain - is that possible?
+**Built with ❤️ using React, Python, and Supabase**
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+**Powered by [Lovable](https://lovable.dev) for rapid frontend development**

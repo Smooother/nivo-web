@@ -1,0 +1,75 @@
+{
+    "financial_criteria": {
+        "revenue_min": 10000,
+        "revenue_max": 150000,
+        "profit_min": 500,
+        "profit_max": 15000,
+        "min_employees": 2,
+        "max_employees": 500
+    },
+    "growth_criteria": {
+        "min_revenue_growth": 0.05,
+        "min_profit_growth": 0.05,
+        "years_to_check": [2023, 2022, 2021]
+    },
+    "excluded_sectors": [
+        "Apoteksvaror, läkemedel - Partihandel",
+        "Gummivaror",
+        "Plåtslagerier",
+        "Lantbruksmaskiner, förnödenheter",
+        "Köttprodukter, slakteriprodukter",
+        "Bilreservdelar",
+        "Tryckerier",
+        "Skogstjänster",
+        "Livsmedel - agenturer och grossister",
+        "Spedition",
+        "Konferensarrangörer",
+        "Reklambyråer",
+        "Insatsvaror - grossister",
+        "Järnvaror",
+        "Förpackningar - Industrin",
+        "Arbetskraftstjänster",
+        "Bemanningsföretag",
+        "Bokhandlare",
+        "Detaljhandel",
+        "Detaljhandel - annat",
+        "Butikshandel -övrigt",
+        "Hotell",
+        "Resor",
+        "Catering",
+        "Restaurangutrustningar, storköksutrustningar"
+    ],
+    "included_sectors": [
+        "IT-konsulter",
+        "Programvaruutveckling",
+        "Teknisk konsultation",
+        "Systemutveckling",
+        "IT-drift och support",
+        "IT-säkerhet",
+        "Digital marknadsföring",
+        "E-handel",
+        "Industriteknik",
+        "Maskinteknik",
+        "Elektroteknik",
+        "Automation",
+        "Robotteknik",
+        "Miljöteknik",
+        "Energiteknik",
+        "Byggteknik",
+        "Arkitektkontor",
+        "Ingenjörskonsulter",
+        "Forsknings- och utvecklingsföretag",
+        "Teknisk konsultation"
+    ],
+    "website_criteria": {
+        "min_fit_score": 3,
+        "required_keywords": [
+            "kontakt",
+            "om oss",
+            "tjänster",
+            "produkter",
+            "kundcase",
+            "referenser"
+        ]
+    }
+} 
