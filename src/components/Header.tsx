@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from './ui/button';
+import { LogIn, LogOut, User } from 'lucide-react';
 
 interface HeaderProps {
   className?: string;
@@ -9,6 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +40,11 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = '/';
+  };
+
   return (
     <header
       className={cn(
@@ -59,6 +68,53 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         
         <div className="hidden md:flex items-center space-x-8">
           <NavLinks scrollToSection={scrollToSection} isScrolled={isScrolled} />
+          
+          {/* Auth buttons */}
+          <div className="flex items-center space-x-2">
+            {user ? (
+              <>
+                <NavLink to="/dashboard">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className={cn(
+                      "flex items-center space-x-1",
+                      isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                    )}
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Button>
+                </NavLink>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleSignOut}
+                  className={cn(
+                    "flex items-center space-x-1",
+                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                  )}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </Button>
+              </>
+            ) : (
+              <NavLink to="/auth">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className={cn(
+                    "flex items-center space-x-1",
+                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                  )}
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign In</span>
+                </Button>
+              </NavLink>
+            )}
+          </div>
         </div>
         
         <button 
