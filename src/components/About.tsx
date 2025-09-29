@@ -11,7 +11,7 @@ interface AboutProps {
 
 const About: React.FC<AboutProps> = ({ className, id }) => {
   return (
-    <section id={id} className={cn('py-20 md:py-32 bg-gray-50', className)}>
+    <section id={id} className={cn('py-20 md:py-32 bg-whisper', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-start max-w-6xl mx-auto">
           <FadeIn className="md:col-span-4" delay={100}>

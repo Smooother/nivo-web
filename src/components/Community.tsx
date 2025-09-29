@@ -34,7 +34,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <input
                     type="text"
                     id="name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                     placeholder="Ditt namn"
                   />
                 </div>
@@ -45,7 +45,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <input
                     type="text"
                     id="company"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                     placeholder="Ditt företag"
                   />
                 </div>
@@ -56,7 +56,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <input
                     type="email"
                     id="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                     placeholder="din@email.com"
                   />
                 </div>
@@ -67,13 +67,13 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <textarea
                     id="message"
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                     placeholder="Berätta om ditt företag..."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-accent text-accent-foreground py-2.5 px-4 rounded-md font-medium hover:bg-accent/90 transition-colors"
+                  className="w-full bg-primary text-primary-foreground py-2.5 px-4 rounded-md font-medium hover:bg-primary/90 transition-colors"
                 >
                   Skicka meddelande
                 </button>

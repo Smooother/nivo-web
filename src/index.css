@@ -4,74 +4,83 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
+    /* Circular Studio Brand Colors */
+    --charcoal: 0 0% 19%;           /* #2E2A2B - Charcoal */
+    --bronze-green: 60 17% 34%;     /* #596152 - Bronze Green */
+    --blanc: 0 0% 90%;              /* #E6E6E6 - Blanc de Blanc */
+    --whisper: 0 0% 97%;            /* #F7F7F7 - Whisper */
+    --white: 0 0% 100%;             /* #FFFFFF - White */
+    
+    /* Design System Colors using Brand Palette */
+    --background: var(--white);
+    --foreground: var(--charcoal);
 
-    --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
+    --card: var(--white);
+    --card-foreground: var(--charcoal);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
+    --popover: var(--white);
+    --popover-foreground: var(--charcoal);
 
-    --primary: 215 25% 25%;
-    --primary-foreground: 60 9.1% 97.8%;
+    --primary: var(--bronze-green);
+    --primary-foreground: var(--white);
 
-    --secondary: 210 15% 15%;
-    --secondary-foreground: 60 9.1% 97.8%;
+    --secondary: var(--whisper);
+    --secondary-foreground: var(--charcoal);
 
-    --muted: 210 10% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: var(--blanc);
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 220 13% 18%;
-    --accent-foreground: 0 0% 98%;
+    --accent: var(--bronze-green);
+    --accent-foreground: var(--white);
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
+    --destructive-foreground: var(--white);
 
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 220 14% 40%;
+    --border: var(--blanc);
+    --input: var(--blanc);
+    --ring: var(--bronze-green);
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: var(--whisper);
+    --sidebar-foreground: var(--charcoal);
+    --sidebar-primary: var(--bronze-green);
+    --sidebar-primary-foreground: var(--white);
+    --sidebar-accent: var(--blanc);
+    --sidebar-accent-foreground: var(--charcoal);
+    --sidebar-border: var(--blanc);
+    --sidebar-ring: var(--bronze-green);
   }
 
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
+    /* Dark mode using inverted brand colors */
+    --background: var(--charcoal);
+    --foreground: var(--whisper);
 
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
+    --card: var(--charcoal);
+    --card-foreground: var(--whisper);
 
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
+    --popover: var(--charcoal);
+    --popover-foreground: var(--whisper);
 
-    --primary: 60 9.1% 97.8%;
-    --primary-foreground: 24 9.8% 10%;
+    --primary: var(--bronze-green);
+    --primary-foreground: var(--white);
 
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: var(--whisper);
 
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
+    --accent: var(--bronze-green);
+    --accent-foreground: var(--white);
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
+    --destructive-foreground: var(--whisper);
 
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 24 5.7% 82.9%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: var(--bronze-green);
   }
 }
 

@@ -11,7 +11,7 @@ interface ManifestoProps {
 
 const Manifesto: React.FC<ManifestoProps> = ({ className, id }) => {
   return (
-    <section id={id} className={cn('py-20 bg-white', className)}>
+    <section id={id} className={cn('py-20 bg-whisper', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
           <FadeIn delay={100} direction="up">

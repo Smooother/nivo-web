@@ -24,6 +24,7 @@ export default {
 				serif: ['GT Sectra', 'Georgia', 'serif'],
 			},
 			colors: {
+				/* Base Design System */
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -67,17 +68,17 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				orangery: {
-					50: '#f9fafb',
-					100: '#f3f4f6',
-					200: '#e5e7eb',
-					300: '#d1d5db',
-					400: '#9ca3af',
-					500: '#6b7280',
-					600: '#4b5563',
-					700: '#374151',
-					800: '#1f2937',
-					900: '#111827',
+				/* Circular Studio Brand Colors - Direct Access */
+				charcoal: 'hsl(var(--charcoal))',
+				bronze: 'hsl(var(--bronze-green))',
+				blanc: 'hsl(var(--blanc))',
+				whisper: 'hsl(var(--whisper))',
+				studio: {
+					charcoal: 'hsl(var(--charcoal))',
+					bronze: 'hsl(var(--bronze-green))',
+					blanc: 'hsl(var(--blanc))',
+					whisper: 'hsl(var(--whisper))',
+					white: 'hsl(var(--white))'
 				}
 			},
 			borderRadius: {
