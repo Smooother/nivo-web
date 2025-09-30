@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import FadeIn from './animations/FadeIn';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +14,8 @@ const Gap: React.FC<GapProps> = ({ className }) => {
   const [messageIndex, setMessageIndex] = useState(0);
   const [opacity, setOpacity] = useState(1);
   const [email, setEmail] = useState('');
+  const intervalRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   
   const messages = [
     "Vill du diskutera framtida projekt eller möjligheter?",
@@ -22,20 +24,26 @@ const Gap: React.FC<GapProps> = ({ className }) => {
   ];
   
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      // Start fading out
+    intervalRef.current = window.setInterval(() => {
       setOpacity(0);
-      
-      // Change message after fade out
-      setTimeout(() => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = window.setTimeout(() => {
         setMessageIndex((prev) => (prev + 1) % messages.length);
-        // Start fading in
         setOpacity(1);
       }, 1000);
-    }, 4000); // Total time for each message
-    
-    return () => clearInterval(interval);
-  }, [messages.length]);
+    }, 4000);
+
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+      }
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
   
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,8 +117,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                   
                   <div className="flex justify-center mb-6">
                     <Button 
-                      variant="outline" 
-                      className="bg-orangery-500/10 text-orangery-700 border-orangery-200 hover:bg-orangery-500/20 min-h-[3.5rem] min-w-[220px] md:min-w-[280px]"
+                      className="bg-orangery-500/10 text-orangery-700 border border-orangery-200 hover:bg-orangery-500/20 min-h-[3.5rem] min-w-[220px] md:min-w-[280px]"
                     >
                       <span 
                         className="transition-opacity duration-1000 ease-in-out"

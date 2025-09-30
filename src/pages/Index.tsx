@@ -12,29 +12,26 @@ import Footer from '@/components/Footer';
 const Index = () => {
   useEffect(() => {
     // Smooth scroll behavior for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        
-        const targetId = this.getAttribute('href')?.substring(1);
-        if (!targetId) return;
-        
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-          window.scrollTo({
-            top: targetElement.offsetTop - 80, // Account for header height
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
+    const anchors = Array.from(document.querySelectorAll('a[href^="#"]')) as HTMLAnchorElement[];
+
+    const clickHandler = (e: Event) => {
+      e.preventDefault();
+      const anchor = e.currentTarget as HTMLAnchorElement;
+      const targetId = anchor.getAttribute('href')?.substring(1);
+      if (!targetId) return;
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    anchors.forEach(anchor => anchor.addEventListener('click', clickHandler));
     
     return () => {
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.removeEventListener('click', function (e) {
-          // Cleanup
-        });
-      });
+      anchors.forEach(anchor => anchor.removeEventListener('click', clickHandler));
     };
   }, []);
   

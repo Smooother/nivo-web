@@ -24,6 +24,18 @@ SEGMENTATION_PARAMS = {
 
 SEGMENTATION_BASE_URL = "https://www.allabolag.se/_next/data/TErsib-B2eQfZjo2ZZyYp/segmentation.json"
 
+# ---- Category filtering (align with mark_excluded_companies.py) ----
+EXCLUDE_NACE_KEYWORDS = [
+    "Uthyrning och förvaltning", "Fastighetsförvaltning", "Handel med egna fastigheter",
+    "Förvaltning av och handel med värdepapper", "Investment- och riskkapitalbolagsverksamhet",
+    "Holdingverksamhet", "Personalutbildning", "Gymnasial yrkesutbildning", "Förskoleutbildning",
+    "Grundskoleutbildning", "Öppna sociala insatser", "Odling", "Mjölkproduktion", "Skogsförvaltning",
+    "Verksamhet i andra intresseorganisationer", "Allmännyttiga anläggningsarbeten",
+    "Specialiserad butikshandel", "Apotekshandel", "Butikshandel", "Uthyrning och leasing",
+    "Arbetsförmedling", "Callcenterverksamhet", "Magasinering", "Städning", "Lokalvård",
+]
+EXCEPTION_NACE = "Uthyrning och leasing av bygg- och anläggningsmaskiner"
+
 # ---- DB SETUP ----
 engine = create_engine(f"sqlite:///{DB_PATH}")
 lock = Lock()
