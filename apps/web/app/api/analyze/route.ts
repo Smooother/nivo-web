@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { getSupabaseServer } from '@/lib/supabaseServer';
-import { webSearch } from '@/app/lib/search';
+import { webSearch } from '@/lib/search';
 import { fetchAndExtract } from '@/app/lib/fetchPage';
 import { analyzeCompany } from '@/app/lib/ai';
 import pLimit from 'p-limit';
@@ -9,11 +10,12 @@ import pLimit from 'p-limit';
 export async function POST(req: NextRequest) {
   const supabase = getSupabaseServer();
   const body = await req.json();
-  const { listId, analysisKind, params, force } = body as {
+  const { listId, analysisKind, params, force, provider } = body as {
     listId: string;
     analysisKind: 'financial' | 'commercial' | 'both';
     params?: any;
     force?: boolean;
+    provider?: string;
   };
 
   if (!listId || !analysisKind) return NextResponse.json({ error: 'missing fields' }, { status: 400 });
@@ -38,6 +40,8 @@ export async function POST(req: NextRequest) {
 
   const orgs = (items ?? []).map((i) => i.org_number);
   const limit = pLimit(4);
+  const cookieStore = cookies();
+  const selectedProvider = (provider || cookieStore.get('search_provider')?.value || process.env.SEARCH_API_PROVIDER || 'tavily').toLowerCase();
 
   const analyzeOne = async (org_number: string) => {
     try {
@@ -79,9 +83,9 @@ export async function POST(req: NextRequest) {
       const financials = (financialRows ?? []).map((r) => ({ year: r.year, revenue: r.revenue, ebit: r.ebit, ebitda: r.ebitda, margin: r.margin }));
 
       const query = `"${company?.name || org_number}" ${company?.industry || ''} company news`;
-      const sources = await webSearch(query, 4);
+      const sources = await webSearch(query, { provider: selectedProvider, num: 5 });
       const docs = await Promise.all(
-        sources.map(async (s) => {
+        sources.slice(0, 5).map(async (s) => {
           const page = await fetchAndExtract(s.url);
           return { url: s.url, title: page.title || s.title, text: page.text };
         }),
