@@ -1,0 +1,42 @@
+{
+  "ebit_margin": {
+    "formula": "RG / SDI",
+    "description": "EBIT margin (Rörelseresultat / Nettoomsättning)",
+    "interpretation": "Shows the proportion of revenue left after operating expenses; higher is better."
+  },
+  "net_margin": {
+    "formula": "DR / SDI",
+    "description": "Net margin (Årets resultat / Nettoomsättning)",
+    "interpretation": "Shows the proportion of revenue left as net profit; higher is better."
+  },
+  "pbt_margin": {
+    "formula": "resultat_e_finansnetto / SDI",
+    "description": "Profit before tax margin (Resultat efter finansnetto / Nettoomsättning)",
+    "interpretation": "Shows the proportion of revenue left before tax; higher is better."
+  },
+  "revenue_growth": {
+    "formula": "(SDI_this_year - SDI_last_year) / SDI_last_year",
+    "description": "Year-on-year revenue growth",
+    "interpretation": "Shows the percentage change in revenue from the previous year."
+  },
+  "ebit_growth": {
+    "formula": "(RG_this_year - RG_last_year) / RG_last_year",
+    "description": "Year-on-year EBIT growth",
+    "interpretation": "Shows the percentage change in EBIT from the previous year."
+  },
+  "profit_growth": {
+    "formula": "(DR_this_year - DR_last_year) / DR_last_year",
+    "description": "Year-on-year profit growth",
+    "interpretation": "Shows the percentage change in net profit from the previous year."
+  },
+  "equity_ratio": {
+    "formula": "EKA",
+    "description": "Equity ratio (Eget kapitalandel)",
+    "interpretation": "Shows the proportion of assets financed by equity; higher is safer."
+  },
+  "return_on_equity": {
+    "formula": "avk_eget_kapital",
+    "description": "Return on equity (Avkastning på eget kapital)",
+    "interpretation": "Shows the return generated on shareholders' equity; higher is better."
+  }
+} 

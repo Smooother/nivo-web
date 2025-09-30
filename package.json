@@ -1,0 +1,21 @@
+{
+  "name": "nivo",
+  "version": "1.0.0",
+  "description": "Nivo - Swedish Company Intelligence Platform - Full Stack Application",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "setup": "npm run install:frontend && npm run install:backend",
+    "deploy": "vercel --prod"
+  },
+  "workspaces": [
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

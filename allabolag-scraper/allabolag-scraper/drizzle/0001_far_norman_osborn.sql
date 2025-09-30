@@ -1,0 +1,1 @@
+DROP TABLE "raw_companies_company_id_idx" CASCADE;
