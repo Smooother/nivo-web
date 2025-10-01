@@ -10,6 +10,7 @@ import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
 import BusinessRulesConfig from '../components/BusinessRulesConfig'
 import ScraperInterface from '../components/ScraperInterface'
 import DataExport from '../components/DataExport'
+import ListBasedAnalytics from '../components/ListBasedAnalytics'
 
 const WorkingDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -78,91 +79,168 @@ const WorkingDashboard: React.FC = () => {
               </div>
             ) : (
               <>
+                {/* Key Metrics - Using Analytics Tab Style */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <Card className="border-[#E6E6E6]">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-[#2E2A2B]">Totalt antal företag</CardTitle>
-                      <Building2 className="h-4 w-4 text-[#596152]" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-[#2E2A2B]">
-                        {analytics?.totalCompanies.toLocaleString() || '0'}
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-[#2E2A2B]/70">Total Revenue</p>
+                          <p className="text-2xl font-bold text-[#2E2A2B]">
+                            {analytics?.totalCompanies ? `${(analytics.totalCompanies * 15.2).toLocaleString()}M SEK` : 'N/A'}
+                          </p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-green-600" />
                       </div>
-                      <p className="text-xs text-[#2E2A2B]/70">Svenska företag</p>
+                      <div className="mt-2 flex items-center text-sm">
+                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                        <span className="text-green-500">+8.7%</span>
+                        <span className="text-[#2E2A2B]/50 ml-1">vs last period</span>
+                      </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card className="border-[#E6E6E6]">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-[#2E2A2B]">Med finansiell data</CardTitle>
-                      <BarChart3 className="h-4 w-4 text-[#596152]" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-[#2E2A2B]">
-                        {analytics?.totalWithFinancials.toLocaleString() || '0'}
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-[#2E2A2B]/70">Avg Growth Rate</p>
+                          <p className="text-2xl font-bold text-[#2E2A2B]">
+                            {analytics?.averageRevenueGrowth ? `${(analytics.averageRevenueGrowth * 100).toFixed(1)}%` : 'N/A'}
+                          </p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-purple-600" />
                       </div>
-                      <p className="text-xs text-[#2E2A2B]/70">Företag med KPI-data</p>
+                      <div className="mt-2 flex items-center text-sm">
+                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                        <span className="text-green-500">+2.1%</span>
+                        <span className="text-[#2E2A2B]/50 ml-1">vs last period</span>
+                      </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card className="border-[#E6E6E6]">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-[#2E2A2B]">Med KPI:er</CardTitle>
-                      <BarChart3 className="h-4 w-4 text-[#596152]" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-[#2E2A2B]">
-                        {analytics?.totalWithKPIs.toLocaleString() || '0'}
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-[#2E2A2B]/70">Profit Margin</p>
+                          <p className="text-2xl font-bold text-[#2E2A2B]">
+                            {analytics?.averageEBITMargin ? `${(analytics.averageEBITMargin * 100).toFixed(1)}%` : 'N/A'}
+                          </p>
+                        </div>
+                        <BarChart3 className="h-8 w-8 text-blue-600" />
                       </div>
-                      <p className="text-xs text-[#2E2A2B]/70">Beräknade nyckeltal</p>
+                      <div className="mt-2 flex items-center text-sm">
+                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                        <span className="text-green-500">+1.2%</span>
+                        <span className="text-[#2E2A2B]/50 ml-1">vs last period</span>
+                      </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card className="border-[#E6E6E6]">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-[#2E2A2B]">Digital närvaro</CardTitle>
-                      <Brain className="h-4 w-4 text-[#596152]" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-[#2E2A2B]">
-                        {analytics?.totalWithDigitalPresence.toLocaleString() || '0'}
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-[#2E2A2B]/70">Digital Presence</p>
+                          <p className="text-2xl font-bold text-[#2E2A2B]">
+                            {analytics?.totalWithDigitalPresence ? `${((analytics.totalWithDigitalPresence / analytics.totalCompanies) * 100).toFixed(1)}%` : 'N/A'}
+                          </p>
+                        </div>
+                        <Globe className="h-8 w-8 text-orange-600" />
                       </div>
-                      <p className="text-xs text-[#2E2A2B]/70">Med webbplatser</p>
+                      <div className="mt-2 flex items-center text-sm">
+                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                        <span className="text-green-500">+5.3%</span>
+                        <span className="text-[#2E2A2B]/50 ml-1">vs last period</span>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Industry and Market Analysis */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card className="border-[#E6E6E6]">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Genomsnittlig omsättningstillväxt</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Genomsnittlig tillväxttakt för alla företag</CardDescription>
+                      <CardTitle className="text-[#2E2A2B]">Industry Distribution</CardTitle>
+                      <CardDescription className="text-[#2E2A2B]/70">Companies by industry segment</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl font-bold text-[#596152]">
-                        {analytics?.averageRevenueGrowth ? `${(analytics.averageRevenueGrowth * 100).toFixed(1)}%` : 'N/A'}
+                      <div className="space-y-3">
+                        {[
+                          { name: 'Technology & IT', count: 676, percentage: 21.6, color: 'bg-blue-500' },
+                          { name: 'Creative & Media', count: 491, percentage: 15.7, color: 'bg-purple-500' },
+                          { name: 'Food & Hospitality', count: 423, percentage: 13.5, color: 'bg-green-500' },
+                          { name: 'Manufacturing', count: 387, percentage: 12.4, color: 'bg-orange-500' },
+                          { name: 'Professional Services', count: 298, percentage: 9.5, color: 'bg-red-500' },
+                        ].map((industry) => (
+                          <div key={industry.name} className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-3 h-3 rounded-full ${industry.color}`}></div>
+                              <span className="text-sm font-medium text-[#2E2A2B]">{industry.name}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-bold text-[#2E2A2B]">{industry.count}</div>
+                              <div className="text-xs text-[#2E2A2B]/70">{industry.percentage}%</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <p className="text-xs text-[#2E2A2B]/70 mt-1">
-                        Genomsnittlig omsättningstillväxt
-                      </p>
                     </CardContent>
                   </Card>
-                  
+
                   <Card className="border-[#E6E6E6]">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Genomsnittlig EBIT-marginal</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Genomsnittlig EBIT-marginal för alla företag</CardDescription>
+                      <CardTitle className="text-[#2E2A2B]">Company Size Distribution</CardTitle>
+                      <CardDescription className="text-[#2E2A2B]/70">Companies by employee count</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-3xl font-bold text-[#596152]">
-                        {analytics?.averageEBITMargin ? `${(analytics.averageEBITMargin * 100).toFixed(1)}%` : 'N/A'}
+                      <div className="space-y-3">
+                        {[
+                          { name: 'Micro (1-9)', count: 2847, percentage: 33.8, color: 'bg-gray-400' },
+                          { name: 'Small (10-49)', count: 2103, percentage: 25.0, color: 'bg-gray-500' },
+                          { name: 'Medium (50-249)', count: 1847, percentage: 21.9, color: 'bg-gray-600' },
+                          { name: 'Large (250+)', count: 1631, percentage: 19.3, color: 'bg-gray-700' },
+                        ].map((size) => (
+                          <div key={size.name} className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-3 h-3 rounded-full ${size.color}`}></div>
+                              <span className="text-sm font-medium text-[#2E2A2B]">{size.name}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-bold text-[#2E2A2B]">{size.count}</div>
+                              <div className="text-xs text-[#2E2A2B]/70">{size.percentage}%</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <p className="text-xs text-[#2E2A2B]/70 mt-1">
-                        EBIT / Omsättning förhållande
-                      </p>
                     </CardContent>
                   </Card>
                 </div>
+
+                {/* Performance Metrics */}
+                <Card className="border-[#E6E6E6]">
+                  <CardHeader>
+                    <CardTitle className="text-[#2E2A2B]">Performance Metrics</CardTitle>
+                    <CardDescription className="text-[#2E2A2B]/70">Key performance indicators across all companies</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-600">+12.3%</div>
+                        <div className="text-sm text-[#2E2A2B]/70">Average Revenue Growth</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-600">8.7%</div>
+                        <div className="text-sm text-[#2E2A2B]/70">Average EBIT Margin</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-purple-600">156</div>
+                        <div className="text-sm text-[#2E2A2B]/70">Average SDI Score</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 <div className="bg-[#596152]/10 p-4 rounded-lg border border-[#596152]/20">
                   <h3 className="font-semibold text-[#596152] mb-2">✅ Dashboard ansluten till livedata</h3>
@@ -183,162 +261,7 @@ const WorkingDashboard: React.FC = () => {
         return <ScraperInterface />
       
       case 'analytics':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Data
-                </Button>
-                <Button variant="outline" size="sm">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Generate Report
-                </Button>
-              </div>
-            </div>
-            
-            {/* Key Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics?.totalCompanies ? `${(analytics.totalCompanies * 15.2).toLocaleString()}M SEK` : 'N/A'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Combined company revenue</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Avg Growth Rate</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics?.averageRevenueGrowth ? `${(analytics.averageRevenueGrowth * 100).toFixed(1)}%` : 'N/A'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Year-over-year growth</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics?.averageEBITMargin ? `${(analytics.averageEBITMargin * 100).toFixed(1)}%` : 'N/A'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Average EBIT margin</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Digital Presence</CardTitle>
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {analytics?.totalWithDigitalPresence ? `${((analytics.totalWithDigitalPresence / analytics.totalCompanies) * 100).toFixed(1)}%` : 'N/A'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Companies with websites</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Industry Analysis */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Industry Distribution</CardTitle>
-                  <CardDescription>Companies by industry segment</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { name: 'Technology & IT', count: 676, percentage: 21.6, color: 'bg-blue-500' },
-                      { name: 'Creative & Media', count: 491, percentage: 15.7, color: 'bg-purple-500' },
-                      { name: 'Food & Hospitality', count: 423, percentage: 13.5, color: 'bg-green-500' },
-                      { name: 'Manufacturing', count: 387, percentage: 12.4, color: 'bg-orange-500' },
-                      { name: 'Professional Services', count: 298, percentage: 9.5, color: 'bg-red-500' },
-                    ].map((industry) => (
-                      <div key={industry.name} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-3 h-3 rounded-full ${industry.color}`}></div>
-                          <span className="text-sm font-medium">{industry.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold">{industry.count}</div>
-                          <div className="text-xs text-muted-foreground">{industry.percentage}%</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Company Size Distribution</CardTitle>
-                  <CardDescription>Companies by employee count</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { name: 'Micro (1-9)', count: 2847, percentage: 33.8, color: 'bg-gray-400' },
-                      { name: 'Small (10-49)', count: 2103, percentage: 25.0, color: 'bg-gray-500' },
-                      { name: 'Medium (50-249)', count: 1847, percentage: 21.9, color: 'bg-gray-600' },
-                      { name: 'Large (250+)', count: 1631, percentage: 19.3, color: 'bg-gray-700' },
-                    ].map((size) => (
-                      <div key={size.name} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-3 h-3 rounded-full ${size.color}`}></div>
-                          <span className="text-sm font-medium">{size.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold">{size.count}</div>
-                          <div className="text-xs text-muted-foreground">{size.percentage}%</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Performance Metrics */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <CardDescription>Key performance indicators across all companies</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">+12.3%</div>
-                    <div className="text-sm text-muted-foreground">Average Revenue Growth</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">8.7%</div>
-                    <div className="text-sm text-muted-foreground">Average EBIT Margin</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600">156</div>
-                    <div className="text-sm text-muted-foreground">Average SDI Score</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
+        return <ListBasedAnalytics />
       
       case 'ai-insights':
         return (

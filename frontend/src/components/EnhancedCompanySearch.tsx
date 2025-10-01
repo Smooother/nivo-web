@@ -22,6 +22,7 @@ import {
   X
 } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany, CompanyFilter } from '../lib/supabaseDataService'
+import CompanyListManager from './CompanyListManager'
 
 interface SearchResults {
   companies: SupabaseCompany[]
@@ -35,6 +36,16 @@ interface SearchResults {
   }
 }
 
+interface SavedCompanyList {
+  id: string
+  name: string
+  description?: string
+  companies: SupabaseCompany[]
+  filters: any
+  createdAt: string
+  updatedAt: string
+}
+
 const EnhancedCompanySearch: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(false)
@@ -44,6 +55,7 @@ const EnhancedCompanySearch: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'analysis'>('list')
   const [selectedCompany, setSelectedCompany] = useState<SupabaseCompany | null>(null)
   const [showCompanyDetail, setShowCompanyDetail] = useState(false)
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
 
   const itemsPerPage = 20
 
@@ -168,6 +180,21 @@ const EnhancedCompanySearch: React.FC = () => {
     setFilters({})
     setSearchTerm('')
     setCurrentPage(1)
+  }
+
+  const handleListSelect = (list: SavedCompanyList) => {
+    // Apply the saved list's filters and companies
+    setFilters(list.filters)
+    setSearchResults({
+      companies: list.companies,
+      total: list.companies.length,
+      summary: calculateSummary(list.companies)
+    })
+    setCurrentPage(1)
+  }
+
+  const handleListUpdate = (lists: SavedCompanyList[]) => {
+    setSavedLists(lists)
   }
 
   const formatNumber = (num: number | null | undefined) => {
@@ -348,6 +375,14 @@ const EnhancedCompanySearch: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Company List Manager */}
+      <CompanyListManager
+        currentCompanies={searchResults?.companies || []}
+        currentFilters={filters}
+        onListSelect={handleListSelect}
+        onListUpdate={handleListUpdate}
+      />
 
       {/* Results */}
       {searchResults && (
