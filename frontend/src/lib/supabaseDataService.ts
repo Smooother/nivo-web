@@ -1,6 +1,10 @@
 import type { PostgrestFilterBuilder } from '@supabase/postgrest-js'
 import type { PostgrestError } from '@supabase/supabase-js'
-import { supabase } from './supabase'
+import { supabase, supabaseConfig } from './supabase'
+import {
+  filterLocalCompanies,
+  getLocalCompanyByOrgNr as getLocalCompanyByOrgNrFallback
+} from './sampleData'
 
 export interface HistoricalDataPoint {
   year: number
@@ -255,6 +259,19 @@ export const supabaseDataService = {
     pageSize = DEFAULT_PAGE_SIZE,
     filters: CompanyFilter = {}
   ): Promise<CompanySearchResult> {
+    if (!supabaseConfig.isConfigured) {
+      const filtered = filterLocalCompanies(filters)
+      const from = (page - 1) * pageSize
+      const to = from + pageSize
+      const paginated = filtered.slice(from, to)
+
+      return {
+        companies: paginated,
+        total: filtered.length,
+        error: null
+      }
+    }
+
     const from = (page - 1) * pageSize
     const to = from + pageSize - 1
 
@@ -287,6 +304,21 @@ export const supabaseDataService = {
   },
 
   async getDashboardAnalytics(filters: CompanyFilter = {}): Promise<DashboardAnalytics> {
+    if (!supabaseConfig.isConfigured) {
+      const filtered = filterLocalCompanies(filters)
+      const aggregations = buildDashboardAggregations(filtered)
+      const lastUpdated = filtered
+        .map(company => company.analysis_year)
+        .filter((year): year is number => typeof year === 'number')
+        .sort((a, b) => b - a)[0]
+
+      return {
+        totalCompanies: filtered.length,
+        lastUpdated: lastUpdated ? `${lastUpdated}-12-31` : null,
+        ...aggregations
+      }
+    }
+
     let query: CompanyQuery = supabase
       .from('master_analytics')
       .select(COMPANY_FIELDS, { count: 'exact' })
@@ -327,6 +359,10 @@ export const supabaseDataService = {
   },
 
   async getCompanyByOrgNr(orgNr: string): Promise<SupabaseCompany | null> {
+    if (!supabaseConfig.isConfigured) {
+      return getLocalCompanyByOrgNrFallback(orgNr)
+    }
+
     const { data, error } = await supabase
       .from('master_analytics')
       .select(COMPANY_FIELDS)

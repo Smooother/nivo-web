@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Loader2, Users, CheckCircle, XCircle, Clock, Shield, Mail, Calendar } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseConfig } from '../lib/supabase';
 
 interface User {
   id: string;
@@ -25,12 +25,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const supabaseEnabled = supabaseConfig.isConfigured;
 
   // Fetch all users
   const fetchUsers = async () => {
+    if (!supabaseEnabled) {
+      setUsers([
+        {
+          id: 'local-demo-admin',
+          email: 'demo@nivo.ai',
+          role: 'admin',
+          created_at: new Date().toISOString(),
+          approved_by: 'system',
+          approved_at: new Date().toISOString()
+        }
+      ]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      
+
       const { data, error } = await supabase
         .from('user_roles')
         .select('*')
@@ -63,10 +79,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [supabaseEnabled]);
 
   // Approve user
   const approveUser = async (userId: string) => {
+    if (!supabaseEnabled) {
+      setError('Supabase is not configured in this environment.');
+      return;
+    }
+
     try {
       setActionLoading(userId);
       const { error } = await supabase
@@ -91,6 +112,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   // Reject user
   const rejectUser = async (userId: string) => {
+    if (!supabaseEnabled) {
+      setError('Supabase is not configured in this environment.');
+      return;
+    }
+
     try {
       setActionLoading(userId);
       const { error } = await supabase
@@ -111,6 +137,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   // Make user admin
   const makeAdmin = async (userId: string) => {
+    if (!supabaseEnabled) {
+      setError('Supabase is not configured in this environment.');
+      return;
+    }
+
     try {
       setActionLoading(userId);
       const { error } = await supabase
@@ -266,7 +297,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                     <Button
                       size="sm"
                       onClick={() => approveUser(user.id)}
-                      disabled={actionLoading === user.id}
+                      disabled={!supabaseEnabled || actionLoading === user.id}
                     >
                       {actionLoading === user.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -281,7 +312,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       size="sm"
                       variant="destructive"
                       onClick={() => rejectUser(user.id)}
-                      disabled={actionLoading === user.id}
+                      disabled={!supabaseEnabled || actionLoading === user.id}
                     >
                       {actionLoading === user.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -339,7 +370,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       size="sm"
                       variant="outline"
                       onClick={() => makeAdmin(user.id)}
-                      disabled={actionLoading === user.id}
+                      disabled={!supabaseEnabled || actionLoading === user.id}
                     >
                       {actionLoading === user.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

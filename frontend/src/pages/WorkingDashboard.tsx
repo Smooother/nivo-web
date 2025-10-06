@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Alert, AlertDescription } from '../components/ui/alert'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { BarChart3, Building2, Search, Brain, Download, Shield, Menu, X, LogOut, User, Loader2, Database, Target, TrendingUp, DollarSign, Globe, Users } from 'lucide-react'
 import { supabaseDataService, DashboardAnalytics } from '../lib/supabaseDataService'
+import { supabaseConfig } from '../lib/supabase'
 import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
 import BusinessRulesConfig from '../components/BusinessRulesConfig'
 import ScraperInterface from '../components/ScraperInterface'
@@ -17,6 +19,7 @@ const WorkingDashboard: React.FC = () => {
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
   const { user, userRole, signOut } = useAuth()
+  const supabaseEnabled = supabaseConfig.isConfigured
 
   // Load dashboard analytics
   useEffect(() => {
@@ -70,6 +73,15 @@ const WorkingDashboard: React.FC = () => {
                 Din omfattande affärsintelligensplattform med realtidsdata och insikter.
               </p>
             </div>
+
+            {!supabaseEnabled && (
+              <Alert>
+                <AlertDescription>
+                  Supabase-integration är inte konfigurerad i denna miljö. Instrumentpanelen använder det incheckade demo-
+                  datasetet för att visa funktionaliteten.
+                </AlertDescription>
+              </Alert>
+            )}
             
             {loading ? (
               <div className="flex items-center justify-center py-12">
