@@ -704,9 +704,142 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
           <AIAnalysisWorkflow 
             onAnalysisComplete={(results) => {
               console.log('AI Analysis Complete:', results)
-              // Handle the results here if needed
+              // Convert AI analysis results to our format and display them
+              if (results && results.length > 0) {
+                const convertedResults = results.map(result => ({
+                  company: {
+                    OrgNr: result.orgNr,
+                    name: result.name,
+                    SDI: 0, // These would need to be fetched from the original data
+                    Revenue_growth: 0,
+                    EBIT_margin: 0,
+                    NetProfit_margin: 0,
+                    segment_name: '',
+                    city: '',
+                    employees: '',
+                    homepage: '',
+                    address: '',
+                    incorporation_date: ''
+                  },
+                  financialScore: result.financialHealth || 0,
+                  marketScore: 0,
+                  growthScore: 0,
+                  efficiencyScore: 0,
+                  overallScore: result.confidence || 0,
+                  primeTargetScore: result.confidence || 0,
+                  aiAnalysis: {
+                    executiveSummary: result.executiveSummary || '',
+                    strengths: result.strengths || [],
+                    weaknesses: result.weaknesses || [],
+                    opportunities: result.opportunities || [],
+                    risks: result.risks || [],
+                    recommendation: result.recommendation || '',
+                    targetPrice: result.targetPrice || 0,
+                    confidence: result.confidence || 0
+                  },
+                  financialMetrics: {
+                    revenue: 0,
+                    growth: 0,
+                    margin: 0,
+                    efficiency: 0
+                  },
+                  softFactors: {
+                    marketPosition: result.marketPosition || '',
+                    growthPotential: result.growthPotential || '',
+                    riskFactors: result.risks || [],
+                    opportunities: result.opportunities || []
+                  }
+                }))
+                setAnalysisResults(convertedResults)
+                setLoading(false)
+              }
             }}
           />
+          
+          {/* Display AI Analysis Results */}
+          {analysisResults.length > 0 && (
+            <div className="mt-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Brain className="h-5 w-5 mr-2" />
+                    AI Analysis Results
+                  </CardTitle>
+                  <CardDescription>
+                    Results from OpenAI analysis of selected companies
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {analysisResults.map((analysis, index) => (
+                      <div key={analysis.company.OrgNr} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="font-semibold text-lg">{analysis.company.name}</h3>
+                            <p className="text-sm text-gray-600">{analysis.company.OrgNr}</p>
+                          </div>
+                          <Badge variant={analysis.aiAnalysis.recommendation === 'Köp' ? 'default' : 
+                                         analysis.aiAnalysis.recommendation === 'Håll' ? 'secondary' : 'destructive'}>
+                            {analysis.aiAnalysis.recommendation}
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-medium mb-2">Executive Summary</h4>
+                            <p className="text-sm text-gray-700">{analysis.aiAnalysis.executiveSummary}</p>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-medium mb-2">Financial Health</h4>
+                            <div className="flex items-center gap-2">
+                              <Progress value={analysis.aiAnalysis.financialHealth * 10} className="flex-1" />
+                              <span className="text-sm font-medium">{analysis.aiAnalysis.financialHealth}/10</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <h4 className="font-medium mb-2">Strengths</h4>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              {analysis.aiAnalysis.strengths.map((strength, i) => (
+                                <li key={i}>• {strength}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-medium mb-2">Opportunities</h4>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              {analysis.aiAnalysis.opportunities.map((opportunity, i) => (
+                                <li key={i}>• {opportunity}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                        
+                        {analysis.aiAnalysis.targetPrice > 0 && (
+                          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">Target Price:</span>
+                              <span className="text-lg font-bold text-green-600">
+                                {analysis.aiAnalysis.targetPrice.toLocaleString('sv-SE')} TSEK
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center mt-1">
+                              <span className="text-sm text-gray-600">Confidence:</span>
+                              <span className="text-sm font-medium">{analysis.aiAnalysis.confidence}%</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </TabsContent>
         
         <TabsContent value="simulated" className="mt-6">
