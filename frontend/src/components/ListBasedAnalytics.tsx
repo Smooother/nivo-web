@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Badge } from './ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 import { 
   BarChart3, 
   TrendingUp, 
@@ -13,7 +15,6 @@ import {
   LineChart,
   Target,
   Users,
-  DollarSign,
   Calendar,
   Filter,
   Download,
@@ -44,6 +45,33 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
   const [selectedList, setSelectedList] = useState<SavedCompanyList | null>(null)
   const [analyticsData, setAnalyticsData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null)
+  const [selectedCity, setSelectedCity] = useState<string | null>(null)
+  const [isIndustryModalOpen, setIsIndustryModalOpen] = useState(false)
+  const [isCityModalOpen, setIsCityModalOpen] = useState(false)
+
+  // Helper functions to get companies by industry/city
+  const getCompaniesByIndustry = (industryName: string): SupabaseCompany[] => {
+    if (!selectedList) return []
+    return selectedList.companies.filter(company => 
+      (company.segment_name || company.industry_name || 'Unknown') === industryName
+    )
+  }
+
+  const getCompaniesByCity = (cityName: string): SupabaseCompany[] => {
+    if (!selectedList) return []
+    return selectedList.companies.filter(company => 
+      (company.city || 'Unknown') === cityName
+    )
+  }
+
+  const formatCurrency = (value: number) => {
+    // SDI values are already in thousands of SEK, so format directly
+    return `${value.toLocaleString('sv-SE', { 
+      minimumFractionDigits: 0, 
+      maximumFractionDigits: 0 
+    })} TSEK`
+  }
 
   // Load saved lists from localStorage
   useEffect(() => {
@@ -81,8 +109,21 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
         return
       }
 
-      // Calculate total revenue
-      const totalRevenue = companies.reduce((sum, c) => sum + (c.SDI || 0), 0)
+      // Calculate average and median revenue
+      const revenues = companies
+        .map(c => c.SDI || 0)
+        .filter(revenue => revenue > 0)
+        .sort((a, b) => a - b)
+      
+      const avgRevenue = revenues.length > 0 
+        ? revenues.reduce((sum, revenue) => sum + revenue, 0) / revenues.length
+        : 0
+      
+      const medianRevenue = revenues.length > 0
+        ? revenues.length % 2 === 0
+          ? (revenues[revenues.length / 2 - 1] + revenues[revenues.length / 2]) / 2
+          : revenues[Math.floor(revenues.length / 2)]
+        : 0
       
       // Calculate average growth rate
       const companiesWithGrowth = companies.filter(c => c.Revenue_growth !== null)
@@ -174,7 +215,8 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
 
       setAnalyticsData({
         totalCompanies,
-        totalRevenue,
+        avgRevenue,
+        medianRevenue,
         avgGrowthRate: avgGrowthRate * 100, // Convert to percentage
         avgEBITMargin: avgEBITMargin * 100, // Convert to percentage
         digitalPresencePercentage,
@@ -195,9 +237,6 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
     return num.toString()
   }
 
-  const formatCurrency = (num: number): string => {
-    return `${formatNumber(num)} SEK`
-  }
 
   if (savedLists.length === 0) {
     return (
@@ -304,15 +343,9 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-2xl font-bold">{formatCurrency(analyticsData.totalRevenue)}</p>
+                    <p className="text-sm font-medium text-gray-600">Genomsnittlig Omsättning</p>
+                    <p className="text-2xl font-bold">{formatCurrency(analyticsData.avgRevenue)}</p>
                   </div>
-                  <DollarSign className="h-8 w-8 text-green-600" />
-                </div>
-                <div className="mt-2 flex items-center text-sm">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-green-500">+8.7%</span>
-                  <span className="text-gray-500 ml-1">vs genomsnitt</span>
                 </div>
               </CardContent>
             </Card>
@@ -321,16 +354,22 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Avg Growth Rate</p>
+                    <p className="text-sm font-medium text-gray-600">Median Omsättning</p>
+                    <p className="text-2xl font-bold">{formatCurrency(analyticsData.medianRevenue)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Genomsnittlig Tillväxt</p>
                     <p className="text-2xl font-bold">{analyticsData.avgGrowthRate.toFixed(1)}%</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-purple-600" />
                 </div>
-                <div className="mt-2 flex items-center text-sm">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-green-500">+2.1%</span>
-                  <span className="text-gray-500 ml-1">vs genomsnitt</span>
-                </div>
               </CardContent>
             </Card>
 
@@ -338,34 +377,14 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Avg EBIT Margin</p>
+                    <p className="text-sm font-medium text-gray-600">Genomsnittlig EBIT Marginal</p>
                     <p className="text-2xl font-bold">{analyticsData.avgEBITMargin.toFixed(1)}%</p>
                   </div>
                   <BarChart3 className="h-8 w-8 text-blue-600" />
                 </div>
-                <div className="mt-2 flex items-center text-sm">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-green-500">+1.2%</span>
-                  <span className="text-gray-500 ml-1">vs genomsnitt</span>
-                </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Digital Presence</p>
-                    <p className="text-2xl font-bold">{analyticsData.digitalPresencePercentage.toFixed(1)}%</p>
-                  </div>
-                  <Building2 className="h-8 w-8 text-orange-600" />
-                </div>
-                <div className="mt-2 flex items-center text-sm">
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-green-500">Aktiv</span>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Industry and Geographic Analysis */}
@@ -381,7 +400,14 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent>
                 <div className="space-y-4">
                   {analyticsData.topIndustries.map((industry: any, index: number) => (
-                    <div key={industry.name} className="flex items-center justify-between">
+                    <div 
+                      key={industry.name} 
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setSelectedIndustry(industry.name)
+                        setIsIndustryModalOpen(true)
+                      }}
+                    >
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
                           <span className="text-sm font-medium text-blue-600">{index + 1}</span>
@@ -409,7 +435,14 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent>
                 <div className="space-y-4">
                   {analyticsData.topCities.map((city: any, index: number) => (
-                    <div key={city.name} className="flex items-center justify-between">
+                    <div 
+                      key={city.name} 
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setSelectedCity(city.name)
+                        setIsCityModalOpen(true)
+                      }}
+                    >
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
                           <span className="text-sm font-medium text-green-600">{index + 1}</span>
@@ -503,6 +536,94 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
           </p>
         </div>
       )}
+
+      {/* Industry Companies Modal */}
+      <Dialog open={isIndustryModalOpen} onOpenChange={setIsIndustryModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Företag inom {selectedIndustry}</DialogTitle>
+            <DialogDescription>
+              {selectedIndustry && getCompaniesByIndustry(selectedIndustry).length} företag hittades
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Företag</TableHead>
+                  <TableHead>OrgNr</TableHead>
+                  <TableHead>Stad</TableHead>
+                  <TableHead>Omsättning</TableHead>
+                  <TableHead>Tillväxt</TableHead>
+                  <TableHead>Marginal</TableHead>
+                  <TableHead>Anställda</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {selectedIndustry && getCompaniesByIndustry(selectedIndustry).map((company) => (
+                  <TableRow key={company.OrgNr}>
+                    <TableCell className="font-medium">{company.name}</TableCell>
+                    <TableCell>{company.OrgNr}</TableCell>
+                    <TableCell>{company.city || 'Okänd'}</TableCell>
+                    <TableCell>{formatCurrency(company.SDI || 0)}</TableCell>
+                    <TableCell>
+                      {company.Revenue_growth ? `${(company.Revenue_growth * 100).toFixed(1)}%` : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {company.EBIT_margin ? `${(company.EBIT_margin * 100).toFixed(1)}%` : 'N/A'}
+                    </TableCell>
+                    <TableCell>{company.employees || 'N/A'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* City Companies Modal */}
+      <Dialog open={isCityModalOpen} onOpenChange={setIsCityModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Företag i {selectedCity}</DialogTitle>
+            <DialogDescription>
+              {selectedCity && getCompaniesByCity(selectedCity).length} företag hittades
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Företag</TableHead>
+                  <TableHead>OrgNr</TableHead>
+                  <TableHead>Bransch</TableHead>
+                  <TableHead>Omsättning</TableHead>
+                  <TableHead>Tillväxt</TableHead>
+                  <TableHead>Marginal</TableHead>
+                  <TableHead>Anställda</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {selectedCity && getCompaniesByCity(selectedCity).map((company) => (
+                  <TableRow key={company.OrgNr}>
+                    <TableCell className="font-medium">{company.name}</TableCell>
+                    <TableCell>{company.OrgNr}</TableCell>
+                    <TableCell>{company.segment_name || company.industry_name || 'Okänd'}</TableCell>
+                    <TableCell>{formatCurrency(company.SDI || 0)}</TableCell>
+                    <TableCell>
+                      {company.Revenue_growth ? `${(company.Revenue_growth * 100).toFixed(1)}%` : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {company.EBIT_margin ? `${(company.EBIT_margin * 100).toFixed(1)}%` : 'N/A'}
+                    </TableCell>
+                    <TableCell>{company.employees || 'N/A'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

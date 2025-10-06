@@ -57,7 +57,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
         console.error('Error loading saved lists:', error)
       }
     }
-  }, [onListUpdate])
+  }, []) // Remove onListUpdate from dependency array to prevent infinite loop
 
   // Save lists to localStorage whenever savedLists changes
   useEffect(() => {
@@ -125,7 +125,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
             disabled={currentCompanies.length === 0}
           >
             <Save className="h-4 w-4 mr-2" />
-            Spara aktuell lista ({currentCompanies.length} företag)
+            Spara valda företag ({currentCompanies.length} företag)
           </Button>
         </DialogTrigger>
         <DialogContent>

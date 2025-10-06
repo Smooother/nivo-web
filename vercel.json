@@ -4,6 +4,10 @@
   "outputDirectory": "frontend/dist",
   "routes": [
     {
+      "src": "/api/ai-analysis",
+      "dest": "/frontend/api/ai-analysis.ts"
+    },
+    {
       "src": "/assets/(.*)",
       "dest": "/assets/$1"
     },

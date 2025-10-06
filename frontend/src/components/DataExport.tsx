@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
@@ -16,26 +16,36 @@ import {
   Loader2,
   Mail,
   Calendar,
-  BarChart3
+  BarChart3,
+  List,
+  AlertCircle
 } from 'lucide-react'
 import { AnalyticsService, CompanyFilter } from '../lib/analyticsService'
+import { SupabaseCompany } from '../lib/supabaseDataService'
+
+interface SavedCompanyList {
+  id: string
+  name: string
+  description?: string
+  companies: SupabaseCompany[]
+  filters: any
+  createdAt: string
+  updatedAt: string
+}
 
 interface ExportOptions {
   format: 'excel' | 'csv' | 'pdf'
-  dataType: 'all' | 'filtered' | 'summary'
+  selectedListId: string
   includeKPIs: boolean
   includeFinancials: boolean
   includeContactInfo: boolean
-  dateRange: 'all' | 'recent' | 'custom'
-  customDateFrom?: string
-  customDateTo?: string
 }
 
 interface ExportJob {
   id: string
   status: 'pending' | 'processing' | 'completed' | 'failed'
   format: string
-  dataType: string
+  listName: string
   recordCount: number
   createdAt: string
   downloadUrl?: string
@@ -44,21 +54,54 @@ interface ExportJob {
 const DataExport: React.FC = () => {
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     format: 'excel',
-    dataType: 'all',
+    selectedListId: '',
     includeKPIs: true,
     includeFinancials: true,
-    includeContactInfo: true,
-    dateRange: 'all'
+    includeContactInfo: true
   })
   
   const [exportJobs, setExportJobs] = useState<ExportJob[]>([])
   const [isExporting, setIsExporting] = useState(false)
-  const [filters, setFilters] = useState<CompanyFilter>({})
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [recordCount, setRecordCount] = useState<number>(0)
 
+  // Load saved lists from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('savedCompanyLists')
+    if (saved) {
+      try {
+        const lists = JSON.parse(saved)
+        setSavedLists(lists)
+      } catch (error) {
+        console.error('Error loading saved lists:', error)
+      }
+    }
+  }, [])
+
+  // Update record count when selected list changes
+  useEffect(() => {
+    if (exportOptions.selectedListId) {
+      const selectedList = savedLists.find(list => list.id === exportOptions.selectedListId)
+      setRecordCount(selectedList ? selectedList.companies.length : 0)
+    } else {
+      setRecordCount(0)
+    }
+  }, [exportOptions.selectedListId, savedLists])
+
   const handleExport = async () => {
+    if (!exportOptions.selectedListId) {
+      alert('Please select a saved list to export')
+      return
+    }
+
     try {
       setIsExporting(true)
+      
+      const selectedList = savedLists.find(list => list.id === exportOptions.selectedListId)
+      if (!selectedList) {
+        alert('Selected list not found')
+        return
+      }
       
       // Create export job
       const jobId = `export_${Date.now()}`
@@ -66,8 +109,8 @@ const DataExport: React.FC = () => {
         id: jobId,
         status: 'processing',
         format: exportOptions.format,
-        dataType: exportOptions.dataType,
-        recordCount: recordCount,
+        listName: selectedList.name,
+        recordCount: selectedList.companies.length,
         createdAt: new Date().toISOString()
       }
       
@@ -85,29 +128,23 @@ const DataExport: React.FC = () => {
       
     } catch (error) {
       console.error('Export failed:', error)
-      setExportJobs(prev => prev.map(job => 
-        job.id === jobId 
-          ? { ...job, status: 'failed' }
-          : job
-      ))
+      // Find the most recent job to mark as failed
+      setExportJobs(prev => {
+        const latestJob = prev[0]
+        if (latestJob && latestJob.status === 'processing') {
+          return prev.map(job => 
+            job.id === latestJob.id 
+              ? { ...job, status: 'failed' }
+              : job
+          )
+        }
+        return prev
+      })
     } finally {
       setIsExporting(false)
     }
   }
 
-  const getRecordCount = async () => {
-    try {
-      const result = await AnalyticsService.getCompanies(1, 1, filters)
-      setRecordCount(result.total)
-    } catch (error) {
-      console.error('Error getting record count:', error)
-      setRecordCount(0)
-    }
-  }
-
-  React.useEffect(() => {
-    getRecordCount()
-  }, [filters])
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -151,7 +188,7 @@ const DataExport: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Data Export</h2>
-        <p className="text-gray-600">Export your company data in various formats</p>
+        <p className="text-gray-600">Export data from your saved company lists in various formats</p>
       </div>
 
       <Tabs defaultValue="export" className="space-y-4">
@@ -205,21 +242,41 @@ const DataExport: React.FC = () => {
                   </Select>
                 </div>
 
-                {/* Data Type */}
+                {/* Saved List Selection */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Data Type</label>
-                  <Select value={exportOptions.dataType} onValueChange={(value: any) => 
-                    setExportOptions(prev => ({ ...prev, dataType: value }))
-                  }>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Companies</SelectItem>
-                      <SelectItem value="filtered">Filtered Results</SelectItem>
-                      <SelectItem value="summary">Summary Statistics</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="text-sm font-medium mb-2 block">Select Saved List</label>
+                  {savedLists.length === 0 ? (
+                    <div className="flex items-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                      <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                      <div>
+                        <p className="text-sm font-medium text-yellow-800">No saved lists found</p>
+                        <p className="text-xs text-yellow-600">Create and save company lists in the search or analytics sections first.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <Select value={exportOptions.selectedListId} onValueChange={(value: string) => 
+                      setExportOptions(prev => ({ ...prev, selectedListId: value }))
+                    }>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a saved list..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {savedLists.map((list) => (
+                          <SelectItem key={list.id} value={list.id}>
+                            <div className="flex items-center">
+                              <List className="h-4 w-4 mr-2" />
+                              <div>
+                                <div className="font-medium">{list.name}</div>
+                                <div className="text-xs text-gray-500">
+                                  {list.companies.length} companies • {new Date(list.updatedAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
 
                 {/* Data Options */}
@@ -256,39 +313,6 @@ const DataExport: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Date Range */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Date Range</label>
-                  <Select value={exportOptions.dateRange} onValueChange={(value: any) => 
-                    setExportOptions(prev => ({ ...prev, dateRange: value }))
-                  }>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Data</SelectItem>
-                      <SelectItem value="recent">Last 30 Days</SelectItem>
-                      <SelectItem value="custom">Custom Range</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {exportOptions.dateRange === 'custom' && (
-                  <div className="grid grid-cols-2 gap-2">
-                    <Input
-                      type="date"
-                      placeholder="From Date"
-                      value={exportOptions.customDateFrom}
-                      onChange={(e) => setExportOptions(prev => ({ ...prev, customDateFrom: e.target.value }))}
-                    />
-                    <Input
-                      type="date"
-                      placeholder="To Date"
-                      value={exportOptions.customDateTo}
-                      onChange={(e) => setExportOptions(prev => ({ ...prev, customDateTo: e.target.value }))}
-                    />
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -302,27 +326,50 @@ const DataExport: React.FC = () => {
                 <CardDescription>Review your export settings</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Records to export:</span>
-                    <span className="font-medium">{recordCount.toLocaleString()}</span>
+                {exportOptions.selectedListId ? (
+                  <>
+                    {(() => {
+                      const selectedList = savedLists.find(list => list.id === exportOptions.selectedListId)
+                      return selectedList ? (
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Selected list:</span>
+                            <span className="font-medium">{selectedList.name}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Records to export:</span>
+                            <span className="font-medium">{recordCount.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Format:</span>
+                            <span className="font-medium capitalize">{exportOptions.format}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Estimated size:</span>
+                            <span className="font-medium">
+                              {formatFileSize(recordCount * (exportOptions.includeKPIs ? 2 : 1) * 100)}
+                            </span>
+                          </div>
+                          {selectedList.description && (
+                            <div className="pt-2 border-t">
+                              <p className="text-xs text-gray-500">{selectedList.description}</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : null
+                    })()}
+                  </>
+                ) : (
+                  <div className="text-center py-4">
+                    <List className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-500">Select a saved list to see export preview</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Format:</span>
-                    <span className="font-medium capitalize">{exportOptions.format}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Estimated size:</span>
-                    <span className="font-medium">
-                      {formatFileSize(recordCount * (exportOptions.includeKPIs ? 2 : 1) * 100)}
-                    </span>
-                  </div>
-                </div>
+                )}
 
                 <div className="pt-4 border-t">
                   <Button 
                     onClick={handleExport} 
-                    disabled={isExporting || recordCount === 0}
+                    disabled={isExporting || recordCount === 0 || !exportOptions.selectedListId}
                     className="w-full"
                   >
                     {isExporting ? (
@@ -333,7 +380,7 @@ const DataExport: React.FC = () => {
                     ) : (
                       <>
                         <Download className="h-4 w-4 mr-2" />
-                        Start Export
+                        {exportOptions.selectedListId ? 'Start Export' : 'Select a List First'}
                       </>
                     )}
                   </Button>
@@ -368,7 +415,7 @@ const DataExport: React.FC = () => {
                         {getStatusIcon(job.status)}
                         <div>
                           <div className="font-medium">
-                            {job.dataType} export ({job.format.toUpperCase()})
+                            {job.listName} export ({job.format.toUpperCase()})
                           </div>
                           <div className="text-sm text-gray-600">
                             {job.recordCount.toLocaleString()} records • {new Date(job.createdAt).toLocaleString()}
@@ -413,6 +460,8 @@ const DataExport: React.FC = () => {
 }
 
 export default DataExport
+
+
 
 
 
