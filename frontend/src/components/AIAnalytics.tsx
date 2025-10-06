@@ -812,23 +812,23 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                             <h3 className="font-semibold text-lg">{analysis.company.name}</h3>
                             <p className="text-sm text-gray-600">{analysis.company.OrgNr}</p>
                           </div>
-                          <Badge variant={analysis.aiAnalysis.recommendation === 'Köp' ? 'default' : 
-                                         analysis.aiAnalysis.recommendation === 'Håll' ? 'secondary' : 'destructive'}>
-                            {analysis.aiAnalysis.recommendation}
+                          <Badge variant={analysis.aiAnalysis?.recommendation === 'Köp' ? 'default' : 
+                                         analysis.aiAnalysis?.recommendation === 'Håll' ? 'secondary' : 'destructive'}>
+                            {analysis.aiAnalysis?.recommendation || 'Håll'}
                           </Badge>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <h4 className="font-medium mb-2">Executive Summary</h4>
-                            <p className="text-sm text-gray-700">{analysis.aiAnalysis.executiveSummary}</p>
+                            <p className="text-sm text-gray-700">{analysis.aiAnalysis?.executiveSummary || 'No summary available'}</p>
                           </div>
                           
                           <div>
                             <h4 className="font-medium mb-2">Financial Health</h4>
                             <div className="flex items-center gap-2">
-                              <Progress value={analysis.aiAnalysis.financialHealth * 10} className="flex-1" />
-                              <span className="text-sm font-medium">{analysis.aiAnalysis.financialHealth}/10</span>
+                              <Progress value={(analysis.aiAnalysis?.financialHealth || 0) * 10} className="flex-1" />
+                              <span className="text-sm font-medium">{analysis.aiAnalysis?.financialHealth || 0}/10</span>
                             </div>
                           </div>
                         </div>
@@ -837,7 +837,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                           <div>
                             <h4 className="font-medium mb-2">Strengths</h4>
                             <ul className="text-sm text-gray-700 space-y-1">
-                              {analysis.aiAnalysis.strengths.map((strength, i) => (
+                              {(analysis.aiAnalysis?.strengths || []).map((strength, i) => (
                                 <li key={i}>• {strength}</li>
                               ))}
                             </ul>
@@ -846,24 +846,24 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                           <div>
                             <h4 className="font-medium mb-2">Opportunities</h4>
                             <ul className="text-sm text-gray-700 space-y-1">
-                              {analysis.aiAnalysis.opportunities.map((opportunity, i) => (
+                              {(analysis.aiAnalysis?.opportunities || []).map((opportunity, i) => (
                                 <li key={i}>• {opportunity}</li>
                               ))}
                             </ul>
                           </div>
                         </div>
                         
-                        {analysis.aiAnalysis.targetPrice > 0 && (
+                        {(analysis.aiAnalysis?.targetPrice || 0) > 0 && (
                           <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                             <div className="flex justify-between items-center">
                               <span className="font-medium">Target Price:</span>
                               <span className="text-lg font-bold text-green-600">
-                                {analysis.aiAnalysis.targetPrice.toLocaleString('sv-SE')} TSEK
+                                {(analysis.aiAnalysis?.targetPrice || 0).toLocaleString('sv-SE')} TSEK
                               </span>
                             </div>
                             <div className="flex justify-between items-center mt-1">
                               <span className="text-sm text-gray-600">Confidence:</span>
-                              <span className="text-sm font-medium">{analysis.aiAnalysis.confidence}%</span>
+                              <span className="text-sm font-medium">{analysis.aiAnalysis?.confidence || 0}%</span>
                             </div>
                           </div>
                         )}
@@ -1115,6 +1115,11 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
             const softFactors = generateSoftFactors(selectedCompany.company, selectedCompany.financialScore)
             const aiAnalysis = generateAIAnalysis(selectedCompany.company, financialMetrics, softFactors)
             
+            // Ensure aiAnalysis is not undefined
+            if (!aiAnalysis) {
+              return <div className="p-4 text-center text-gray-500">No analysis available</div>
+            }
+            
             return (
               <div className="space-y-8">
                 {/* Executive Summary */}
@@ -1130,11 +1135,11 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                       <div className="space-y-4">
                         <div>
                           <h4 className="font-semibold text-gray-700 mb-2">AI-analys sammanfattning</h4>
-                          <p className="text-sm text-gray-600">{aiAnalysis.executiveSummary}</p>
+                          <p className="text-sm text-gray-600">{aiAnalysis?.executiveSummary || 'No summary available'}</p>
                         </div>
                         <div>
                           <h4 className="font-semibold text-gray-700 mb-2">Investeringsargument</h4>
-                          <p className="text-sm text-gray-600">{aiAnalysis.investmentThesis}</p>
+                          <p className="text-sm text-gray-600">{aiAnalysis?.investmentThesis || 'No investment thesis available'}</p>
                         </div>
                       </div>
                       
@@ -1142,13 +1147,13 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="text-center p-3 bg-blue-50 rounded-lg">
                             <div className="text-lg font-bold text-blue-600">
-                              {aiAnalysis.financialHealth.toUpperCase()}
+                              {(aiAnalysis?.financialHealth || 'unknown').toUpperCase()}
                             </div>
                             <div className="text-xs text-blue-800">Finansiell Hälsa</div>
                           </div>
                           <div className="text-center p-3 bg-green-50 rounded-lg">
                             <div className="text-lg font-bold text-green-600">
-                              {aiAnalysis.growthPotential.toUpperCase()}
+                              {(aiAnalysis?.growthPotential || 'unknown').toUpperCase()}
                             </div>
                             <div className="text-xs text-green-800">Tillväxtpotential</div>
                           </div>
@@ -1156,11 +1161,11 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         
                         <div className="text-center p-4 bg-purple-50 rounded-lg">
                           <div className="text-xl font-bold text-purple-600 mb-1">
-                            {aiAnalysis.recommendation.replace('_', ' ').toUpperCase()}
+                            {(aiAnalysis?.recommendation || 'hold').replace('_', ' ').toUpperCase()}
                           </div>
                           <div className="text-xs text-purple-800">AI Rekommendation</div>
                           <div className="text-xs text-gray-600 mt-1">
-                            Confidence: {Math.round(aiAnalysis.confidence)}%
+                            Confidence: {Math.round(aiAnalysis?.confidence || 0)}%
                           </div>
                         </div>
                       </div>
@@ -1168,22 +1173,22 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                       <div className="space-y-4">
                         <div className="text-center p-3 bg-orange-50 rounded-lg">
                           <div className="text-lg font-bold text-orange-600">
-                            {aiAnalysis.marketOutlook.toUpperCase()}
+                            {(aiAnalysis?.marketOutlook || 'neutral').toUpperCase()}
                           </div>
                           <div className="text-xs text-orange-800">Marknadsutsikt</div>
                         </div>
                         
-                        {aiAnalysis.targetPrice && (
+                        {(aiAnalysis?.targetPrice || 0) > 0 && (
                           <div className="text-center p-3 bg-gray-50 rounded-lg">
                             <div className="text-lg font-bold text-gray-700">
-                              {formatCurrency(aiAnalysis.targetPrice)}
+                              {formatCurrency(aiAnalysis?.targetPrice || 0)}
                             </div>
                             <div className="text-xs text-gray-600">Target Price</div>
                           </div>
                         )}
                         
                         <div className="text-center p-2 bg-gray-100 rounded text-xs text-gray-600">
-                          Analysdatum: {aiAnalysis.analysisDate}
+                          Analysdatum: {aiAnalysis?.analysisDate || new Date().toISOString().split('T')[0]}
                         </div>
                       </div>
                     </div>
@@ -1427,7 +1432,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         <div>
                           <h4 className="font-semibold text-gray-700 mb-2">Nyckelfördelar</h4>
                           <div className="space-y-2">
-                            {aiAnalysis.keyStrengths.map((strength, index) => (
+                            {(aiAnalysis?.keyStrengths || []).map((strength, index) => (
                               <div key={index} className="flex items-start space-x-2">
                                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                                 <span className="text-sm text-gray-700">{strength}</span>
@@ -1439,7 +1444,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         <div>
                           <h4 className="font-semibold text-gray-700 mb-2">Strategiska Möjligheter</h4>
                           <div className="space-y-2">
-                            {aiAnalysis.strategicOpportunities.map((opportunity, index) => (
+                            {(aiAnalysis?.strategicOpportunities || []).map((opportunity, index) => (
                               <div key={index} className="flex items-start space-x-2">
                                 <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
                                 <span className="text-sm text-gray-700">{opportunity}</span>
@@ -1464,8 +1469,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         <div>
                           <h4 className="font-semibold text-gray-700 mb-2">Svagheter</h4>
                           <div className="space-y-2">
-                            {aiAnalysis.keyWeaknesses.length > 0 ? (
-                              aiAnalysis.keyWeaknesses.map((weakness, index) => (
+                            {(aiAnalysis?.keyWeaknesses || []).length > 0 ? (
+                              (aiAnalysis?.keyWeaknesses || []).map((weakness, index) => (
                                 <div key={index} className="flex items-start space-x-2">
                                   <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
                                   <span className="text-sm text-gray-700">{weakness}</span>
@@ -1480,7 +1485,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         <div>
                           <h4 className="font-semibold text-gray-700 mb-2">Stora Risker</h4>
                           <div className="space-y-2">
-                            {aiAnalysis.majorRisks.map((risk, index) => (
+                            {(aiAnalysis?.majorRisks || []).map((risk, index) => (
                               <div key={index} className="flex items-start space-x-2">
                                 <Shield className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                                 <span className="text-sm text-gray-700">{risk}</span>
