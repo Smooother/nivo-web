@@ -149,6 +149,21 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   const [selectedCompany, setSelectedCompany] = useState<CompanyAnalysis | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
 
+  // Add ESC key handler to close modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isDetailModalOpen) {
+        setIsDetailModalOpen(false)
+        setSelectedCompany(null)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isDetailModalOpen])
+
   // Load saved lists from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('savedCompanyLists')
@@ -706,50 +721,69 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
               console.log('AI Analysis Complete:', results)
               // Convert AI analysis results to our format and display them
               if (results && results.length > 0) {
-                const convertedResults = results.map(result => ({
-                  company: {
-                    OrgNr: result.orgNr,
-                    name: result.name,
-                    SDI: 0, // These would need to be fetched from the original data
-                    Revenue_growth: 0,
-                    EBIT_margin: 0,
-                    NetProfit_margin: 0,
-                    segment_name: '',
-                    city: '',
-                    employees: '',
-                    homepage: '',
-                    address: '',
-                    incorporation_date: ''
-                  },
-                  financialScore: result.financialHealth || 0,
-                  marketScore: 0,
-                  growthScore: 0,
-                  efficiencyScore: 0,
-                  overallScore: result.confidence || 0,
-                  primeTargetScore: result.confidence || 0,
-                  aiAnalysis: {
-                    executiveSummary: result.executiveSummary || '',
-                    strengths: result.strengths || [],
-                    weaknesses: result.weaknesses || [],
-                    opportunities: result.opportunities || [],
-                    risks: result.risks || [],
-                    recommendation: result.recommendation || '',
-                    targetPrice: result.targetPrice || 0,
-                    confidence: result.confidence || 0
-                  },
-                  financialMetrics: {
-                    revenue: 0,
-                    growth: 0,
-                    margin: 0,
-                    efficiency: 0
-                  },
-                  softFactors: {
-                    marketPosition: result.marketPosition || '',
-                    growthPotential: result.growthPotential || '',
-                    riskFactors: result.risks || [],
-                    opportunities: result.opportunities || []
+                const convertedResults = results.map(result => {
+                  // Ensure all required fields exist with fallbacks
+                  const safeResult = {
+                    orgNr: result?.orgNr || result?.OrgNr || 'Unknown',
+                    name: result?.name || 'Unknown Company',
+                    executiveSummary: result?.executiveSummary || 'No summary available',
+                    financialHealth: result?.financialHealth || 0,
+                    growthPotential: result?.growthPotential || 'Unknown',
+                    marketPosition: result?.marketPosition || 'Unknown',
+                    strengths: Array.isArray(result?.strengths) ? result.strengths : [],
+                    weaknesses: Array.isArray(result?.weaknesses) ? result.weaknesses : [],
+                    opportunities: Array.isArray(result?.opportunities) ? result.opportunities : [],
+                    risks: Array.isArray(result?.risks) ? result.risks : [],
+                    recommendation: result?.recommendation || 'Håll',
+                    targetPrice: result?.targetPrice || 0,
+                    confidence: result?.confidence || 0
                   }
-                }))
+
+                  return {
+                    company: {
+                      OrgNr: safeResult.orgNr,
+                      name: safeResult.name,
+                      SDI: 0, // These would need to be fetched from the original data
+                      Revenue_growth: 0,
+                      EBIT_margin: 0,
+                      NetProfit_margin: 0,
+                      segment_name: '',
+                      city: '',
+                      employees: '',
+                      homepage: '',
+                      address: '',
+                      incorporation_date: ''
+                    },
+                    financialScore: safeResult.financialHealth,
+                    marketScore: 0,
+                    growthScore: 0,
+                    efficiencyScore: 0,
+                    overallScore: safeResult.confidence,
+                    primeTargetScore: safeResult.confidence,
+                    aiAnalysis: {
+                      executiveSummary: safeResult.executiveSummary,
+                      strengths: safeResult.strengths,
+                      weaknesses: safeResult.weaknesses,
+                      opportunities: safeResult.opportunities,
+                      risks: safeResult.risks,
+                      recommendation: safeResult.recommendation,
+                      targetPrice: safeResult.targetPrice,
+                      confidence: safeResult.confidence
+                    },
+                    financialMetrics: {
+                      revenue: 0,
+                      growth: 0,
+                      margin: 0,
+                      efficiency: 0
+                    },
+                    softFactors: {
+                      marketPosition: safeResult.marketPosition,
+                      growthPotential: safeResult.growthPotential,
+                      riskFactors: safeResult.risks,
+                      opportunities: safeResult.opportunities
+                    }
+                  }
+                })
                 setAnalysisResults(convertedResults)
                 setLoading(false)
               }

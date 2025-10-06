@@ -239,6 +239,21 @@ const EnhancedCompanySearch: React.FC = () => {
     }
   }, [filters])
 
+  // Add ESC key handler to close popup
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showCompanyDetail) {
+        setShowCompanyDetail(false)
+        setSelectedCompany(null)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showCompanyDetail])
+
   useEffect(() => {
     // Only search if there are active filters or search term
     const hasActiveFilters = Object.values(filters).some(value => value !== undefined && value !== null && value !== '')
@@ -791,9 +806,9 @@ const EnhancedCompanySearch: React.FC = () => {
                           
                           const safeData = {
                             year: data.year || 2023,
-                            SDI: data.SDI || 0,
-                            RG: data.RG || 0,
-                            DR: data.DR || 0
+                            SDI: data.SDI || 0, // Revenue (Omsättning)
+                            RG: data.RG || 0,   // EBIT
+                            DR: data.DR || 0    // Net Profit (Vinst)
                           }
                           
                           const maxValue = Math.max(...selectedCompany.historicalData!.map(d => (d && d.SDI) || 0), 1) // Prevent division by zero
@@ -813,6 +828,8 @@ const EnhancedCompanySearch: React.FC = () => {
                               </div>
                               <div className="text-xs text-[#2E2A2B] font-medium">{`${safeData.year}-12-31`}</div>
                               <div className="text-xs font-bold text-[#596152]">{formatNumber(safeData.SDI)}</div>
+                              <div className="text-xs font-bold text-[#596152]/70">{formatNumber(safeData.RG)}</div>
+                              <div className="text-xs font-bold text-[#596152]/40">{formatNumber(safeData.DR)}</div>
                             </div>
                           )
                         }).filter(Boolean) // Remove any null entries
