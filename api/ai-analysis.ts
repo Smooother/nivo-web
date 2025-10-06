@@ -65,7 +65,7 @@ Grundat: ${company.incorporation_date || 'Ej tillgänglig'}
     })
 
     const messageItem = (response.output || []).find((i: any) => i.type === 'message')
-    const responseText: string | undefined = (messageItem?.content?.[0] as any)?.text
+    const responseText: string | undefined = (messageItem as any)?.content?.[0]?.text
 
     let analysis: any
     try {
