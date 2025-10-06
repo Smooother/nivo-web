@@ -163,3 +163,4 @@ For issues and questions:
 ---
 
 **Built with ❤️ using Python, Next.js, and Supabase**# Environment variables added for preview
+# OpenAI API key added to Vercel
