@@ -90,7 +90,7 @@ const WorkingDashboard: React.FC = () => {
                         <div>
                           <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Omsättning</p>
                           <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.totalCompanies ? `${(15.2).toLocaleString('sv-SE')} TSEK` : 'N/A'}
+                            {analytics?.totalCompanies ? `${(analytics.averageRevenue || 0).toLocaleString('sv-SE')} TSEK` : 'N/A'}
                           </p>
                         </div>
                         <DollarSign className="h-8 w-8 text-green-600" />

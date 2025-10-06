@@ -83,6 +83,7 @@ export interface DashboardAnalytics {
   totalWithDigitalPresence: number
   averageRevenueGrowth: number
   averageEBITMargin: number
+  averageRevenue: number
 }
 
 class SupabaseDataService {
@@ -329,13 +330,24 @@ class SupabaseDataService {
         ? marginData.reduce((sum, item) => sum + (item.EBIT_margin || 0), 0) / marginData.length
         : 0
 
+      // Get average revenue (SDI field)
+      const { data: revenueData } = await supabase
+        .from('master_analytics')
+        .select('SDI')
+        .not('SDI', 'is', null)
+
+      const averageRevenue = revenueData?.length
+        ? revenueData.reduce((sum, item) => sum + (item.SDI || 0), 0) / revenueData.length
+        : 0
+
       return {
         totalCompanies: totalCompanies || 0,
         totalWithFinancials: totalWithFinancials || 0,
         totalWithKPIs: totalWithKPIs || 0,
         totalWithDigitalPresence: totalWithDigitalPresence || 0,
         averageRevenueGrowth,
-        averageEBITMargin
+        averageEBITMargin,
+        averageRevenue
       }
     } catch (error) {
       console.error('Error fetching dashboard analytics:', error)
@@ -345,7 +357,8 @@ class SupabaseDataService {
         totalWithKPIs: 0,
         totalWithDigitalPresence: 0,
         averageRevenueGrowth: 0,
-        averageEBITMargin: 0
+        averageEBITMargin: 0,
+        averageRevenue: 0
       }
     }
   }
