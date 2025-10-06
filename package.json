@@ -17,5 +17,9 @@
   ],
   "engines": {
     "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "openai": "^6.1.0",
+    "@vercel/node": "^3.0.0"
   }
 }
