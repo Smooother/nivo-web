@@ -5,6 +5,7 @@ import { Input } from './ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Badge } from './ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import { Checkbox } from './ui/checkbox'
 import { 
   Search, 
   Building2, 
@@ -19,9 +20,11 @@ import {
   Target,
   Users,
   DollarSign,
-  X
+  X,
+  Check
 } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany, CompanyFilter } from '../lib/supabaseDataService'
+import CompanyListManager from './CompanyListManager'
 
 interface SearchResults {
   companies: SupabaseCompany[]
@@ -35,6 +38,16 @@ interface SearchResults {
   }
 }
 
+interface SavedCompanyList {
+  id: string
+  name: string
+  description?: string
+  companies: SupabaseCompany[]
+  filters: any
+  createdAt: string
+  updatedAt: string
+}
+
 const EnhancedCompanySearch: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(false)
@@ -44,8 +57,76 @@ const EnhancedCompanySearch: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'analysis'>('list')
   const [selectedCompany, setSelectedCompany] = useState<SupabaseCompany | null>(null)
   const [showCompanyDetail, setShowCompanyDetail] = useState(false)
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
+  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())
+  const [selectAll, setSelectAll] = useState(false)
+  const [allMatchingCompanyOrgNrs, setAllMatchingCompanyOrgNrs] = useState<Set<string>>(new Set())
 
   const itemsPerPage = 20
+
+  // Handle individual company selection
+  const handleCompanySelect = (companyOrgNr: string, checked: boolean) => {
+    setSelectedCompanies(prev => {
+      const newSet = new Set(prev)
+      if (checked) {
+        newSet.add(companyOrgNr)
+      } else {
+        newSet.delete(companyOrgNr)
+      }
+      return newSet
+    })
+  }
+
+  // Handle select all functionality - selects ALL matching companies across all pages
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedCompanies(new Set(allMatchingCompanyOrgNrs))
+      setSelectAll(true)
+    } else {
+      setSelectedCompanies(new Set())
+      setSelectAll(false)
+    }
+  }
+
+  // Get selected companies as array - fetches all selected companies from database
+  const [selectedCompaniesArray, setSelectedCompaniesArray] = useState<SupabaseCompany[]>([])
+  
+  // Update selected companies array when selection changes
+  useEffect(() => {
+    const fetchSelectedCompanies = async () => {
+      if (selectedCompanies.size > 0) {
+        try {
+          const companies = await supabaseDataService.getCompaniesByOrgNrs(Array.from(selectedCompanies))
+          setSelectedCompaniesArray(companies)
+        } catch (error) {
+          console.error('Error fetching selected companies:', error)
+          setSelectedCompaniesArray([])
+        }
+      } else {
+        setSelectedCompaniesArray([])
+      }
+    }
+
+    fetchSelectedCompanies()
+  }, [selectedCompanies])
+
+  const getSelectedCompaniesArray = (): SupabaseCompany[] => {
+    return selectedCompaniesArray
+  }
+
+  // Update select all state when individual selections change
+  useEffect(() => {
+    if (allMatchingCompanyOrgNrs.size > 0) {
+      setSelectAll(selectedCompanies.size === allMatchingCompanyOrgNrs.size)
+    }
+  }, [selectedCompanies, allMatchingCompanyOrgNrs])
+
+  // Clear selections when search results change
+  useEffect(() => {
+    setSelectedCompanies(new Set())
+    setSelectAll(false)
+    setSelectedCompaniesArray([])
+  }, [searchResults])
 
   const searchCompanies = async () => {
     try {
@@ -57,7 +138,11 @@ const EnhancedCompanySearch: React.FC = () => {
         searchFilters.name = searchTerm.trim()
       }
 
-      const result = await supabaseDataService.getCompanies(currentPage, itemsPerPage, searchFilters)
+      // Get paginated results and all matching company OrgNrs in parallel
+      const [result, allMatchingOrgNrs] = await Promise.all([
+        supabaseDataService.getCompanies(currentPage, itemsPerPage, searchFilters),
+        supabaseDataService.getAllMatchingCompanyOrgNrs(searchFilters)
+      ])
       
       // Calculate summary from the companies data
       const summary = calculateSummary(result.companies)
@@ -67,10 +152,14 @@ const EnhancedCompanySearch: React.FC = () => {
         ...result,
         summary
       })
+
+      // Set all matching company OrgNrs for Select All functionality
+      setAllMatchingCompanyOrgNrs(new Set(allMatchingOrgNrs))
       
     } catch (error) {
       console.error('Error searching companies:', error)
       setSearchResults(null)
+      setAllMatchingCompanyOrgNrs(new Set())
     } finally {
       setLoading(false)
     }
@@ -133,24 +222,65 @@ const EnhancedCompanySearch: React.FC = () => {
   }
 
   useEffect(() => {
-    if (currentPage === 1) {
-      searchCompanies()
+    // Only search if there are active filters or search term
+    const hasActiveFilters = Object.values(filters).some(value => value !== undefined && value !== null && value !== '')
+    const hasSearchTerm = searchTerm.trim() !== ''
+    
+    if (hasActiveFilters || hasSearchTerm) {
+      if (currentPage === 1) {
+        searchCompanies()
+      } else {
+        setCurrentPage(1)
+      }
     } else {
-      setCurrentPage(1)
+      // Clear results when no search/filters
+      setSearchResults(null)
+      setAllMatchingCompanyOrgNrs(new Set())
     }
   }, [filters])
 
+  // Add ESC key handler to close popup
   useEffect(() => {
-    searchCompanies()
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showCompanyDetail) {
+        setShowCompanyDetail(false)
+        setSelectedCompany(null)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showCompanyDetail])
+
+  useEffect(() => {
+    // Only search if there are active filters or search term
+    const hasActiveFilters = Object.values(filters).some(value => value !== undefined && value !== null && value !== '')
+    const hasSearchTerm = searchTerm.trim() !== ''
+    
+    if (hasActiveFilters || hasSearchTerm) {
+      searchCompanies()
+    }
   }, [currentPage])
 
   // Add search term effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (currentPage === 1) {
-        searchCompanies()
+      // Only search if there's a search term or active filters
+      const hasActiveFilters = Object.values(filters).some(value => value !== undefined && value !== null && value !== '')
+      const hasSearchTerm = searchTerm.trim() !== ''
+      
+      if (hasActiveFilters || hasSearchTerm) {
+        if (currentPage === 1) {
+          searchCompanies()
+        } else {
+          setCurrentPage(1)
+        }
       } else {
-        setCurrentPage(1)
+        // Clear results when no search/filters
+        setSearchResults(null)
+        setAllMatchingCompanyOrgNrs(new Set())
       }
     }, 500) // Debounce search by 500ms
 
@@ -168,6 +298,21 @@ const EnhancedCompanySearch: React.FC = () => {
     setFilters({})
     setSearchTerm('')
     setCurrentPage(1)
+  }
+
+  const handleListSelect = (list: SavedCompanyList) => {
+    // Apply the saved list's filters and companies
+    setFilters(list.filters)
+    setSearchResults({
+      companies: list.companies,
+      total: list.companies.length,
+      summary: calculateSummary(list.companies)
+    })
+    setCurrentPage(1)
+  }
+
+  const handleListUpdate = (lists: SavedCompanyList[]) => {
+    setSavedLists(lists)
   }
 
   const formatNumber = (num: number | null | undefined) => {
@@ -349,6 +494,14 @@ const EnhancedCompanySearch: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Company List Manager */}
+      <CompanyListManager
+        currentCompanies={getSelectedCompaniesArray()}
+        currentFilters={filters}
+        onListSelect={handleListSelect}
+        onListUpdate={handleListUpdate}
+      />
+
       {/* Results */}
       {searchResults && (
         <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'list' | 'analysis')}>
@@ -358,20 +511,50 @@ const EnhancedCompanySearch: React.FC = () => {
           </TabsList>
 
           <TabsContent value="list" className="space-y-4">
+            {/* Select All Header */}
+            {searchResults.companies.length > 0 && (
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="select-all"
+                    checked={selectAll}
+                    onCheckedChange={handleSelectAll}
+                  />
+                  <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                    Välj alla företag ({allMatchingCompanyOrgNrs.size})
+                  </label>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {selectedCompanies.size} företag valda
+                </div>
+              </div>
+            )}
+            
             <div className="grid gap-4">
               {searchResults.companies.map((company, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => {
-                        setSelectedCompany(company)
-                        setShowCompanyDetail(true)
-                      }}>
+                <Card key={index} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-lg">{company.name}</h3>
-                          <Badge variant="secondary">{company.OrgNr}</Badge>
-                        </div>
+                      <div className="flex items-center space-x-3 flex-1">
+                        <Checkbox
+                          id={`company-${company.OrgNr}`}
+                          checked={selectedCompanies.has(company.OrgNr)}
+                          onCheckedChange={(checked) => handleCompanySelect(company.OrgNr, checked as boolean)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 
+                              className="font-semibold text-lg cursor-pointer hover:text-blue-600"
+                              onClick={() => {
+                                setSelectedCompany(company)
+                                setShowCompanyDetail(true)
+                              }}
+                            >
+                              {company.name}
+                            </h3>
+                            <Badge variant="secondary">{company.OrgNr}</Badge>
+                          </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
@@ -429,6 +612,7 @@ const EnhancedCompanySearch: React.FC = () => {
                                </span>
                              </div>
                            </div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -622,9 +806,9 @@ const EnhancedCompanySearch: React.FC = () => {
                           
                           const safeData = {
                             year: data.year || 2023,
-                            SDI: data.SDI || 0,
-                            RG: data.RG || 0,
-                            DR: data.DR || 0
+                            SDI: data.SDI || 0, // Revenue (Omsättning)
+                            RG: data.RG || 0,   // EBIT
+                            DR: data.DR || 0    // Net Profit (Vinst)
                           }
                           
                           const maxValue = Math.max(...selectedCompany.historicalData!.map(d => (d && d.SDI) || 0), 1) // Prevent division by zero
@@ -644,6 +828,8 @@ const EnhancedCompanySearch: React.FC = () => {
                               </div>
                               <div className="text-xs text-[#2E2A2B] font-medium">{`${safeData.year}-12-31`}</div>
                               <div className="text-xs font-bold text-[#596152]">{formatNumber(safeData.SDI)}</div>
+                              <div className="text-xs font-bold text-[#596152]/70">{formatNumber(safeData.RG)}</div>
+                              <div className="text-xs font-bold text-[#596152]/40">{formatNumber(safeData.DR)}</div>
                             </div>
                           )
                         }).filter(Boolean) // Remove any null entries

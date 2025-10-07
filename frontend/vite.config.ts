@@ -8,6 +8,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   plugins: [
     react(),
@@ -18,5 +25,30 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split vendor libraries
+          'react-vendor': ['react', 'react-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-select'],
+          'chart-vendor': ['recharts'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          // Split large components
+          'ai-components': [
+            './src/components/AIAnalytics.tsx',
+            './src/components/AIAnalysisWorkflow.tsx'
+          ],
+          'analytics-components': [
+            './src/components/ListBasedAnalytics.tsx',
+            './src/lib/analyticsService.ts'
+          ]
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000, // Increase limit to 1MB
+    target: 'esnext',
+    minify: 'esbuild', // Use esbuild instead of terser
   },
 }));

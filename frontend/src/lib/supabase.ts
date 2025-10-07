@@ -1,114 +1,161 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
-declare global {
-  interface Window {
-    __SUPABASE_URL__?: string
-    __SUPABASE_ANON_KEY__?: string
-    __SUPABASE_CONFIG__?: {
-      url?: string
-      anonKey?: string
-    }
-    __env?: Record<string, string | undefined>
-  }
+// Supabase configuration
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables')
 }
 
-const importMetaEnv = typeof import.meta !== 'undefined' ? (import.meta as any).env ?? {} : {}
-const processEnv = typeof process !== 'undefined' ? process.env ?? {} : {}
-
-const readFirstDefined = (values: Array<string | undefined>) =>
-  values.find(value => typeof value === 'string' && value.length > 0)
-
-const resolveEnvValue = (
-  keys: string[],
-  resolveWindowExtras: (win: Window & typeof globalThis) => Array<string | undefined>
-) => {
-  const win = typeof window !== 'undefined' ? window : undefined
-  const candidates: Array<string | undefined> = []
-
-  for (const key of keys) {
-    candidates.push(importMetaEnv?.[key])
-    candidates.push(processEnv?.[key])
-    if (win) {
-      candidates.push((win as any)?.[key])
-      candidates.push(win.__env?.[key])
-    }
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   }
+})
 
-  if (win) {
-    candidates.push(...resolveWindowExtras(win))
-  }
-
-  return readFirstDefined(candidates)
-}
-
-const resolvedUrl = resolveEnvValue(
-  ['VITE_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL', 'PUBLIC_SUPABASE_URL', 'SUPABASE_URL'],
-  win => [win.__SUPABASE_URL__, win.__SUPABASE_CONFIG__?.url]
-)
-
-const resolvedAnonKey = resolveEnvValue(
-  [
-    'VITE_SUPABASE_ANON_KEY',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    'PUBLIC_SUPABASE_ANON_KEY',
-    'SUPABASE_ANON_KEY',
-    'SUPABASE_PUBLIC_ANON_KEY'
-  ],
-  win => [win.__SUPABASE_ANON_KEY__, win.__SUPABASE_CONFIG__?.anonKey]
-)
-
-export const supabaseConfig = {
-  url: resolvedUrl ?? null,
-  anonKey: resolvedAnonKey ?? null,
-  isConfigured:
-    typeof resolvedUrl === 'string' &&
-    resolvedUrl.length > 0 &&
-    !resolvedUrl.includes('placeholder.supabase.co') &&
-    typeof resolvedAnonKey === 'string' &&
-    resolvedAnonKey.length > 0 &&
-    resolvedAnonKey !== 'public-anon-key'
-} as const
-
-let cachedClient: SupabaseClient | null = null
-let warnedAboutFallback = false
-
-const createFallbackClient = () => {
-  if (!warnedAboutFallback && typeof console !== 'undefined') {
-    console.warn(
-      '[supabase] Supabase credentials were not found. Using in-memory fallback client; data operations will rely on local fixtures.'
-    )
-    warnedAboutFallback = true
-  }
-
-  return createClient('https://placeholder.supabase.co', 'public-anon-key', {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false
-    }
-  })
-}
-
-const instantiateClient = () => {
-  if (supabaseConfig.isConfigured && supabaseConfig.url && supabaseConfig.anonKey) {
-    return createClient(supabaseConfig.url, supabaseConfig.anonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true
+// Database types (we'll expand these as we add more tables)
+export interface Database {
+  public: {
+    Tables: {
+      user_roles: {
+        Row: {
+          id: string
+          user_id: string
+          role: 'admin' | 'approved' | 'pending'
+          approved_by: string | null
+          approved_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          role?: 'admin' | 'approved' | 'pending'
+          approved_by?: string | null
+          approved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          role?: 'admin' | 'approved' | 'pending'
+          approved_by?: string | null
+          approved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
       }
-    })
+      companies: {
+        Row: {
+          OrgNr: string
+          name: string | null
+          address: string | null
+          city: string | null
+          incorporation_date: string | null
+          email: string | null
+          homepage: string | null
+          segment: string | null
+          segment_name: string | null
+          last_updated: string
+        }
+        Insert: {
+          OrgNr: string
+          name?: string | null
+          address?: string | null
+          city?: string | null
+          incorporation_date?: string | null
+          email?: string | null
+          homepage?: string | null
+          segment?: string | null
+          segment_name?: string | null
+          last_updated?: string
+        }
+        Update: {
+          OrgNr?: string
+          name?: string | null
+          address?: string | null
+          city?: string | null
+          incorporation_date?: string | null
+          email?: string | null
+          homepage?: string | null
+          segment?: string | null
+          segment_name?: string | null
+          last_updated?: string
+        }
+      }
+      company_accounts_by_id: {
+        Row: {
+          companyId: string
+          organisationNumber: string
+          name: string
+          year: number
+          period: string
+          periodStart: string
+          periodEnd: string
+          length: number
+          currency: string
+          remark: string | null
+          referenceUrl: string | null
+          accIncompleteCode: string | null
+          accIncompleteDesc: string | null
+          [key: string]: any // For all the financial fields
+        }
+        Insert: {
+          companyId: string
+          organisationNumber: string
+          name: string
+          year: number
+          period: string
+          periodStart: string
+          periodEnd: string
+          length: number
+          currency: string
+          remark?: string | null
+          referenceUrl?: string | null
+          accIncompleteCode?: string | null
+          accIncompleteDesc?: string | null
+          [key: string]: any
+        }
+        Update: {
+          companyId?: string
+          organisationNumber?: string
+          name?: string
+          year?: number
+          period?: string
+          periodStart?: string
+          periodEnd?: string
+          length?: number
+          currency?: string
+          remark?: string | null
+          referenceUrl?: string | null
+          accIncompleteCode?: string | null
+          accIncompleteDesc?: string | null
+          [key: string]: any
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
   }
-
-  return createFallbackClient()
 }
 
-export const getSupabaseClient = (): SupabaseClient => {
-  if (!cachedClient) {
-    cachedClient = instantiateClient()
+// Typed Supabase client
+export const typedSupabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   }
-
-  return cachedClient
-}
-
-export const supabase = getSupabaseClient()
-
-export const isSupabaseConfigured = () => supabaseConfig.isConfigured
+})

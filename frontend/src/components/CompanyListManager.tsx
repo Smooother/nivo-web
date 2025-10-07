@@ -1,0 +1,253 @@
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Badge } from './ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
+import { 
+  Save, 
+  List, 
+  Plus, 
+  Trash2, 
+  Edit, 
+  Building2,
+  Calendar,
+  Users
+} from 'lucide-react'
+import { SupabaseCompany } from '../lib/supabaseDataService'
+
+interface SavedCompanyList {
+  id: string
+  name: string
+  description?: string
+  companies: SupabaseCompany[]
+  filters: any
+  createdAt: string
+  updatedAt: string
+}
+
+interface CompanyListManagerProps {
+  currentCompanies: SupabaseCompany[]
+  currentFilters: any
+  onListSelect: (list: SavedCompanyList) => void
+  onListUpdate: (lists: SavedCompanyList[]) => void
+}
+
+const CompanyListManager: React.FC<CompanyListManagerProps> = ({
+  currentCompanies,
+  currentFilters,
+  onListSelect,
+  onListUpdate
+}) => {
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [listName, setListName] = useState('')
+  const [listDescription, setListDescription] = useState('')
+  const [editingList, setEditingList] = useState<SavedCompanyList | null>(null)
+
+  // Load saved lists from localStorage on component mount
+  useEffect(() => {
+    const saved = localStorage.getItem('savedCompanyLists')
+    if (saved) {
+      try {
+        const lists = JSON.parse(saved)
+        setSavedLists(lists)
+        onListUpdate(lists)
+      } catch (error) {
+        console.error('Error loading saved lists:', error)
+      }
+    }
+  }, []) // Remove onListUpdate from dependency array to prevent infinite loop
+
+  // Save lists to localStorage whenever savedLists changes
+  useEffect(() => {
+    localStorage.setItem('savedCompanyLists', JSON.stringify(savedLists))
+  }, [savedLists])
+
+  const saveCurrentList = () => {
+    if (!listName.trim()) return
+
+    const newList: SavedCompanyList = {
+      id: editingList?.id || Date.now().toString(),
+      name: listName.trim(),
+      description: listDescription.trim() || undefined,
+      companies: [...currentCompanies],
+      filters: { ...currentFilters },
+      createdAt: editingList?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+
+    if (editingList) {
+      // Update existing list
+      setSavedLists(prev => prev.map(list => 
+        list.id === editingList.id ? newList : list
+      ))
+    } else {
+      // Add new list
+      setSavedLists(prev => [...prev, newList])
+    }
+
+    onListUpdate(savedLists)
+    setIsDialogOpen(false)
+    setListName('')
+    setListDescription('')
+    setEditingList(null)
+  }
+
+  const deleteList = (listId: string) => {
+    setSavedLists(prev => prev.filter(list => list.id !== listId))
+    onListUpdate(savedLists.filter(list => list.id !== listId))
+  }
+
+  const editList = (list: SavedCompanyList) => {
+    setEditingList(list)
+    setListName(list.name)
+    setListDescription(list.description || '')
+    setIsDialogOpen(true)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('sv-SE', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Save Current List Button */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="outline" 
+            className="w-full"
+            disabled={currentCompanies.length === 0}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Spara valda företag ({currentCompanies.length} företag)
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingList ? 'Redigera lista' : 'Spara företagslista'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingList 
+                ? 'Uppdatera informationen för denna lista.'
+                : 'Spara den aktuella sökningen och filtren som en lista för framtida användning.'
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Listnamn *</label>
+              <Input
+                value={listName}
+                onChange={(e) => setListName(e.target.value)}
+                placeholder="t.ex. 'Högväxande tech-företag'"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Beskrivning</label>
+              <Input
+                value={listDescription}
+                onChange={(e) => setListDescription(e.target.value)}
+                placeholder="Kort beskrivning av listan..."
+                className="mt-1"
+              />
+            </div>
+            <div className="text-sm text-gray-600">
+              <p><strong>Företag:</strong> {currentCompanies.length}</p>
+              <p><strong>Filter:</strong> {Object.keys(currentFilters).length > 0 ? 'Aktiva' : 'Inga'}</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setIsDialogOpen(false)
+              setListName('')
+              setListDescription('')
+              setEditingList(null)
+            }}>
+              Avbryt
+            </Button>
+            <Button onClick={saveCurrentList} disabled={!listName.trim()}>
+              {editingList ? 'Uppdatera' : 'Spara lista'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Saved Lists */}
+      {savedLists.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <List className="h-5 w-5 mr-2" />
+              Sparade listor ({savedLists.length})
+            </CardTitle>
+            <CardDescription>
+              Dina sparade företagslistor för snabb åtkomst
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {savedLists.map((list) => (
+                <div key={list.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium">{list.name}</h4>
+                      <Badge variant="secondary">{list.companies.length} företag</Badge>
+                    </div>
+                    {list.description && (
+                      <p className="text-sm text-gray-600 mb-2">{list.description}</p>
+                    )}
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Skapad: {formatDate(list.createdAt)}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Building2 className="h-3 w-3" />
+                        Uppdaterad: {formatDate(list.updatedAt)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onListSelect(list)}
+                    >
+                      Välj
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => editList(list)}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteList(list.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+export default CompanyListManager
+

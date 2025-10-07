@@ -105,3 +105,5 @@ All essential data fetching and updating capabilities from allabolag.se are pres
 
 
 
+
+

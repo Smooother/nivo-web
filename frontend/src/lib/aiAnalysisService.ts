@@ -1,213 +1,337 @@
-import type { CompanyFilter, SupabaseCompany } from './supabaseDataService'
-import { supabaseDataService } from './supabaseDataService'
+import { supabase } from './supabase'
 
 export interface AIAnalysisRequest {
   query: string
-  dataView?: string
-  filters?: CompanyFilter
+  dataView: string
+  filters?: {
+    segment?: string
+    city?: string
+    minRevenue?: number
+    maxRevenue?: number
+    minEmployees?: number
+    maxEmployees?: number
+  }
 }
 
 export interface AIAnalysisResult {
+  companies: any[]
+  insights: string[]
   summary: {
     totalFound: number
-    averageRevenue: number | null
-    averageGrowth: number | null
-    averageMargin: number | null
-    topIndustries: { industry: string; count: number }[]
-    topCities: { city: string; count: number }[]
+    averageRevenue?: number
+    averageGrowth?: number
+    topSegments: { segment: string, count: number }[]
   }
-  insights: string[]
   recommendations: string[]
-  companies: SupabaseCompany[]
-  metadata: {
-    generatedAt: string
-    query: string
-    filtersApplied: CompanyFilter
-  }
 }
 
-interface AnalysisTemplate {
-  id: string
-  name: string
-  description: string
-  query: string
-}
-
-const ANALYSIS_TEMPLATES: AnalysisTemplate[] = [
-  {
-    id: 'high-growth-tech',
-    name: 'High growth tech companies',
-    description: 'Identify tech companies with strong revenue growth and profitability',
-    query: 'High growth tech companies with strong profitability'
-  },
-  {
-    id: 'regional-champions',
-    name: 'Regional champions',
-    description: 'Find companies dominating their local market with solid fundamentals',
-    query: 'Regional champions with solid fundamentals'
-  },
-  {
-    id: 'turnaround-candidates',
-    name: 'Turnaround candidates',
-    description: 'Companies with declining performance but strong potential',
-    query: 'Declining companies with turnaround potential'
-  },
-  {
-    id: 'steady-compounders',
-    name: 'Steady compounders',
-    description: 'Stable companies with consistent growth and profitability',
-    query: 'Stable companies with consistent growth and profitability'
-  }
-]
-
-const calculateAverage = (values: Array<number | null | undefined>) => {
-  const numericValues = values.filter((value): value is number => typeof value === 'number')
-  if (numericValues.length === 0) {
-    return null
-  }
-  return numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length
-}
-
-const buildInsights = (companies: SupabaseCompany[], summary: AIAnalysisResult['summary']) => {
-  const insights: string[] = []
-
-  if (summary.averageRevenue) {
-    insights.push(`Average revenue of the selected companies is ${(summary.averageRevenue / 1_000_000).toFixed(1)}M SEK.`)
+export class AIAnalysisService {
+  // Natural language query processing
+  static async analyzeWithAI(request: AIAnalysisRequest): Promise<AIAnalysisResult> {
+    try {
+      // Step 1: Parse the natural language query
+      const parsedQuery = await this.parseNaturalLanguageQuery(request.query)
+      
+      // Step 2: Build SQL query based on parsed intent
+      const sqlQuery = await this.buildSQLFromIntent(parsedQuery, request.dataView, request.filters)
+      
+      // Step 3: Execute query and get results
+      const rawResults = await this.executeQuery(sqlQuery)
+      
+      // Step 4: Generate AI insights
+      const insights = await this.generateInsights(rawResults, request.query)
+      
+      // Step 5: Create summary and recommendations
+      const summary = this.createSummary(rawResults)
+      const recommendations = await this.generateRecommendations(rawResults, request.query)
+      
+      return {
+        companies: rawResults,
+        insights,
+        summary,
+        recommendations
+      }
+    } catch (error) {
+      console.error('AI Analysis error:', error)
+      throw new Error('Failed to analyze data with AI')
+    }
   }
 
-  if (summary.averageGrowth) {
-    insights.push(`Average revenue growth is ${(summary.averageGrowth * 100).toFixed(1)}%.`)
-  }
-
-  if (summary.averageMargin) {
-    insights.push(`Average EBIT margin is ${(summary.averageMargin * 100).toFixed(1)}%.`)
-  }
-
-  if (summary.topIndustries.length > 0) {
-    const topIndustry = summary.topIndustries[0]
-    insights.push(`Most common industry: ${topIndustry.industry} (${topIndustry.count} companies).`)
-  }
-
-  if (summary.topCities.length > 0) {
-    const topCity = summary.topCities[0]
-    insights.push(`Most represented city: ${topCity.city} (${topCity.count} companies).`)
-  }
-
-  if (companies.some(company => (company.Revenue_growth ?? 0) > 0.25)) {
-    insights.push('Several companies show exceptional growth momentum (>25%).')
-  }
-
-  if (companies.some(company => (company.EBIT_margin ?? 0) > 0.15)) {
-    insights.push('A subset of companies deliver outstanding profitability (>15% EBIT margin).')
-  }
-
-  return insights
-}
-
-const buildRecommendations = (summary: AIAnalysisResult['summary']) => {
-  const recommendations: string[] = []
-
-  if ((summary.averageGrowth ?? 0) > 0.15) {
-    recommendations.push('Prioritize due diligence on growth sustainability and scalability risks.')
-  }
-
-  if ((summary.averageMargin ?? 0) < 0.05) {
-    recommendations.push('Investigate cost structure improvements to enhance profitability.')
-  }
-
-  if (summary.topIndustries.length > 1) {
-    recommendations.push('Segment follow-up analysis by industry cluster to tailor go-to-market positioning.')
-  }
-
-  if (summary.topCities.length > 1) {
-    recommendations.push('Consider region-specific outreach strategies to leverage geographic clusters.')
-  }
-
-  if (recommendations.length === 0) {
-    recommendations.push('Proceed with deeper qualitative research on management, moat, and customer stickiness.')
-  }
-
-  return recommendations
-}
-
-const deriveFiltersFromQuery = (query: string): CompanyFilter => {
-  const normalizedQuery = query.toLowerCase()
-  const filters: CompanyFilter = {}
-
-  if (normalizedQuery.includes('stockholm')) {
-    filters.city = 'Stockholm'
-  }
-
-  if (normalizedQuery.includes('growth')) {
-    filters.minRevenueGrowth = 5
-  }
-
-  if (normalizedQuery.includes('profit')) {
-    filters.minProfit = 0
-  }
-
-  return filters
-}
-
-export const AIAnalysisService = {
-  getAnalysisTemplates(): AnalysisTemplate[] {
-    return ANALYSIS_TEMPLATES
-  },
-
-  async analyzeWithAI(request: AIAnalysisRequest): Promise<AIAnalysisResult> {
-    const baseFilters = request.filters || {}
-    const derivedFilters = { ...baseFilters, ...deriveFiltersFromQuery(request.query) }
-
-    // Use the textual query as a fallback name search if no explicit name filter is set
-    if (!derivedFilters.name && request.query.trim().length > 3) {
-      derivedFilters.name = request.query.trim()
+  // Parse natural language into structured intent
+  private static async parseNaturalLanguageQuery(query: string): Promise<any> {
+    // This would integrate with OpenAI or similar AI service
+    // For now, we'll use pattern matching as a fallback
+    
+    const patterns = {
+      highGrowth: /high.?growth|growing.?fast|growth.?rate/i,
+      revenue: /revenue|turnover|sales/i,
+      location: /stockholm|gothenburg|malmö|city|location/i,
+      industry: /tech|ecommerce|retail|manufacturing|sector|industry/i,
+      size: /large|small|medium|employees|size/i,
+      profitability: /profit|profitable|margin|ebit/i
     }
 
-    const { companies, total } = await supabaseDataService.getCompanies(1, 100, derivedFilters)
-
-    const summary = {
-      totalFound: total,
-      averageRevenue: calculateAverage(companies.map(company => company.revenue ?? company.SDI ?? null)),
-      averageGrowth: calculateAverage(companies.map(company => company.Revenue_growth ?? null)),
-      averageMargin: calculateAverage(companies.map(company => company.EBIT_margin ?? null)),
-      topIndustries: (() => {
-        const counts = new Map<string, number>()
-        companies.forEach(company => {
-          const industry = company.segment_name || company.segment || 'Unknown'
-          counts.set(industry, (counts.get(industry) || 0) + 1)
-        })
-        return Array.from(counts.entries())
-          .map(([industry, count]) => ({ industry, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5)
-      })(),
-      topCities: (() => {
-        const counts = new Map<string, number>()
-        companies.forEach(company => {
-          if (company.city) {
-            counts.set(company.city, (counts.get(company.city) || 0) + 1)
-          }
-        })
-        return Array.from(counts.entries())
-          .map(([city, count]) => ({ city, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5)
-      })()
+    const intent = {
+      criteria: [],
+      filters: {},
+      sortBy: 'revenue',
+      limit: 50
     }
 
-    const insights = buildInsights(companies, summary)
-    const recommendations = buildRecommendations(summary)
-
-    return {
-      summary,
-      insights,
-      recommendations,
-      companies: companies.slice(0, 10),
-      metadata: {
-        generatedAt: new Date().toISOString(),
-        query: request.query,
-        filtersApplied: derivedFilters
+    // Extract criteria
+    if (patterns.highGrowth.test(query)) {
+      intent.criteria.push({ type: 'growth', operator: '>', value: 0.15 })
+    }
+    
+    if (patterns.revenue.test(query)) {
+      if (query.includes('>') || query.includes('more than')) {
+        const match = query.match(/(\d+)\s*(million|m|billion|b)/i)
+        if (match) {
+          const value = parseFloat(match[1])
+          const unit = match[2].toLowerCase()
+          const multiplier = unit.includes('b') ? 1000000000 : 1000000
+          intent.criteria.push({ type: 'revenue', operator: '>', value: value * multiplier })
+        }
       }
     }
+
+    if (patterns.location.test(query)) {
+      const cityMatch = query.match(/(stockholm|gothenburg|malmö)/i)
+      if (cityMatch) {
+        intent.filters.city = cityMatch[1]
+      }
+    }
+
+    if (patterns.industry.test(query)) {
+      if (query.includes('tech')) {
+        intent.filters.segment = 'tech'
+      } else if (query.includes('ecommerce')) {
+        intent.filters.segment = 'ecommerce'
+      }
+    }
+
+    return intent
+  }
+
+  // Build SQL query from parsed intent
+  private static async buildSQLFromIntent(intent: any, dataView: string, filters?: any): Promise<string> {
+    let baseQuery = `SELECT * FROM ${dataView}`
+    const conditions = []
+    
+    // Apply intent criteria
+    intent.criteria.forEach((criterion: any) => {
+      switch (criterion.type) {
+        case 'growth':
+          conditions.push(`revenue_growth ${criterion.operator} ${criterion.value}`)
+          break
+        case 'revenue':
+          conditions.push(`revenue ${criterion.operator} ${criterion.value}`)
+          break
+      }
+    })
+
+    // Apply filters
+    if (filters?.city) {
+      conditions.push(`city ILIKE '%${filters.city}%'`)
+    }
+    if (filters?.segment) {
+      conditions.push(`segment ILIKE '%${filters.segment}%'`)
+    }
+    if (filters?.minRevenue) {
+      conditions.push(`revenue >= ${filters.minRevenue}`)
+    }
+    if (filters?.maxRevenue) {
+      conditions.push(`revenue <= ${filters.maxRevenue}`)
+    }
+
+    // Apply intent filters
+    if (intent.filters.city) {
+      conditions.push(`city ILIKE '%${intent.filters.city}%'`)
+    }
+    if (intent.filters.segment) {
+      conditions.push(`segment ILIKE '%${intent.filters.segment}%'`)
+    }
+
+    if (conditions.length > 0) {
+      baseQuery += ` WHERE ${conditions.join(' AND ')}`
+    }
+
+    // Add ordering and limit
+    baseQuery += ` ORDER BY ${intent.sortBy} DESC LIMIT ${intent.limit}`
+
+    return baseQuery
+  }
+
+  // Execute the built query
+  private static async executeQuery(sqlQuery: string): Promise<any[]> {
+    try {
+      // For now, we'll use Supabase's query builder
+      // In production, you might want to use raw SQL execution
+      
+      // Parse the query to extract table and conditions
+      const tableMatch = sqlQuery.match(/FROM (\w+)/i)
+      const whereMatch = sqlQuery.match(/WHERE (.+?) ORDER/i)
+      const orderMatch = sqlQuery.match(/ORDER BY (\w+)/i)
+      const limitMatch = sqlQuery.match(/LIMIT (\d+)/i)
+
+      if (!tableMatch) throw new Error('Invalid query format')
+
+      let query = supabase.from(tableMatch[1]).select('*')
+
+      if (whereMatch) {
+        // This is simplified - in production you'd need a proper SQL parser
+        const conditions = whereMatch[1].split(' AND ')
+        conditions.forEach(condition => {
+          if (condition.includes('ILIKE')) {
+            const [field, , value] = condition.split(' ')
+            query = query.ilike(field, value.replace(/'/g, ''))
+          } else if (condition.includes('>=')) {
+            const [field, , value] = condition.split(' ')
+            query = query.gte(field, parseFloat(value))
+          } else if (condition.includes('<=')) {
+            const [field, , value] = condition.split(' ')
+            query = query.lte(field, parseFloat(value))
+          } else if (condition.includes('>')) {
+            const [field, , value] = condition.split(' ')
+            query = query.gt(field, parseFloat(value))
+          }
+        })
+      }
+
+      if (orderMatch) {
+        query = query.order(orderMatch[1], { ascending: false })
+      }
+
+      if (limitMatch) {
+        query = query.limit(parseInt(limitMatch[1]))
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+
+      return data || []
+    } catch (error) {
+      console.error('Query execution error:', error)
+      return []
+    }
+  }
+
+  // Generate AI insights from results
+  private static async generateInsights(results: any[], originalQuery: string): Promise<string[]> {
+    const insights = []
+
+    if (results.length === 0) {
+      insights.push("No companies found matching your criteria. Try broadening your search parameters.")
+      return insights
+    }
+
+    // Calculate basic statistics
+    const revenues = results.map(r => parseFloat(r.revenue || r.Revenue || '0')).filter(r => r > 0)
+    const avgRevenue = revenues.length > 0 ? revenues.reduce((a, b) => a + b, 0) / revenues.length : 0
+
+    // Generate insights based on data
+    insights.push(`Found ${results.length} companies matching your criteria.`)
+
+    if (avgRevenue > 0) {
+      insights.push(`Average revenue: ${(avgRevenue / 1000000).toFixed(1)}M SEK`)
+    }
+
+    // Industry distribution
+    const segments = results.map(r => r.segment || r.Bransch || 'Unknown').filter(s => s !== 'Unknown')
+    if (segments.length > 0) {
+      const segmentCounts = segments.reduce((acc, seg) => {
+        acc[seg] = (acc[seg] || 0) + 1
+        return acc
+      }, {} as Record<string, number>)
+      
+      const topSegment = Object.entries(segmentCounts).sort(([,a], [,b]) => b - a)[0]
+      if (topSegment) {
+        insights.push(`Most common industry: ${topSegment[0]} (${topSegment[1]} companies)`)
+      }
+    }
+
+    // Growth insights
+    const growthRates = results.map(r => parseFloat(r.revenue_growth || r.Revenue_growth || '0')).filter(g => g > 0)
+    if (growthRates.length > 0) {
+      const avgGrowth = growthRates.reduce((a, b) => a + b, 0) / growthRates.length
+      insights.push(`Average growth rate: ${(avgGrowth * 100).toFixed(1)}%`)
+    }
+
+    return insights
+  }
+
+  // Create summary statistics
+  private static createSummary(results: any[]): any {
+    const revenues = results.map(r => parseFloat(r.revenue || r.Revenue || '0')).filter(r => r > 0)
+    const growthRates = results.map(r => parseFloat(r.revenue_growth || r.Revenue_growth || '0')).filter(g => g > 0)
+    
+    const segments = results.map(r => r.segment || r.Bransch || 'Unknown').filter(s => s !== 'Unknown')
+    const segmentCounts = segments.reduce((acc, seg) => {
+      acc[seg] = (acc[seg] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    return {
+      totalFound: results.length,
+      averageRevenue: revenues.length > 0 ? revenues.reduce((a, b) => a + b, 0) / revenues.length : 0,
+      averageGrowth: growthRates.length > 0 ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length : 0,
+      topSegments: Object.entries(segmentCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([segment, count]) => ({ segment, count }))
+    }
+  }
+
+  // Generate recommendations
+  private static async generateRecommendations(results: any[], originalQuery: string): Promise<string[]> {
+    const recommendations = []
+
+    if (results.length > 10) {
+      recommendations.push("Consider adding more specific filters to narrow down your results.")
+    } else if (results.length < 5) {
+      recommendations.push("Try broadening your search criteria to find more companies.")
+    }
+
+    // Industry-specific recommendations
+    const segments = results.map(r => r.segment || r.Bransch || '').filter(s => s)
+    if (segments.some(s => s.toLowerCase().includes('tech'))) {
+      recommendations.push("Tech companies often benefit from digital transformation initiatives.")
+    }
+    if (segments.some(s => s.toLowerCase().includes('retail'))) {
+      recommendations.push("Retail companies may be good candidates for e-commerce expansion.")
+    }
+
+    return recommendations
+  }
+
+  // Pre-built analysis templates
+  static getAnalysisTemplates() {
+    return [
+      {
+        id: 'high-growth-tech',
+        name: 'High-Growth Tech Companies',
+        query: 'Find tech companies with revenue growth above 20%',
+        description: 'Identify fast-growing technology companies'
+      },
+      {
+        id: 'profitable-ecommerce',
+        name: 'Profitable E-commerce Companies',
+        query: 'Show me profitable e-commerce companies in major cities',
+        description: 'Find successful online retail businesses'
+      },
+      {
+        id: 'large-manufacturing',
+        name: 'Large Manufacturing Companies',
+        query: 'Find large manufacturing companies with high revenue',
+        description: 'Identify major industrial players'
+      },
+      {
+        id: 'startup-potential',
+        name: 'Startup Potential Analysis',
+        query: 'Find young companies with high growth potential',
+        description: 'Identify promising early-stage companies'
+      }
+    ]
   }
 }

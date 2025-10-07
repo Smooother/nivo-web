@@ -40,7 +40,7 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
           
           <FadeIn delay={600} duration={900} direction="up">
             <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
-              Business Intelligence and Analytics Platform. Discover, analyze, and understand companies with comprehensive data insights and advanced analytics tools.
+              Förvärv som skapar värde – tillväxt som består.
             </p>
           </FadeIn>
           
