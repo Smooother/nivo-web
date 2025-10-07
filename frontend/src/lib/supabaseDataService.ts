@@ -77,17 +77,17 @@ export interface DashboardAnalytics {
   lastUpdated: string | null
 }
 
+// Query only columns that exist in the actual Supabase table
 const COMPANY_FIELDS = `
-  id,
   "OrgNr",
   name,
   address,
   city,
   incorporation_date,
+  email,
   homepage,
   segment,
   segment_name,
-  industry_name,
   revenue,
   profit,
   employees,
@@ -97,13 +97,7 @@ const COMPANY_FIELDS = `
   "Revenue_growth",
   "EBIT_margin",
   "NetProfit_margin",
-  analysis_year,
-  digital_maturity,
-  company_size_category,
-  employee_size_category,
-  profitability_category,
-  growth_category,
-  fit_score_reason
+  analysis_year
 `
 
 const DEFAULT_PAGE_SIZE = 20
@@ -162,7 +156,6 @@ const applyFilters = (query: CompanyQuery, filters: CompanyFilter): CompanyQuery
 }
 
 const mapCompanyRecord = (record: any): SupabaseCompany => ({
-  id: record.id ?? undefined,
   OrgNr: record.OrgNr ?? record.orgnr ?? undefined,
   name: record.name,
   address: record.address ?? null,
@@ -171,7 +164,7 @@ const mapCompanyRecord = (record: any): SupabaseCompany => ({
   homepage: record.homepage ?? null,
   segment: record.segment ?? null,
   segment_name: record.segment_name ?? null,
-  industry_name: record.industry_name ?? record.segment_name ?? null,
+  industry_name: record.segment_name ?? null,
   revenue: typeof record.revenue === 'number' ? record.revenue : record.SDI ?? null,
   profit: typeof record.profit === 'number' ? record.profit : null,
   employees: record.employees ?? null,
@@ -183,12 +176,12 @@ const mapCompanyRecord = (record: any): SupabaseCompany => ({
   NetProfit_margin: typeof record.NetProfit_margin === 'number' ? record.NetProfit_margin : null,
   analysis_year: record.analysis_year ?? null,
   year: record.analysis_year ?? null,
-  digital_maturity: record.digital_maturity ?? null,
-  company_size_category: record.company_size_category ?? null,
-  employee_size_category: record.employee_size_category ?? null,
-  profitability_category: record.profitability_category ?? null,
-  growth_category: record.growth_category ?? null,
-  fit_score_reason: record.fit_score_reason ?? null,
+  digital_maturity: null,
+  company_size_category: null,
+  employee_size_category: null,
+  profitability_category: null,
+  growth_category: null,
+  fit_score_reason: null,
   historicalData: Array.isArray(record.historicalData) ? record.historicalData : []
 })
 
