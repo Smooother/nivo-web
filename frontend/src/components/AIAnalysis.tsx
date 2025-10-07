@@ -37,10 +37,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [selectedList, setSelectedList] = useState<string>('')
   const [companies, setCompanies] = useState<SupabaseCompany[]>([])
+  const [totalCompanies, setTotalCompanies] = useState<number>(0)
+  const [loadingCompanies, setLoadingCompanies] = useState<boolean>(false)
 
   const templates = AIAnalysisService.getAnalysisTemplates()
 
-  // Load saved lists and companies on mount
+  // Load saved lists on mount
   useEffect(() => {
     const saved = localStorage.getItem('savedCompanyLists')
     if (saved) {
@@ -51,56 +53,66 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
         console.error('Error loading saved lists:', error)
       }
     }
-    
-    // Load companies on mount
-    loadAllCompanies()
   }, [])
 
-  // Load companies when list is selected
+  // Load companies when list is selected or when "All companies" is chosen
   useEffect(() => {
     if (selectedList && selectedList !== "") {
       const list = savedLists.find(l => l.id === selectedList)
       if (list) {
         setCompanies(list.companies)
+        setTotalCompanies(list.companies.length)
       }
     } else {
-      // Load all companies if no list selected
-      loadAllCompanies()
+      // Don't load all companies upfront - load them on-demand
+      setCompanies([])
+      setTotalCompanies(8438) // We know the total from dashboard
     }
   }, [selectedList, savedLists])
 
-  const loadAllCompanies = async () => {
+  // Load companies on-demand for analysis
+  const loadCompaniesForAnalysis = async (query: string, limit: number = 50) => {
     try {
-      console.log('Loading all companies...')
-      // Load all companies (up to 10,000 to cover all 8,438 companies)
-      const allCompanies = await supabaseDataService.getCompanies(1, 10000)
-      console.log('Full response:', allCompanies)
-      console.log('Loaded companies:', allCompanies.companies?.length || 0)
-      console.log('Total available:', allCompanies.total || 0)
-      setCompanies(allCompanies.companies || [])
+      setLoadingCompanies(true)
+      console.log('Loading companies for analysis...')
+      
+      // For now, load a sample of companies for analysis
+      // In the future, we could parse the query to apply smart filters
+      const result = await supabaseDataService.getCompanies(1, limit)
+      console.log('Loaded companies for analysis:', result.companies?.length || 0)
+      
+      setCompanies(result.companies || [])
+      return result.companies || []
     } catch (error) {
-      console.error('Error loading companies:', error)
+      console.error('Error loading companies for analysis:', error)
       setCompanies([])
+      return []
+    } finally {
+      setLoadingCompanies(false)
     }
   }
 
   const handleAnalyze = async () => {
     if (!query.trim()) return
 
-    if (companies.length === 0) {
-      console.error('No companies loaded for analysis')
-      setResults({
-        companies: [],
-        insights: ['Error: No companies loaded. Please wait for companies to load or select a saved list.'],
-        summary: 'No companies available for analysis',
-        recommendations: ['Wait for companies to load', 'Select a saved list', 'Check your internet connection']
-      })
-      return
-    }
-
     setLoading(true)
     try {
-      console.log('Analyzing with', companies.length, 'companies')
+      let companiesToAnalyze: SupabaseCompany[] = []
+      
+      // If a saved list is selected, use those companies
+      if (selectedList && selectedList !== "") {
+        companiesToAnalyze = companies
+      } else {
+        // Load companies on-demand for analysis
+        console.log('Loading companies on-demand for analysis...')
+        companiesToAnalyze = await loadCompaniesForAnalysis(query.trim(), 50)
+      }
+
+      if (companiesToAnalyze.length === 0) {
+        throw new Error('No companies available for analysis')
+      }
+
+      console.log('Analyzing with', companiesToAnalyze.length, 'companies')
       // Use the working backend API instead of the complex AIAnalysisService
       const response = await fetch('/api/ai-analysis', {
         method: 'POST',
@@ -108,7 +120,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          companies: companies.slice(0, 5), // Limit to first 5 companies for analysis to avoid connection issues
+          companies: companiesToAnalyze.slice(0, 5), // Limit to first 5 companies for analysis to avoid connection issues
           analysisType: 'comprehensive',
           query: query.trim()
         }),
@@ -178,14 +190,17 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All companies (or select a saved list)" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All companies ({companies.length || 'Loading...'})</SelectItem>
-                  {savedLists.map((list) => (
-                    <SelectItem key={list.id} value={list.id}>
-                      {list.name} ({list.companies.length} companies)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+        <SelectContent>
+          <SelectItem value="all">
+            All companies ({selectedList === "" ? totalCompanies : companies.length})
+            {selectedList === "" && " - Loaded on-demand"}
+          </SelectItem>
+          {savedLists.map((list) => (
+            <SelectItem key={list.id} value={list.id}>
+              {list.name} ({list.companies.length} companies)
+            </SelectItem>
+          ))}
+        </SelectContent>
               </Select>
             </div>
 
@@ -202,11 +217,16 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                 />
                 <Button 
                   onClick={handleAnalyze} 
-                  disabled={loading || !query.trim()}
+                  disabled={loading || loadingCompanies || !query.trim()}
                   className="px-6"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : loadingCompanies ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Loading companies...
+                    </>
                   ) : (
                     <>
                       <Search className="h-4 w-4 mr-2" />
