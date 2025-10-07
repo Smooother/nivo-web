@@ -55,7 +55,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
 
   // Load companies when list is selected
   useEffect(() => {
-    if (selectedList) {
+    if (selectedList && selectedList !== "") {
       const list = savedLists.find(l => l.id === selectedList)
       if (list) {
         setCompanies(list.companies)
@@ -152,12 +152,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                 <List className="h-4 w-4 mr-2" />
                 Choose data source:
               </label>
-              <Select value={selectedList} onValueChange={setSelectedList}>
+              <Select value={selectedList || "all"} onValueChange={(value) => setSelectedList(value === "all" ? "" : value)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All companies (or select a saved list)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All companies ({companies.length})</SelectItem>
+                  <SelectItem value="all">All companies ({companies.length})</SelectItem>
                   {savedLists.map((list) => (
                     <SelectItem key={list.id} value={list.id}>
                       {list.name} ({list.companies.length} companies)
