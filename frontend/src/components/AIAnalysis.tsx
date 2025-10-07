@@ -124,7 +124,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           analysisType: 'comprehensive',
           query: query.trim()
         }),
-        signal: AbortSignal.timeout(30000) // 30 second timeout
+        signal: AbortSignal.timeout(60000) // 60 second timeout
       })
 
       const data = await response.json()
