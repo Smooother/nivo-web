@@ -2,6 +2,11 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import OpenAI from 'openai'
+import { config } from 'dotenv'
+import path from 'path'
+
+// Load environment variables from .env.local
+config({ path: path.resolve(process.cwd(), '.env.local') })
 
 const app = express()
 const port = process.env.PORT ? Number(process.env.PORT) : 3001
@@ -9,7 +14,11 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3001
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+// Check if API key is available
+const apiKey = process.env.OPENAI_API_KEY
+console.log('OpenAI API Key available:', !!apiKey)
+
+const openai = new OpenAI({ apiKey: apiKey || 'placeholder' })
 
 app.post('/api/ai-analysis', async (req, res) => {
   try {
@@ -55,20 +64,17 @@ Grundat: ${company.incorporation_date || 'Ej tillgänglig'}
 
     const userPrompt = `Analysera följande ${companies.length} svenska företag och ge mig en omfattande rapport:\n\n${companyDataString}\n\nGe mig följande för varje företag:\n1. Executive Summary (2-3 meningar)\n2. Finansiell hälsa (1-10 skala)\n3. Tillväxtpotential (Hög/Medium/Låg)\n4. Marknadsposition (Ledare/Utmanare/Följare/Nisch)\n5. Top 3 styrkor\n6. Top 3 svagheter\n7. Top 3 strategiska möjligheter\n8. Top 3 risker\n9. Investeringsrekommendation (Köp/Håll/Sälj) med motivering\n10. Target price (TSEK) om tillämpligt\n\nSvara i JSON-format med följande struktur:\n{\n  \"companies\": [\n    {\n      \"orgNr\": \"string\",\n      \"name\": \"string\",\n      \"executiveSummary\": \"string\",\n      \"financialHealth\": number,\n      \"growthPotential\": \"string\",\n      \"marketPosition\": \"string\",\n      \"strengths\": [\"string\", \"string\", \"string\"],\n      \"weaknesses\": [\"string\", \"string\", \"string\"],\n      \"opportunities\": [\"string\", \"string\", \"string\"],\n      \"risks\": [\"string\", \"string\", \"string\"],\n      \"recommendation\": \"string\",\n      \"targetPrice\": number,\n      \"confidence\": number\n    }\n  ]\n}`
 
-    const response = await openai.responses.create({
-      model,
-      input: [
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini', // Use a supported model
+      messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.7,
-      max_output_tokens: 4000,
-      store: false,
-      text: { verbosity: 'low' }
+      max_tokens: 4000
     })
 
-    const messageItem = (response.output || []).find((i: any) => i.type === 'message')
-    const responseText: string | undefined = messageItem?.content?.[0]?.text
+    const responseText = response.choices?.[0]?.message?.content
 
     let analysis: any
     try {

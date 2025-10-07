@@ -15,6 +15,7 @@ import ScraperInterface from '../components/ScraperInterface'
 import DataExport from '../components/DataExport'
 import ListBasedAnalytics from '../components/ListBasedAnalytics'
 import AIAnalytics from '../components/AIAnalytics'
+import AIAnalysis from '../components/AIAnalysis'
 import AdminPanel from '../components/AdminPanel'
 
 const WorkingDashboard: React.FC = () => {
@@ -269,7 +270,7 @@ const WorkingDashboard: React.FC = () => {
         return <ListBasedAnalytics />
       
       case 'ai-insights':
-        return <AIAnalytics />
+        return <AIAnalysis selectedDataView="master_analytics" />
       
       case 'export':
         return <DataExport />
