@@ -72,7 +72,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
   const loadAllCompanies = async () => {
     try {
       console.log('Loading all companies...')
-      const allCompanies = await supabaseDataService.getCompanies(0, 1000)
+      const allCompanies = await supabaseDataService.getCompanies(1, 1000)
+      console.log('Full response:', allCompanies)
       console.log('Loaded companies:', allCompanies.companies?.length || 0)
       setCompanies(allCompanies.companies || [])
     } catch (error) {
