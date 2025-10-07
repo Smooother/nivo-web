@@ -108,10 +108,11 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          companies: companies.slice(0, 10), // Limit to first 10 companies for analysis
+          companies: companies.slice(0, 5), // Limit to first 5 companies for analysis to avoid connection issues
           analysisType: 'comprehensive',
           query: query.trim()
         }),
+        signal: AbortSignal.timeout(30000) // 30 second timeout
       })
 
       const data = await response.json()
