@@ -40,7 +40,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
 
   const templates = AIAnalysisService.getAnalysisTemplates()
 
-  // Load saved lists
+  // Load saved lists and companies on mount
   useEffect(() => {
     const saved = localStorage.getItem('savedCompanyLists')
     if (saved) {
@@ -51,6 +51,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
         console.error('Error loading saved lists:', error)
       }
     }
+    
+    // Load companies on mount
+    loadAllCompanies()
   }, [])
 
   // Load companies when list is selected
@@ -68,18 +71,33 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
 
   const loadAllCompanies = async () => {
     try {
+      console.log('Loading all companies...')
       const allCompanies = await supabaseDataService.getCompanies(0, 1000)
-      setCompanies(allCompanies.companies)
+      console.log('Loaded companies:', allCompanies.companies?.length || 0)
+      setCompanies(allCompanies.companies || [])
     } catch (error) {
       console.error('Error loading companies:', error)
+      setCompanies([])
     }
   }
 
   const handleAnalyze = async () => {
     if (!query.trim()) return
 
+    if (companies.length === 0) {
+      console.error('No companies loaded for analysis')
+      setResults({
+        companies: [],
+        insights: ['Error: No companies loaded. Please wait for companies to load or select a saved list.'],
+        summary: 'No companies available for analysis',
+        recommendations: ['Wait for companies to load', 'Select a saved list', 'Check your internet connection']
+      })
+      return
+    }
+
     setLoading(true)
     try {
+      console.log('Analyzing with', companies.length, 'companies')
       // Use the working backend API instead of the complex AIAnalysisService
       const response = await fetch('/api/ai-analysis', {
         method: 'POST',
@@ -157,7 +175,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                   <SelectValue placeholder="All companies (or select a saved list)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All companies ({companies.length})</SelectItem>
+                  <SelectItem value="all">All companies ({companies.length || 'Loading...'})</SelectItem>
                   {savedLists.map((list) => (
                     <SelectItem key={list.id} value={list.id}>
                       {list.name} ({list.companies.length} companies)
@@ -301,7 +319,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           </Card>
 
           {/* Top Segments */}
-          {results.summary.topSegments.length > 0 && (
+          {results.summary?.topSegments?.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Top Industries</CardTitle>
