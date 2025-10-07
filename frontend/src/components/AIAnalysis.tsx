@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Badge } from './ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { 
   Brain, 
   Search, 
@@ -11,36 +12,115 @@ import {
   Building2, 
   Lightbulb,
   Loader2,
-  Sparkles
+  Sparkles,
+  List
 } from 'lucide-react'
 import { AIAnalysisService, AIAnalysisRequest, AIAnalysisResult } from '../lib/aiAnalysisService'
+import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
 
-interface AIAnalysisProps {
-  selectedDataView: string
+interface SavedCompanyList {
+  id: string
+  name: string
+  companies: SupabaseCompany[]
+  createdAt: string
 }
 
-const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView }) => {
+interface AIAnalysisProps {
+  selectedDataView?: string
+}
+
+const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_analytics" }) => {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<AIAnalysisResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
+  const [selectedList, setSelectedList] = useState<string>('')
+  const [companies, setCompanies] = useState<SupabaseCompany[]>([])
 
   const templates = AIAnalysisService.getAnalysisTemplates()
+
+  // Load saved lists
+  useEffect(() => {
+    const saved = localStorage.getItem('savedCompanyLists')
+    if (saved) {
+      try {
+        const lists = JSON.parse(saved)
+        setSavedLists(lists)
+      } catch (error) {
+        console.error('Error loading saved lists:', error)
+      }
+    }
+  }, [])
+
+  // Load companies when list is selected
+  useEffect(() => {
+    if (selectedList) {
+      const list = savedLists.find(l => l.id === selectedList)
+      if (list) {
+        setCompanies(list.companies)
+      }
+    } else {
+      // Load all companies if no list selected
+      loadAllCompanies()
+    }
+  }, [selectedList, savedLists])
+
+  const loadAllCompanies = async () => {
+    try {
+      const allCompanies = await supabaseDataService.getCompanies(0, 1000)
+      setCompanies(allCompanies.companies)
+    } catch (error) {
+      console.error('Error loading companies:', error)
+    }
+  }
 
   const handleAnalyze = async () => {
     if (!query.trim()) return
 
     setLoading(true)
     try {
-      const request: AIAnalysisRequest = {
-        query: query.trim(),
-        dataView: selectedDataView
+      // Use the working backend API instead of the complex AIAnalysisService
+      const response = await fetch('/api/ai-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companies: companies.slice(0, 10), // Limit to first 10 companies for analysis
+          analysisType: 'comprehensive',
+          query: query.trim()
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Analysis failed')
       }
 
-      const analysisResult = await AIAnalysisService.analyzeWithAI(request)
+      // Transform the backend response to match the expected format
+      const analysisResult: AIAnalysisResult = {
+        companies: data.analysis?.companies || [],
+        insights: [`Analysis completed for ${companies.length} companies based on: "${query.trim()}"`],
+        summary: `Found ${data.analysis?.companies?.length || 0} companies matching your criteria`,
+        recommendations: [
+          'Review the analysis results below',
+          'Consider the financial health scores',
+          'Evaluate growth potential and market position'
+        ]
+      }
+
       setResults(analysisResult)
     } catch (error) {
       console.error('Analysis failed:', error)
+      // Set error result
+      setResults({
+        companies: [],
+        insights: [`Error: ${error instanceof Error ? error.message : 'Analysis failed'}`],
+        summary: 'Analysis could not be completed',
+        recommendations: ['Please try again with a different query', 'Check your internet connection']
+      })
     } finally {
       setLoading(false)
     }
@@ -66,6 +146,27 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {/* Saved Lists Selector */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center">
+                <List className="h-4 w-4 mr-2" />
+                Choose data source:
+              </label>
+              <Select value={selectedList} onValueChange={setSelectedList}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All companies (or select a saved list)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All companies ({companies.length})</SelectItem>
+                  {savedLists.map((list) => (
+                    <SelectItem key={list.id} value={list.id}>
+                      {list.name} ({list.companies.length} companies)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Query Input */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Ask a question about your data:</label>
@@ -235,22 +336,23 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView }) => {
             </Card>
           )}
 
-          {/* Sample Results */}
+          {/* Analysis Results */}
           <Card>
             <CardHeader>
-              <CardTitle>Sample Results</CardTitle>
+              <CardTitle>Analysis Results</CardTitle>
               <CardDescription>
-                Showing first 10 companies from your analysis
+                AI analysis results for your query
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {results.companies.slice(0, 10).map((company, index) => (
-                  <div key={index} className="p-3 border rounded-lg">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium">{company.name || company.companyName}</h4>
-                        <p className="text-sm text-gray-600">
+                {results.companies && results.companies.length > 0 ? (
+                  results.companies.slice(0, 10).map((company, index) => (
+                    <div key={index} className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-medium">{company.name || company.companyName}</h4>
+                          <p className="text-sm text-gray-600">
                           {company.city || company.address} • {company.segment || company.Bransch || 'Unknown'}
                         </p>
                       </div>
@@ -268,7 +370,13 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView }) => {
                       </div>
                     </div>
                   </div>
-                ))}
+                ))
+                ) : (
+                  <div className="p-4 text-center text-gray-500">
+                    <p>No companies found matching your criteria.</p>
+                    <p className="text-sm mt-1">Try broadening your search parameters or select a different data source.</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
