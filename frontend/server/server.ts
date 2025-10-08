@@ -30,7 +30,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const model = process.env.OPENAI_MODEL || 'gpt-4o-mini'
+    const model = process.env.OPENAI_MODEL || 'gpt-4o'
 
     const systemPrompt = `Du är en expert finansiell analytiker som specialiserar dig på svenska företag.
 Din uppgift är att analysera företagsdata och ge djupgående insikter på svenska.
@@ -69,7 +69,7 @@ Grundat: ${company.incorporation_date || 'Ej tillgänglig'}
     const timeout = setTimeout(() => controller.abort(), 45000)
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Use a supported model
+      model: 'gpt-4o', // Use a supported model
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }

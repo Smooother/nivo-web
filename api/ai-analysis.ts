@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const model = process.env.OPENAI_MODEL || 'gpt-4o-mini'
+    const model = process.env.OPENAI_MODEL || 'gpt-4o'
 
     const systemPrompt = `Du är en expert finansiell analytiker som specialiserar dig på svenska företag.
 Din uppgift är att analysera företagsdata och ge djupgående insikter på svenska.
