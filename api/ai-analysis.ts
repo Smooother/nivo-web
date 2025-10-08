@@ -67,8 +67,7 @@ Grundat: ${company.incorporation_date || 'Ej tillgänglig'}
 
     clearTimeout(timeout)
 
-    const messageItem = (response.output || []).find((i: any) => i.type === 'message')
-    const responseText: string | undefined = (messageItem as any)?.content?.[0]?.text
+    const responseText = response.choices?.[0]?.message?.content
 
     let analysis: any
     try {
