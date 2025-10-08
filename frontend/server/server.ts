@@ -30,7 +30,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const model = process.env.OPENAI_MODEL || 'gpt-5-nano'
+    const model = process.env.OPENAI_MODEL || 'gpt-4o-mini'
 
     const systemPrompt = `Du är en expert finansiell analytiker som specialiserar dig på svenska företag.
 Din uppgift är att analysera företagsdata och ge djupgående insikter på svenska.
