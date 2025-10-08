@@ -269,6 +269,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   }
 
   const datasetSummary = analysisResult?.meta?.datasetSummary
+  const actionPlan = analysisResult?.actionPlan
+  const focusAreas = Array.isArray(analysisResult?.meta?.focusAreas)
+    ? (analysisResult.meta?.focusAreas as string[])
+    : []
 
   return (
     <div className="space-y-6">
@@ -435,7 +439,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 <div className="flex items-center space-x-2">
                   <Building2 className="h-5 w-5 text-blue-600" />
                   <div>
-                    <p className="text-2xl font-bold">{analysisResult.meta.companyCount}</p>
+                    <p className="text-2xl font-bold">{analysisResult.meta?.companyCount ?? 0}</p>
                     <p className="text-xs text-gray-600">Analyserade bolag</p>
                   </div>
                 </div>
@@ -495,18 +499,24 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 <span>Analysöversikt</span>
               </CardTitle>
               <CardDescription>
-                {new Date(analysisResult.meta.generatedAt).toLocaleString('sv-SE')}
+                {analysisResult.meta?.generatedAt
+                  ? new Date(analysisResult.meta.generatedAt).toLocaleString('sv-SE')
+                  : 'Okänt genereringsdatum'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">
-                  Profil: {analysisTypeLabels[analysisResult.meta.analysisType as AnalysisType] || analysisResult.meta.analysisType}
-                </Badge>
-                <Badge variant="secondary">
-                  Tidshorisont: {timeHorizonLabels[analysisResult.meta.timeHorizon || 'unspecified']}
-                </Badge>
-                {analysisResult.meta.focusAreas?.map((area) => (
+                  <Badge variant="secondary">
+                    Profil:{' '}
+                    {analysisTypeLabels[analysisResult.meta?.analysisType as AnalysisType] ||
+                      analysisResult.meta?.analysisType ||
+                      'Okänd'}
+                  </Badge>
+                  <Badge variant="secondary">
+                    Tidshorisont:{' '}
+                    {timeHorizonLabels[(analysisResult.meta?.timeHorizon as TimeHorizon | undefined) || 'unspecified']}
+                  </Badge>
+                {focusAreas.map((area) => (
                   <Badge key={area} variant="outline">
                     {getFocusAreaLabel(area)}
                   </Badge>
@@ -540,7 +550,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                   <div>
                     <h4 className="font-semibold mb-2">Teman</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.portfolioInsights.themes.map((theme, index) => (
+                      {analysisResult.portfolioInsights?.themes?.map((theme, index) => (
                         <li key={index} className="p-2 bg-purple-50 rounded">{theme}</li>
                       ))}
                     </ul>
@@ -550,7 +560,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                   <div>
                     <h4 className="font-semibold mb-2">Signaler</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.portfolioInsights.signals.map((signal, index) => (
+                      {analysisResult.portfolioInsights?.signals?.map((signal, index) => (
                         <li key={index} className="p-2 bg-green-50 rounded">{signal}</li>
                       ))}
                     </ul>
@@ -560,7 +570,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                   <div>
                     <h4 className="font-semibold mb-2">Benchmark</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.portfolioInsights.benchmarks.map((benchmark, index) => (
+                      {analysisResult.portfolioInsights?.benchmarks?.map((benchmark, index) => (
                         <li key={index} className="p-2 bg-orange-50 rounded">{benchmark}</li>
                       ))}
                     </ul>
@@ -589,7 +599,11 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
           )}
 
           {/* Action Plan */}
-          {analysisResult.actionPlan && (
+          {actionPlan &&
+            (actionPlan.quickWins?.length ||
+              actionPlan.strategicMoves?.length ||
+              actionPlan.riskMitigations?.length ||
+              actionPlan.nextSteps?.length) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -598,41 +612,41 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid md:grid-cols-2 gap-4">
-                {analysisResult.actionPlan.quickWins && analysisResult.actionPlan.quickWins.length > 0 && (
+                {actionPlan?.quickWins && actionPlan.quickWins.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2">Snabba vinster</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.actionPlan.quickWins.map((item, index) => (
+                      {actionPlan.quickWins.map((item, index) => (
                         <li key={index} className="p-2 bg-green-50 rounded">{item}</li>
                       ))}
                     </ul>
                   </div>
                 )}
-                {analysisResult.actionPlan.strategicMoves && analysisResult.actionPlan.strategicMoves.length > 0 && (
+                {actionPlan?.strategicMoves && actionPlan.strategicMoves.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2">Strategiska initiativ</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.actionPlan.strategicMoves.map((item, index) => (
+                      {actionPlan.strategicMoves.map((item, index) => (
                         <li key={index} className="p-2 bg-blue-50 rounded">{item}</li>
                       ))}
                     </ul>
                   </div>
                 )}
-                {analysisResult.actionPlan.riskMitigations && analysisResult.actionPlan.riskMitigations.length > 0 && (
+                {actionPlan?.riskMitigations && actionPlan.riskMitigations.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2">Riskmitigering</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.actionPlan.riskMitigations.map((item, index) => (
+                      {actionPlan.riskMitigations.map((item, index) => (
                         <li key={index} className="p-2 bg-red-50 rounded">{item}</li>
                       ))}
                     </ul>
                   </div>
                 )}
-                {analysisResult.actionPlan.nextSteps && analysisResult.actionPlan.nextSteps.length > 0 && (
+                {actionPlan?.nextSteps && actionPlan.nextSteps.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2">Nästa steg</h4>
                     <ul className="space-y-2 text-sm">
-                      {analysisResult.actionPlan.nextSteps.map((item, index) => (
+                      {actionPlan.nextSteps.map((item, index) => (
                         <li key={index} className="p-2 bg-gray-100 rounded">{item}</li>
                       ))}
                     </ul>

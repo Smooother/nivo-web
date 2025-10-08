@@ -223,18 +223,22 @@ Grundat: ${company.incorporation_date || 'Ej tillgänglig'}
   `)
       .join('\n---\n')
 
-    const datasetSummaryPrompt = `Dataset-sammanfattning:
-- Antal företag: ${companies.length}
-- Genomsnittlig omsättning (TSEK): ${datasetSummary.averageRevenue ? datasetSummary.averageRevenue.toFixed(0) : 'Ej tillgänglig'}
-- Genomsnittlig tillväxt: ${datasetSummary.averageGrowth ? `${(datasetSummary.averageGrowth * 100).toFixed(1)}%` : 'Ej tillgänglig'}
-- Median EBIT-marginal: ${datasetSummary.medianEBITMargin ? `${(datasetSummary.medianEBITMargin * 100).toFixed(1)}%` : 'Ej tillgänglig'}
-- Median nettomarginal: ${datasetSummary.medianNetMargin ? `${(datasetSummary.medianNetMargin * 100).toFixed(1)}%` : 'Ej tillgänglig'}
-- Total antal anställda: ${datasetSummary.totalEmployees ?? 'Ej tillgängligt'}
-- Top 3 branscher: ${datasetSummary.topIndustries
-      .slice(0, 3)
-      .map((industry) => `${industry.name} (${industry.count})`)
-      .join(', ') || 'Ej tillgängligt'}
-${timeHorizonInstruction ? `\n${timeHorizonInstruction}` : ''}`
+    const datasetSummaryLines = [
+      `- Antal företag: ${companies.length}`,
+      `- Genomsnittlig omsättning (TSEK): ${datasetSummary.averageRevenue ? datasetSummary.averageRevenue.toFixed(0) : 'Ej tillgänglig'}`,
+      `- Genomsnittlig tillväxt: ${datasetSummary.averageGrowth ? `${(datasetSummary.averageGrowth * 100).toFixed(1)}%` : 'Ej tillgänglig'}`,
+      `- Median EBIT-marginal: ${datasetSummary.medianEBITMargin ? `${(datasetSummary.medianEBITMargin * 100).toFixed(1)}%` : 'Ej tillgänglig'}`,
+      `- Median nettomarginal: ${datasetSummary.medianNetMargin ? `${(datasetSummary.medianNetMargin * 100).toFixed(1)}%` : 'Ej tillgänglig'}`,
+      `- Total antal anställda: ${datasetSummary.totalEmployees ?? 'Ej tillgängligt'}`,
+      `- Top 3 branscher: ${datasetSummary.topIndustries
+        .slice(0, 3)
+        .map((industry) => `${industry.name} (${industry.count})`)
+        .join(', ') || 'Ej tillgängligt'}`,
+    ]
+
+    const datasetSummaryPrompt = `Dataset-sammanfattning:\n${datasetSummaryLines.join('\n')}${
+      timeHorizonInstruction ? `\n${timeHorizonInstruction}` : ''
+    }`
 
     const userPrompt = `Utforma en ${analysisType}-analys för investmentteamet.
 ${analysisInstruction}
@@ -314,18 +318,20 @@ Svara ENDAST i strikt JSON-format enligt följande struktur:
 
     const parsedAnalysis = safeJsonParse(responseText)
 
-    const analysis = parsedAnalysis || {
-      meta: {
-        analysisType,
-        generatedAt: new Date().toISOString(),
-        companyCount: companies.length,
-        focusAreas,
-        timeHorizon: timeHorizon || 'unspecified',
-        summaryInsights: [
-          'Kunde inte tolka JSON-svar. Visar råtext i stället.',
-        ],
-        datasetSummary,
-      },
+    const fallbackMeta = {
+      analysisType,
+      generatedAt: new Date().toISOString(),
+      companyCount: companies.length,
+      focusAreas,
+      timeHorizon: timeHorizon || 'unspecified',
+      summaryInsights: [
+        'Kunde inte tolka JSON-svar. Visar råtext i stället.',
+      ],
+      datasetSummary,
+    }
+
+    const fallbackAnalysis = {
+      meta: fallbackMeta,
       portfolioInsights: {
         themes: [],
         signals: [],
@@ -341,16 +347,66 @@ Svara ENDAST i strikt JSON-format enligt följande struktur:
       rawResponse: responseText,
     }
 
-    if (analysis.meta) {
-      analysis.meta.analysisType = analysis.meta.analysisType || analysisType
-      analysis.meta.generatedAt = analysis.meta.generatedAt || new Date().toISOString()
-      analysis.meta.companyCount = analysis.meta.companyCount || companies.length
-      analysis.meta.focusAreas = analysis.meta.focusAreas || focusAreas
-      analysis.meta.timeHorizon = analysis.meta.timeHorizon || timeHorizon || 'unspecified'
-      analysis.meta.datasetSummary = analysis.meta.datasetSummary || datasetSummary
-      if (!analysis.meta.summaryInsights || !Array.isArray(analysis.meta.summaryInsights)) {
-        analysis.meta.summaryInsights = []
+    const analysis: any =
+      parsedAnalysis && typeof parsedAnalysis === 'object' ? parsedAnalysis : fallbackAnalysis
+
+    if (!analysis.meta || typeof analysis.meta !== 'object') {
+      analysis.meta = { ...fallbackMeta, summaryInsights: [] }
+    }
+
+    analysis.meta.analysisType = analysis.meta.analysisType || analysisType
+    analysis.meta.generatedAt = analysis.meta.generatedAt || new Date().toISOString()
+    analysis.meta.companyCount =
+      typeof analysis.meta.companyCount === 'number' ? analysis.meta.companyCount : companies.length
+    analysis.meta.focusAreas = Array.isArray(analysis.meta.focusAreas) ? analysis.meta.focusAreas : focusAreas
+    analysis.meta.timeHorizon = analysis.meta.timeHorizon || timeHorizon || 'unspecified'
+    analysis.meta.datasetSummary = analysis.meta.datasetSummary || datasetSummary
+    if (!Array.isArray(analysis.meta.summaryInsights)) {
+      analysis.meta.summaryInsights = []
+    }
+
+    if (!Array.isArray(analysis.companies)) {
+      analysis.companies = []
+    }
+
+    if (!analysis.portfolioInsights || typeof analysis.portfolioInsights !== 'object') {
+      analysis.portfolioInsights = { themes: [], signals: [], benchmarks: [] }
+    } else {
+      analysis.portfolioInsights.themes = Array.isArray(analysis.portfolioInsights.themes)
+        ? analysis.portfolioInsights.themes
+        : []
+      analysis.portfolioInsights.signals = Array.isArray(analysis.portfolioInsights.signals)
+        ? analysis.portfolioInsights.signals
+        : []
+      analysis.portfolioInsights.benchmarks = Array.isArray(analysis.portfolioInsights.benchmarks)
+        ? analysis.portfolioInsights.benchmarks
+        : []
+    }
+
+    if (!analysis.actionPlan || typeof analysis.actionPlan !== 'object') {
+      analysis.actionPlan = {
+        quickWins: [],
+        strategicMoves: [],
+        riskMitigations: [],
+        nextSteps: [],
       }
+    } else {
+      analysis.actionPlan.quickWins = Array.isArray(analysis.actionPlan.quickWins)
+        ? analysis.actionPlan.quickWins
+        : []
+      analysis.actionPlan.strategicMoves = Array.isArray(analysis.actionPlan.strategicMoves)
+        ? analysis.actionPlan.strategicMoves
+        : []
+      analysis.actionPlan.riskMitigations = Array.isArray(analysis.actionPlan.riskMitigations)
+        ? analysis.actionPlan.riskMitigations
+        : []
+      analysis.actionPlan.nextSteps = Array.isArray(analysis.actionPlan.nextSteps)
+        ? analysis.actionPlan.nextSteps
+        : []
+    }
+
+    if (responseText && !analysis.rawResponse) {
+      analysis.rawResponse = responseText
     }
 
     res.status(200).json({
