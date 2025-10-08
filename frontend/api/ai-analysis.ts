@@ -5,6 +5,25 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+const FALLBACK_MODEL = 'gpt-4o-mini'
+
+function resolveModel(preferredModel?: string) {
+  const candidate = preferredModel?.trim()
+
+  if (!candidate) {
+    return FALLBACK_MODEL
+  }
+
+  if (candidate === 'gpt-4o') {
+    console.warn(
+      `Requested OpenAI model "${candidate}" is not supported by the chat completions API. Falling back to ${FALLBACK_MODEL}.`
+    )
+    return FALLBACK_MODEL
+  }
+
+  return candidate
+}
+
 interface CompanyData {
   name: string
   OrgNr: string
@@ -192,7 +211,7 @@ export default async function handler(
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const model = process.env.OPENAI_MODEL || 'gpt-4o'
+    const model = resolveModel(process.env.OPENAI_MODEL)
 
     const datasetSummary = summarizeCompanies(companies)
     const analysisInstruction = buildAnalysisInstruction(analysisType, focusAreas)
