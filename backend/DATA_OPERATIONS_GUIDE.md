@@ -51,6 +51,23 @@ python3 analyze_top_companies.py
 python3 export_to_excel.py
 ```
 
+### 4. Run Agentic Targeting Pipeline with Optional AI Analysis
+```bash
+python3 run_agentic_targeting_pipeline.py --db-path allabolag.db --top 30 --ai-analysis --ai-limit 10
+```
+
+- Add `--ai-no-supabase` to skip writing AI insights back to Supabase.
+- Use `--ai-table your_table` to override the default `ai_company_analysis` table name.
+- Provide `OPENAI_API_KEY` and Supabase credentials (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) as environment variables before running.
+
+### 5. Run AI Analysis Against Existing Shortlist CSV
+```bash
+python3 run_ai_analysis.py shortlist.csv --write-supabase --initiated-by "analyst@nivo.ai"
+```
+
+- Accepts any CSV exported from the shortlist tooling and stores structured insights in the `ai_ops` schema.
+- Pass `--filters '{"segment": "Digital services"}'` to log context about the triggering filters.
+
 ## Data Quality and Validation
 
 ### 1. Check Database Health

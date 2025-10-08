@@ -1,431 +1,652 @@
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card'
+import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
-import { Badge } from './ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { 
-  Brain, 
-  Search, 
-  TrendingUp, 
-  Building2, 
-  Lightbulb,
-  Loader2,
-  Sparkles,
-  List
-} from 'lucide-react'
-import { AIAnalysisService, AIAnalysisRequest, AIAnalysisResult } from '../lib/aiAnalysisService'
+import { Separator } from './ui/separator'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion'
+import { ScrollArea } from './ui/scroll-area'
+import { Checkbox } from './ui/checkbox'
+import { Loader2, RefreshCw, ShieldAlert, ShieldCheck, Sparkles, Undo2 } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
+import { AIAnalysisService } from '../lib/aiAnalysisService'
 
-interface SavedCompanyList {
+type Nullable<T> = T | null
+
+interface SectionResult {
+  section_type: string
+  title?: string | null
+  content_md: string
+  supporting_metrics: any[]
+  confidence?: number | null
+  tokens_used?: number | null
+}
+
+interface MetricResult {
+  metric_name: string
+  metric_value: number
+  metric_unit?: string | null
+  source?: string | null
+  year?: number | null
+  confidence?: number | null
+}
+
+interface CompanyResult {
+  orgnr: string
+  companyName: string
+  summary: string | null
+  recommendation: string | null
+  confidence: number | null
+  riskScore: number | null
+  financialGrade: string | null
+  commercialGrade: string | null
+  operationalGrade: string | null
+  nextSteps: string[]
+  sections: SectionResult[]
+  metrics: MetricResult[]
+}
+
+interface RunPayload {
   id: string
-  name: string
-  companies: SupabaseCompany[]
-  createdAt: string
+  status: string
+  modelVersion: string
+  startedAt: string
+  completedAt?: string | null
+  errorMessage?: string | null
+}
+
+interface RunResponsePayload {
+  run: RunPayload
+  analysis: { companies: CompanyResult[] }
+}
+
+interface HistoryRow {
+  run_id: string
+  orgnr: string
+  company_name: string
+  summary: string | null
+  recommendation: string | null
+  completed_at: string | null
+  model_version: string | null
+  confidence: number | null
 }
 
 interface AIAnalysisProps {
   selectedDataView?: string
 }
 
-const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_analytics" }) => {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<AIAnalysisResult | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('')
-  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
-  const [selectedList, setSelectedList] = useState<string>('')
-  const [companies, setCompanies] = useState<SupabaseCompany[]>([])
-  const [totalCompanies, setTotalCompanies] = useState<number>(0)
-  const [loadingCompanies, setLoadingCompanies] = useState<boolean>(false)
+const formatDate = (value?: string | null) => {
+  if (!value) return '—'
+  try {
+    return new Intl.DateTimeFormat('sv-SE', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value))
+  } catch (error) {
+    return value
+  }
+}
 
-  const templates = AIAnalysisService.getAnalysisTemplates()
+const gradeBadge = (label: string | null) => {
+  if (!label) return <Badge variant="outline">N/A</Badge>
+  const normalized = label.toUpperCase()
+  const variants: Record<string, string> = {
+    A: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    B: 'bg-sky-100 text-sky-800 border-sky-200',
+    C: 'bg-amber-100 text-amber-800 border-amber-200',
+    D: 'bg-rose-100 text-rose-800 border-rose-200',
+  }
+  const variant = variants[normalized[0]] || 'bg-slate-100 text-slate-700 border-slate-200'
+  return <Badge className={variant}>{normalized}</Badge>
+}
 
-  // Load saved lists on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('savedCompanyLists')
-    if (saved) {
-      try {
-        const lists = JSON.parse(saved)
-        setSavedLists(lists)
-      } catch (error) {
-        console.error('Error loading saved lists:', error)
-      }
-    }
-  }, [])
+const statusBadge = (status: string) => {
+  const normalized = status.toLowerCase()
+  if (normalized.includes('error')) {
+    return <Badge variant="destructive">Completed with issues</Badge>
+  }
+  return <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">Completed</Badge>
+}
 
-  // Load companies when list is selected or when "All companies" is chosen
-  useEffect(() => {
-    if (selectedList && selectedList !== "") {
-      const list = savedLists.find(l => l.id === selectedList)
-      if (list) {
-        setCompanies(list.companies)
-        setTotalCompanies(list.companies.length)
-      }
-    } else {
-      // Don't load all companies upfront - load them on-demand
-      setCompanies([])
-      setTotalCompanies(8438) // We know the total from dashboard
-    }
-  }, [selectedList, savedLists])
+const confidenceLabel = (value: Nullable<number>) => {
+  if (!value && value !== 0) return 'N/A'
+  return `${value.toFixed(1)} / 5`
+}
 
-  // Load companies on-demand for analysis
-  const loadCompaniesForAnalysis = async (query: string, limit: number = 50) => {
+const riskBadge = (value: Nullable<number>) => {
+  if (!value && value !== 0) return <Badge variant="outline">Unknown risk</Badge>
+  if (value <= 2) return <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">Low risk</Badge>
+  if (value <= 3.5) return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Moderate risk</Badge>
+  return <Badge className="bg-rose-100 text-rose-800 border-rose-200">Elevated risk</Badge>
+}
+
+const metricUnitLabel = (metric: MetricResult) => {
+  if (metric.metric_unit) return metric.metric_unit
+  if (metric.metric_name.toLowerCase().includes('margin')) return '%'
+  return ''
+}
+
+const CompanySelectionList: React.FC<{
+  companies: SupabaseCompany[]
+  selected: Set<string>
+  onToggle: (orgnr: string) => void
+  loading: boolean
+}> = ({ companies, selected, onToggle, loading }) => (
+  <ScrollArea className="h-64 rounded-md border">
+    <div className="divide-y">
+      {loading ? (
+        <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading companies
+        </div>
+      ) : companies.length === 0 ? (
+        <div className="py-8 text-center text-sm text-muted-foreground">No companies found for the applied filters.</div>
+      ) : (
+        companies.map((company) => (
+          <label
+            key={company.OrgNr}
+            className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-muted/40"
+          >
+            <Checkbox
+              checked={selected.has(company.OrgNr)}
+              onCheckedChange={() => onToggle(company.OrgNr)}
+              className="mt-1"
+            />
+            <div className="flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium text-foreground">{company.name}</span>
+                <Badge variant="outline">{company.OrgNr}</Badge>
+              </div>
+              <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                {company.segment_name && <span>{company.segment_name}</span>}
+                {company.city && <span>{company.city}</span>}
+                {company.Revenue_growth !== undefined && (
+                  <span>Growth: {(company.Revenue_growth * 100).toFixed(1)}%</span>
+                )}
+                {company.EBIT_margin !== undefined && (
+                  <span>EBIT margin: {(company.EBIT_margin * 100).toFixed(1)}%</span>
+                )}
+              </div>
+            </div>
+          </label>
+        ))
+      )}
+    </div>
+  </ScrollArea>
+)
+
+const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) => (
+  <Card>
+    <CardHeader>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <CardTitle className="flex items-center gap-3 text-xl">
+            {company.companyName}
+            {riskBadge(company.riskScore)}
+          </CardTitle>
+          <CardDescription>Organisation number: {company.orgnr}</CardDescription>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          {company.recommendation && <Badge className="bg-purple-100 text-purple-700 border-purple-200">{company.recommendation}</Badge>}
+          <Badge variant="outline">Confidence: {confidenceLabel(company.confidence)}</Badge>
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-6">
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground">Executive Summary</h3>
+        <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+          {company.summary || 'No summary provided.'}
+        </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border bg-muted/50 p-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase">Financial grade</p>
+          <div className="mt-2 text-lg font-semibold text-foreground">{gradeBadge(company.financialGrade)}</div>
+        </div>
+        <div className="rounded-lg border bg-muted/50 p-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase">Commercial grade</p>
+          <div className="mt-2 text-lg font-semibold text-foreground">{gradeBadge(company.commercialGrade)}</div>
+        </div>
+        <div className="rounded-lg border bg-muted/50 p-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase">Operational grade</p>
+          <div className="mt-2 text-lg font-semibold text-foreground">{gradeBadge(company.operationalGrade)}</div>
+        </div>
+      </div>
+
+      {company.nextSteps.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground">Recommended next steps</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
+            {company.nextSteps.map((step, index) => (
+              <li key={`${company.orgnr}-step-${index}`}>{step}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-muted-foreground">Narrative sections</h3>
+          <span className="text-xs text-muted-foreground">Expand for SWOT, financial outlook, integration plays and more.</span>
+        </div>
+        <Accordion type="multiple" className="mt-2">
+          {company.sections.length === 0 ? (
+            <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+              No narrative sections captured for this company.
+            </div>
+          ) : (
+            company.sections.map((section) => (
+              <AccordionItem value={`${company.orgnr}-${section.section_type}`} key={`${company.orgnr}-${section.section_type}`}>
+                <AccordionTrigger className="text-left">
+                  <div>
+                    <p className="text-sm font-medium capitalize text-foreground">{section.title || section.section_type.replace(/_/g, ' ')}</p>
+                    {section.confidence !== undefined && section.confidence !== null && (
+                      <span className="text-xs text-muted-foreground">Confidence {section.confidence.toFixed(1)}/5</span>
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="prose prose-sm max-w-none whitespace-pre-wrap text-foreground">
+                    {section.content_md || 'No content provided.'}
+                  </div>
+                  {section.supporting_metrics?.length > 0 && (
+                    <div className="mt-3 rounded-md border bg-muted/30 p-3">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">Supporting metrics</p>
+                      <ul className="mt-2 space-y-1 text-xs text-foreground">
+                        {section.supporting_metrics.map((metric: any, index: number) => (
+                          <li key={`${company.orgnr}-${section.section_type}-metric-${index}`}>
+                            {metric.metric_name}: {metric.metric_value}
+                            {metric.metric_unit ? ` ${metric.metric_unit}` : ''}
+                            {metric.year ? ` (${metric.year})` : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            ))
+          )}
+        </Accordion>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground">Key metrics</h3>
+        {company.metrics.length === 0 ? (
+          <div className="mt-3 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+            The analysis did not surface quantitative metrics for this company.
+          </div>
+        ) : (
+          <ScrollArea className="mt-3 max-h-60 rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left font-semibold">Metric</th>
+                  <th className="px-3 py-2 text-left font-semibold">Value</th>
+                  <th className="px-3 py-2 text-left font-semibold">Year</th>
+                  <th className="px-3 py-2 text-left font-semibold">Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                {company.metrics.map((metric) => (
+                  <tr key={`${company.orgnr}-${metric.metric_name}-${metric.year || 'na'}`} className="border-t">
+                    <td className="px-3 py-2 font-medium text-foreground">{metric.metric_name}</td>
+                    <td className="px-3 py-2 text-foreground">
+                      {metric.metric_value.toLocaleString('sv-SE', { maximumFractionDigits: 2 })}
+                      {metricUnitLabel(metric)}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{metric.year || 'N/A'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{metric.source || 'Analysis'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollArea>
+        )}
+      </div>
+    </CardContent>
+  </Card>
+)
+
+const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_analytics' }) => {
+  const [availableCompanies, setAvailableCompanies] = useState<SupabaseCompany[]>([])
+  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+  const [instructions, setInstructions] = useState('')
+  const [loadingCompanies, setLoadingCompanies] = useState(false)
+  const [runningAnalysis, setRunningAnalysis] = useState(false)
+  const [currentRun, setCurrentRun] = useState<RunResponsePayload | null>(null)
+  const [history, setHistory] = useState<HistoryRow[]>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [loadingRunId, setLoadingRunId] = useState<string | null>(null)
+
+  const templates = useMemo(() => AIAnalysisService.getAnalysisTemplates(), [])
+
+  const loadHistory = async () => {
     try {
-      setLoadingCompanies(true)
-      console.log('Loading companies for analysis...')
-      
-      // For now, load a sample of companies for analysis
-      // In the future, we could parse the query to apply smart filters
-      const result = await supabaseDataService.getCompanies(1, limit)
-      console.log('Loaded companies for analysis:', result.companies?.length || 0)
-      
-      setCompanies(result.companies || [])
-      return result.companies || []
+      const response = await fetch('/api/ai-analysis?history=1&limit=10')
+      const data = await response.json()
+      if (data.success) {
+        setHistory(data.history || [])
+      }
     } catch (error) {
-      console.error('Error loading companies for analysis:', error)
-      setCompanies([])
-      return []
+      console.error('Failed to load AI analysis history', error)
+    }
+  }
+
+  const loadCompanies = async (term?: string) => {
+    setLoadingCompanies(true)
+    try {
+      const filters = term?.trim()
+        ? {
+            name: term.trim(),
+          }
+        : {}
+      const result = await supabaseDataService.getCompanies(1, 50, filters)
+      setAvailableCompanies(result.companies || [])
+    } catch (error) {
+      console.error('Failed to load companies', error)
+      setAvailableCompanies([])
     } finally {
       setLoadingCompanies(false)
     }
   }
 
-  const handleAnalyze = async () => {
-    if (!query.trim()) return
+  useEffect(() => {
+    loadCompanies()
+    loadHistory()
+  }, [])
 
-    setLoading(true)
-    try {
-      let companiesToAnalyze: SupabaseCompany[] = []
-      
-      // If a saved list is selected, use those companies
-      if (selectedList && selectedList !== "") {
-        companiesToAnalyze = companies
+  const toggleCompanySelection = (orgnr: string) => {
+    setSelectedCompanies((prev) => {
+      const next = new Set(prev)
+      if (next.has(orgnr)) {
+        next.delete(orgnr)
       } else {
-        // Load companies on-demand for analysis
-        console.log('Loading companies on-demand for analysis...')
-        companiesToAnalyze = await loadCompaniesForAnalysis(query.trim(), 50)
+        next.add(orgnr)
       }
+      return next
+    })
+  }
 
-      if (companiesToAnalyze.length === 0) {
-        throw new Error('No companies available for analysis')
+  const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    await loadCompanies(searchTerm)
+  }
+
+  const handleRunAnalysis = async () => {
+    setErrorMessage(null)
+    setRunningAnalysis(true)
+    try {
+      const selected = availableCompanies.filter((company) => selectedCompanies.has(company.OrgNr))
+      if (selected.length === 0) {
+        throw new Error('Select at least one company to analyse')
       }
-
-      console.log('Analyzing with', companiesToAnalyze.length, 'companies')
-      // Use the working backend API instead of the complex AIAnalysisService
       const response = await fetch('/api/ai-analysis', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companies: companiesToAnalyze.slice(0, 5), // Limit to first 5 companies for analysis to avoid connection issues
+          companies: selected,
           analysisType: 'comprehensive',
-          query: query.trim()
+          instructions: instructions.trim() || undefined,
+          filters: { dataView: selectedDataView },
         }),
-        signal: AbortSignal.timeout(60000) // 60 second timeout
       })
-
       const data = await response.json()
-
       if (!data.success) {
-        throw new Error(data.error || 'Analysis failed')
+        throw new Error(data.error || 'AI analysis failed')
       }
-
-      // Transform the backend response to match the expected format
-      const analysisResult: AIAnalysisResult = {
-        companies: data.analysis?.companies || [],
-        insights: [`Analysis completed for ${companies.length} companies based on: "${query.trim()}"`],
-        summary: `Found ${data.analysis?.companies?.length || 0} companies matching your criteria`,
-        recommendations: [
-          'Review the analysis results below',
-          'Consider the financial health scores',
-          'Evaluate growth potential and market position'
-        ]
-      }
-
-      setResults(analysisResult)
+      setCurrentRun(data)
+      await loadHistory()
     } catch (error) {
-      console.error('Analysis failed:', error)
-      // Set error result
-      setResults({
-        companies: [],
-        insights: [`Error: ${error instanceof Error ? error.message : 'Analysis failed'}`],
-        summary: 'Analysis could not be completed',
-        recommendations: ['Please try again with a different query', 'Check your internet connection']
-      })
+      console.error('AI analysis failed', error)
+      setErrorMessage(error instanceof Error ? error.message : 'AI analysis failed')
     } finally {
-      setLoading(false)
+      setRunningAnalysis(false)
     }
   }
 
-  const handleTemplateSelect = (template: any) => {
-    setQuery(template.query)
-    setSelectedTemplate(template.id)
+  const handleSelectRun = async (runId: string) => {
+    setLoadingRunId(runId)
+    setErrorMessage(null)
+    try {
+      const response = await fetch(`/api/ai-analysis?runId=${encodeURIComponent(runId)}`)
+      const data = await response.json()
+      if (!data.success) {
+        throw new Error(data.error || 'Could not load run details')
+      }
+      setCurrentRun({ run: data.run, analysis: data.analysis })
+    } catch (error) {
+      console.error('Failed to load run details', error)
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to load run details')
+    } finally {
+      setLoadingRunId(null)
+    }
+  }
+
+  const resetSelection = () => {
+    setSelectedCompanies(new Set())
+    setInstructions('')
+    setErrorMessage(null)
   }
 
   return (
     <div className="space-y-6">
-      {/* AI Analysis Header */}
       <Card>
         <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Brain className="h-6 w-6 text-purple-600" />
-            <CardTitle>AI-Powered Analysis</CardTitle>
+          <div className="flex items-center gap-3 text-purple-600">
+            <Sparkles className="h-6 w-6" />
+            <div>
+              <CardTitle>AI Deal Room</CardTitle>
+              <CardDescription>
+                Select shortlisted companies and trigger a full commercial, financial and integration analysis powered by GPT.
+              </CardDescription>
+            </div>
           </div>
-          <CardDescription>
-            Ask questions about your data in natural language and get intelligent insights
-          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Saved Lists Selector */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center">
-                <List className="h-4 w-4 mr-2" />
-                Choose data source:
-              </label>
-              <Select value={selectedList || "all"} onValueChange={(value) => setSelectedList(value === "all" ? "" : value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="All companies (or select a saved list)" />
-                </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">
-            All companies ({selectedList === "" ? totalCompanies : companies.length})
-            {selectedList === "" && " - Loaded on-demand"}
-          </SelectItem>
-          {savedLists.map((list) => (
-            <SelectItem key={list.id} value={list.id}>
-              {list.name} ({list.companies.length} companies)
-            </SelectItem>
-          ))}
-        </SelectContent>
-              </Select>
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSearch} className="flex flex-col gap-3 md:flex-row">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-muted-foreground">Search companies</label>
+              <Input
+                placeholder="Filter by name, city or segment"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                className="mt-1"
+              />
             </div>
+            <div className="flex items-end gap-2">
+              <Button type="submit" disabled={loadingCompanies}>
+                {loadingCompanies && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Search
+              </Button>
+              <Button type="button" variant="outline" onClick={() => loadCompanies()} disabled={loadingCompanies}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Reset
+              </Button>
+            </div>
+          </form>
 
-            {/* Query Input */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Ask a question about your data:</label>
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="e.g., Find high-growth tech companies in Stockholm with revenue > 10M SEK"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleAnalyze} 
-                  disabled={loading || loadingCompanies || !query.trim()}
-                  className="px-6"
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : loadingCompanies ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Loading companies...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="h-4 w-4 mr-2" />
-                      Analyze
-                    </>
-                  )}
-                </Button>
+          <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-muted-foreground">Available companies</h3>
+                <span className="text-xs text-muted-foreground">{selectedCompanies.size} selected</span>
               </div>
+              <CompanySelectionList
+                companies={availableCompanies}
+                selected={selectedCompanies}
+                loading={loadingCompanies}
+                onToggle={toggleCompanySelection}
+              />
             </div>
 
-            {/* Quick Templates */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Or try a quick analysis:</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {templates.map((template) => (
-                  <Button
-                    key={template.id}
-                    variant={selectedTemplate === template.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleTemplateSelect(template)}
-                    className="h-auto p-3 text-left justify-start"
-                  >
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{template.name}</span>
-                      <span className="text-xs opacity-70">{template.description}</span>
-                    </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Analysis templates</label>
+                <div className="mt-2 grid gap-2">
+                  {templates.map((template) => (
+                    <button
+                      type="button"
+                      key={template.id}
+                      onClick={() => setInstructions(template.query)}
+                      className="rounded-md border p-3 text-left transition hover:border-purple-300 hover:bg-purple-50"
+                    >
+                      <p className="text-sm font-semibold text-foreground">{template.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{template.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Custom focus</label>
+                <Textarea
+                  placeholder="Add specific diligence questions or AI instructions"
+                  value={instructions}
+                  onChange={(event) => setInstructions(event.target.value)}
+                  className="mt-1 min-h-[120px]"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-muted-foreground">
+                  Analyses are saved and can be revisited in the history panel below.
+                </div>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={resetSelection} disabled={runningAnalysis}>
+                    <Undo2 className="mr-2 h-4 w-4" /> Clear
                   </Button>
-                ))}
+                  <Button type="button" onClick={handleRunAnalysis} disabled={runningAnalysis || selectedCompanies.size === 0}>
+                    {runningAnalysis ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}Run analysis
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
+
+          {errorMessage && (
+            <div className="flex items-start gap-3 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+              <ShieldAlert className="h-4 w-4 flex-shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Results */}
-      {results && (
+      {currentRun && (
         <div className="space-y-4">
-          {/* Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Building2 className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{results.summary.totalFound}</p>
-                    <p className="text-xs text-gray-600">Companies Found</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {results.summary.averageRevenue && (
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {(results.summary.averageRevenue / 1000000).toFixed(1)}M
-                      </p>
-                      <p className="text-xs text-gray-600">Avg Revenue (SEK)</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {results.summary.averageGrowth && (
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-purple-600" />
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {(results.summary.averageGrowth * 100).toFixed(1)}%
-                      </p>
-                      <p className="text-xs text-gray-600">Avg Growth</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="h-5 w-5 text-yellow-600" />
-                  <div>
-                    <p className="text-2xl font-bold">{results.insights.length}</p>
-                    <p className="text-xs text-gray-600">AI Insights</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Insights */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Lightbulb className="h-5 w-5 text-yellow-600" />
-                <span>AI Insights</span>
-              </CardTitle>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-xl">Analysis run summary</CardTitle>
+                  <CardDescription>
+                    Model {currentRun.run.modelVersion} • Started {formatDate(currentRun.run.startedAt)} • Completed{' '}
+                    {formatDate(currentRun.run.completedAt)}
+                  </CardDescription>
+                </div>
+                {statusBadge(currentRun.run.status)}
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                {results.insights.map((insight, index) => (
-                  <div key={index} className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-900">{insight}</p>
+              {currentRun.run.errorMessage && (
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                  {currentRun.run.errorMessage}
+                </div>
+              )}
+              <Separator className="my-4" />
+              <div className="grid gap-4 md:grid-cols-2">
+                {currentRun.analysis.companies.map((company) => (
+                  <div key={`${currentRun.run.id}-${company.orgnr}`} className="rounded-lg border bg-muted/40 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{company.companyName}</span>
+                      {riskBadge(company.riskScore)}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">Recommendation: {company.recommendation || '—'}</p>
+                    <p className="text-xs text-muted-foreground">Confidence: {confidenceLabel(company.confidence)}</p>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Top Segments */}
-          {results.summary?.topSegments?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Industries</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {results.summary.topSegments.map((segment, index) => (
-                    <Badge key={index} variant="secondary" className="text-sm">
-                      {segment.segment} ({segment.count})
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Recommendations */}
-          {results.recommendations.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommendations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {results.recommendations.map((recommendation, index) => (
-                    <div key={index} className="p-3 bg-green-50 rounded-lg">
-                      <p className="text-sm text-green-900">{recommendation}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Analysis Results */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Analysis Results</CardTitle>
-              <CardDescription>
-                AI analysis results for your query
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {results.companies && results.companies.length > 0 ? (
-                  results.companies.slice(0, 10).map((company, index) => (
-                    <div key={index} className="p-3 border rounded-lg">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium">{company.name || company.companyName}</h4>
-                          <p className="text-sm text-gray-600">
-                          {company.city || company.address} • {company.segment || company.Bransch || 'Unknown'}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        {company.revenue && (
-                          <p className="text-sm font-medium">
-                            {(parseFloat(company.revenue) / 1000000).toFixed(1)}M SEK
-                          </p>
-                        )}
-                        {company.revenue_growth && (
-                          <p className="text-xs text-green-600">
-                            +{(parseFloat(company.revenue_growth) * 100).toFixed(1)}% growth
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-                ) : (
-                  <div className="p-4 text-center text-gray-500">
-                    <p>No companies found matching your criteria.</p>
-                    <p className="text-sm mt-1">Try broadening your search parameters or select a different data source.</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            {currentRun.analysis.companies.map((company) => (
+              <CompanyAnalysisCard key={`${currentRun.run.id}-detail-${company.orgnr}`} company={company} />
+            ))}
+          </div>
         </div>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Analysis history</CardTitle>
+          <CardDescription>Review recent AI generated assessments and reopen them for collaboration.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {history.length === 0 ? (
+            <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+              No analyses have been recorded yet. Run your first batch above.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-semibold">Run ID</th>
+                    <th className="px-3 py-2 text-left font-semibold">Company</th>
+                    <th className="px-3 py-2 text-left font-semibold">Recommendation</th>
+                    <th className="px-3 py-2 text-left font-semibold">Confidence</th>
+                    <th className="px-3 py-2 text-left font-semibold">Completed</th>
+                    <th className="px-3 py-2 text-left font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((row) => (
+                    <tr key={`${row.run_id}-${row.orgnr}`} className="border-t">
+                      <td className="px-3 py-2 text-xs font-mono text-muted-foreground">{row.run_id}</td>
+                      <td className="px-3 py-2 text-sm font-medium text-foreground">{row.company_name}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{row.recommendation || '—'}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{confidenceLabel(row.confidence)}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{formatDate(row.completed_at)}</td>
+                      <td className="px-3 py-2 text-sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={loadingRunId === row.run_id}
+                          onClick={() => handleSelectRun(row.run_id)}
+                        >
+                          {loadingRunId === row.run_id ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="mr-2 h-4 w-4" />
+                          )}
+                          Open
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
 
 export default AIAnalysis
+
