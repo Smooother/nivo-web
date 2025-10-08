@@ -1,6 +1,25 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import OpenAI from 'openai'
 
+const FALLBACK_MODEL = 'gpt-4o-mini'
+
+function resolveModel(preferredModel?: string) {
+  const candidate = preferredModel?.trim()
+
+  if (!candidate) {
+    return FALLBACK_MODEL
+  }
+
+  if (candidate === 'gpt-4o') {
+    console.warn(
+      `Requested OpenAI model "${candidate}" is not supported by the chat completions API. Falling back to ${FALLBACK_MODEL}.`
+    )
+    return FALLBACK_MODEL
+  }
+
+  return candidate
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' })
@@ -17,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const model = process.env.OPENAI_MODEL || 'gpt-4o'
+    const model = resolveModel(process.env.OPENAI_MODEL)
 
     const systemPrompt = `Du är en expert finansiell analytiker som specialiserar dig på svenska företag.
 Din uppgift är att analysera företagsdata och ge djupgående insikter på svenska.
