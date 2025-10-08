@@ -15,6 +15,8 @@
 - `analyze_top_companies.py` - Analyze top performing companies
 - `company_data_report.py` - Generate company data reports
 - `simple_company_report.py` - Simple company reporting
+- `run_agentic_targeting_pipeline.py` - End-to-end targeting pipeline with optional AI deep dives
+- `run_ai_analysis.py` - Run structured AI analysis for a prepared shortlist and persist results
 
 ## Data Processing & Filtering
 - `filter_companies_consolidated.py` - Consolidated company filtering
