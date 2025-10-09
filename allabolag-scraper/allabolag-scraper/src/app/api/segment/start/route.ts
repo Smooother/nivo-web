@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { supabase } from '@/lib/db';
+import { getSupabase } from '@/lib/db';
 import { filterHash } from '@/lib/hash';
 import { getBuildId, fetchSegmentationPage, normalizeCompany } from '@/lib/allabolag';
 
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
     const hash = filterHash(params);
     
     // Check if job already exists and is running
+    const supabase = getSupabase();
     const { data: existingJobs, error: checkError } = await supabase
       .from('scraper_staging_jobs')
       .select('*')
@@ -101,6 +102,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function processSegmentationJob(jobId: string, params: any) {
+  const supabase = getSupabase();
   const buildId = await getBuildId();
   let currentPage = 1;
   let emptyPages = 0;

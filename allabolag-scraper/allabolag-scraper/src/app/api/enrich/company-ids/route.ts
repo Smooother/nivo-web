@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Start processing in background
     processEnrichmentJob(enrichmentJobId, jobId).catch(async (error) => {
       console.error('Enrichment job failed:', error);
-      await db
+      await (db as any)
         .update(jobs)
         .set({ 
           status: 'error', 
@@ -64,7 +64,7 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
   
   while (true) {
     // Get batch of companies without companyId
-    const companies = await db
+    const companies = await (db as any)
       .select()
       .from(rawCompanies)
       .where(and(
@@ -119,7 +119,7 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
           
           if (companyId) {
             // Store in company_ids table
-            await db
+            await (db as any)
               .insert(companyIds)
               .values({
                 orgnr: company.orgnr,
@@ -145,7 +145,7 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
               });
             
             // Update raw_companies with the found companyId
-            await db
+            await (db as any)
               .update(rawCompanies)
               .set({
                 companyId,
@@ -167,7 +167,7 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
       processedCount += chunk.length;
       
       // Update job progress
-      await db
+      await (db as any)
         .update(jobs)
         .set({
           processedCount,
@@ -181,7 +181,7 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
   }
   
   // Mark job as done
-  await db
+  await (db as any)
     .update(jobs)
     .set({ 
       status: 'done',

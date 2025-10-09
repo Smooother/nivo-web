@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/db';
+import { getSupabase } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
       );
     }
     
+    const supabase = getSupabase();
     const { data: jobs, error } = await supabase
       .from('scraper_staging_jobs')
       .select('*')
