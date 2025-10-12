@@ -71,6 +71,23 @@ export interface Database {
           updated_at?: string
         }
       }
+      roles: {
+        Row: {
+          id: number
+          user_id: string
+          role: 'admin' | 'analyst' | 'viewer'
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          role?: 'admin' | 'analyst' | 'viewer'
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          role?: 'admin' | 'analyst' | 'viewer'
+        }
+      }
       companies: {
         Row: {
           OrgNr: string

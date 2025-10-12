@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase, supabaseConfig } from '../lib/supabase'
+import { UserRole } from '@/lib/rbac'
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  userRole: string | null
+  userRole: UserRole | null
   isApproved: boolean
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
@@ -31,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const [userRole, setUserRole] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<UserRole | null>(null)
   const [isApproved, setIsApproved] = useState(false)
   const authEnabled = supabaseConfig.isConfigured
 
@@ -42,45 +43,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } as AuthError)
 
   // Check user role and approval status
-  const checkUserStatus = async (userId: string, userEmail?: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single()
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error checking user status:', error)
-        return
-      }
-
-      if (data) {
-        setUserRole(data.role)
-        setIsApproved(data.role === 'approved' || data.role === 'admin')
-      } else {
-        // User not in user_roles table, check if they're the admin email
-        const isAdminEmail = userEmail === 'jesper@rgcapital.se'
-        if (isAdminEmail) {
-          setUserRole('admin')
-          setIsApproved(true)
-        } else {
-          setUserRole('pending')
-          setIsApproved(false)
-        }
-      }
-    } catch (err) {
-      console.error('Error checking user status:', err)
-      // Fallback: if there's an error, check if it's the admin email
-      const isAdminEmail = userEmail === 'jesper@rgcapital.se'
-      if (isAdminEmail) {
-        setUserRole('admin')
-        setIsApproved(true)
-      } else {
-        setUserRole('pending')
-        setIsApproved(false)
+  const resolveRoleFromMetadata = (user: User | null): { role: UserRole; approved: boolean } | null => {
+    if (!user) return null
+    const metadata = (user.user_metadata ?? {}) as { role?: string; approved?: boolean }
+    if (metadata.role && ['admin', 'analyst', 'viewer'].includes(metadata.role)) {
+      return {
+        role: metadata.role as UserRole,
+        approved: metadata.approved ?? metadata.role !== 'viewer'
       }
     }
+    return null
+  }
+
+  const checkUserStatus = async (user: User | null) => {
+    const metadataRole = resolveRoleFromMetadata(user)
+    if (metadataRole) {
+      setUserRole(metadataRole.role)
+      setIsApproved(metadataRole.approved)
+      return
+    }
+
+    if (!user) {
+      setUserRole(null)
+      setIsApproved(false)
+      return
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking user role from roles table:', error)
+      }
+
+      if (data?.role && ['admin', 'analyst', 'viewer'].includes(data.role)) {
+        setUserRole(data.role as UserRole)
+        setIsApproved(data.role !== 'viewer')
+        return
+      }
+    } catch (err) {
+      console.error('Error resolving user role:', err)
+    }
+
+    setUserRole('viewer')
+    setIsApproved(true)
   }
 
   useEffect(() => {
@@ -102,14 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          // TEMPORARY FIX: Force admin for jesper@rgcapital.se
-          if (session.user.email === 'jesper@rgcapital.se') {
-            console.log('TEMPORARY FIX: Forcing admin access for jesper@rgcapital.se')
-            setUserRole('admin')
-            setIsApproved(true)
-          } else {
-            await checkUserStatus(session.user.id, session.user.email)
-          }
+          await checkUserStatus(session.user)
         }
       }
       setLoading(false)
@@ -127,14 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          // TEMPORARY FIX: Force admin for jesper@rgcapital.se
-          if (session.user.email === 'jesper@rgcapital.se') {
-            console.log('TEMPORARY FIX: Forcing admin access for jesper@rgcapital.se (auth change)')
-            setUserRole('admin')
-            setIsApproved(true)
-          } else {
-            await checkUserStatus(session.user.id, session.user.email)
-          }
+          await checkUserStatus(session.user)
         } else {
           setUserRole(null)
           setIsApproved(false)
@@ -154,18 +150,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          role: 'viewer',
+          approved: false
+        }
+      }
     })
-    
-    if (!error && data.user) {
-      // Add user to user_roles table with pending status
-      await supabase
-        .from('user_roles')
-        .insert({
-          user_id: data.user.id,
-          role: 'pending'
-        })
-    }
-    
+
     return { error }
   }
 
