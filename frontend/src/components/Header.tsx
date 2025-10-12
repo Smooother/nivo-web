@@ -14,7 +14,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
+  const dashboardPath = userRole === 'admin' ? '/admin/users' : '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <div className="flex items-center space-x-2">
             {user ? (
               <>
-                <NavLink to="/dashboard">
+                <NavLink to={dashboardPath}>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -195,7 +196,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         onClose={() => setIsLoginPopupOpen(false)}
         onSuccess={() => {
           // Optionally redirect to dashboard after successful login
-          window.location.href = '/dashboard';
+          window.location.href = dashboardPath;
         }}
       />
     </header>

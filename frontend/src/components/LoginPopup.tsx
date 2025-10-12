@@ -128,7 +128,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/`
         }
       })
       

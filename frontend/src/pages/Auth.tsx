@@ -15,15 +15,16 @@ const Auth: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('signin')
 
-  const { signIn, signUp, user } = useAuth()
+  const { signIn, signUp, user, userRole } = useAuth()
   const navigate = useNavigate()
 
   // Redirect to dashboard if user is already logged in
   useEffect(() => {
     if (user) {
-      navigate('/dashboard')
+      const destination = userRole === 'admin' ? '/admin/users' : '/'
+      navigate(destination, { replace: true })
     }
-  }, [user, navigate])
+  }, [user, userRole, navigate])
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,10 +45,6 @@ const Auth: React.FC = () => {
       setLoading(false)
     } else {
       setSuccess('Successfully signed in! Redirecting to dashboard...')
-      // Redirect to dashboard after successful login
-      setTimeout(() => {
-        navigate('/dashboard')
-      }, 1000)
     }
   }
 
