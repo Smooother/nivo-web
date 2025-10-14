@@ -94,22 +94,18 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
 
   const handleAnalyze = async () => {
     if (!query.trim()) return
+    
+    if (!selectedList || selectedList === "") {
+      alert('Välj en sparad lista först för att kunna analysera företag')
+      return
+    }
 
     setLoading(true)
     try {
-      let companiesToAnalyze: SupabaseCompany[] = []
-      
-      // If a saved list is selected, use those companies
-      if (selectedList && selectedList !== "") {
-        companiesToAnalyze = companies
-      } else {
-        // Load companies on-demand for analysis
-        console.log('Loading companies on-demand for analysis...')
-        companiesToAnalyze = await loadCompaniesForAnalysis(query.trim(), 50)
-      }
+      const companiesToAnalyze = companies
 
       if (companiesToAnalyze.length === 0) {
-        throw new Error('No companies available for analysis')
+        throw new Error('Inga företag tillgängliga för analys')
       }
 
       console.log('Analyzing with', companiesToAnalyze.length, 'companies')
@@ -130,18 +126,18 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
       const data = await response.json()
 
       if (!data.success) {
-        throw new Error(data.error || 'Analysis failed')
+        throw new Error(data.error || 'Analys misslyckades')
       }
 
       // Transform the backend response to match the expected format
       const analysisResult: AIAnalysisResult = {
         companies: data.analysis?.companies || [],
-        insights: [`Analysis completed for ${companies.length} companies based on: "${query.trim()}"`],
-        summary: `Found ${data.analysis?.companies?.length || 0} companies matching your criteria`,
+        insights: [`Analys slutförd för ${companies.length} företag baserat på: "${query.trim()}"`],
+        summary: `Hittade ${data.analysis?.companies?.length || 0} företag som matchar dina kriterier`,
         recommendations: [
-          'Review the analysis results below',
-          'Consider the financial health scores',
-          'Evaluate growth potential and market position'
+          'Granska analysresultaten nedan',
+          'Överväg de finansiella hälsopoängen',
+          'Utvärdera tillväxtpotential och marknadsposition'
         ]
       }
 
@@ -151,9 +147,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
       // Set error result
       setResults({
         companies: [],
-        insights: [`Error: ${error instanceof Error ? error.message : 'Analysis failed'}`],
-        summary: 'Analysis could not be completed',
-        recommendations: ['Please try again with a different query', 'Check your internet connection']
+        insights: [`Fel: ${error instanceof Error ? error.message : 'Analys misslyckades'}`],
+        summary: 'Analys kunde inte slutföras',
+        recommendations: ['Försök igen med en annan fråga', 'Kontrollera din internetanslutning']
       })
     } finally {
       setLoading(false)
@@ -172,10 +168,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
         <CardHeader>
           <div className="flex items-center space-x-2">
             <Brain className="h-6 w-6 text-purple-600" />
-            <CardTitle>AI-Powered Analysis</CardTitle>
+            <CardTitle>AI-driven analys</CardTitle>
           </div>
           <CardDescription>
-            Ask questions about your data in natural language and get intelligent insights
+            Ställ frågor om din data på naturligt språk och få intelligenta insikter
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -184,32 +180,34 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center">
                 <List className="h-4 w-4 mr-2" />
-                Choose data source:
+                Välj datakälla:
               </label>
-              <Select value={selectedList || "all"} onValueChange={(value) => setSelectedList(value === "all" ? "" : value)}>
+              <Select value={selectedList} onValueChange={(value) => setSelectedList(value)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="All companies (or select a saved list)" />
+                  <SelectValue placeholder="Välj en sparad lista för analys" />
                 </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">
-            All companies ({selectedList === "" ? totalCompanies : companies.length})
-            {selectedList === "" && " - Loaded on-demand"}
-          </SelectItem>
-          {savedLists.map((list) => (
-            <SelectItem key={list.id} value={list.id}>
-              {list.name} ({list.companies.length} companies)
-            </SelectItem>
-          ))}
+          {savedLists.length === 0 ? (
+            <div className="p-2 text-sm text-gray-500">
+              Inga sparade listor tillgängliga. Skapa en lista i Företagssökning först.
+            </div>
+          ) : (
+            savedLists.map((list) => (
+              <SelectItem key={list.id} value={list.id}>
+                {list.name} ({list.companies.length} företag)
+              </SelectItem>
+            ))
+          )}
         </SelectContent>
               </Select>
             </div>
 
             {/* Query Input */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Ask a question about your data:</label>
+              <label className="text-sm font-medium">Ställ en fråga om din data:</label>
               <div className="flex space-x-2">
                 <Input
-                  placeholder="e.g., Find high-growth tech companies in Stockholm with revenue > 10M SEK"
+                  placeholder="t.ex., Hitta högtillväxt teknikföretag i Stockholm med omsättning > 10M SEK"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -217,7 +215,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                 />
                 <Button 
                   onClick={handleAnalyze} 
-                  disabled={loading || loadingCompanies || !query.trim()}
+                  disabled={loading || loadingCompanies || !query.trim() || !selectedList}
                   className="px-6"
                 >
                   {loading ? (
@@ -225,12 +223,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                   ) : loadingCompanies ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Loading companies...
+                      Laddar företag...
                     </>
                   ) : (
                     <>
                       <Search className="h-4 w-4 mr-2" />
-                      Analyze
+                      {selectedList ? 'Analysera' : 'Välj lista först'}
                     </>
                   )}
                 </Button>
@@ -239,7 +237,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
 
             {/* Quick Templates */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Or try a quick analysis:</label>
+              <label className="text-sm font-medium">Eller prova en snabb analys:</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {templates.map((template) => (
                   <Button
@@ -272,7 +270,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                   <Building2 className="h-5 w-5 text-blue-600" />
                   <div>
                     <p className="text-2xl font-bold">{results.summary.totalFound}</p>
-                    <p className="text-xs text-gray-600">Companies Found</p>
+                    <p className="text-xs text-gray-600">Företag hittade</p>
                   </div>
                 </div>
               </CardContent>
@@ -287,7 +285,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                       <p className="text-2xl font-bold">
                         {(results.summary.averageRevenue / 1000000).toFixed(1)}M
                       </p>
-                      <p className="text-xs text-gray-600">Avg Revenue (SEK)</p>
+                      <p className="text-xs text-gray-600">Genomsnittlig omsättning (SEK)</p>
                     </div>
                   </div>
                 </CardContent>
@@ -303,7 +301,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                       <p className="text-2xl font-bold">
                         {(results.summary.averageGrowth * 100).toFixed(1)}%
                       </p>
-                      <p className="text-xs text-gray-600">Avg Growth</p>
+                      <p className="text-xs text-gray-600">Genomsnittlig tillväxt</p>
                     </div>
                   </div>
                 </CardContent>
@@ -316,7 +314,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                   <Sparkles className="h-5 w-5 text-yellow-600" />
                   <div>
                     <p className="text-2xl font-bold">{results.insights.length}</p>
-                    <p className="text-xs text-gray-600">AI Insights</p>
+                    <p className="text-xs text-gray-600">AI-insikter</p>
                   </div>
                 </div>
               </CardContent>
@@ -328,7 +326,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Lightbulb className="h-5 w-5 text-yellow-600" />
-                <span>AI Insights</span>
+                <span>AI-insikter</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -346,7 +344,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           {results.summary?.topSegments?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Top Industries</CardTitle>
+                <CardTitle>Toppbranscher</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -364,7 +362,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           {results.recommendations.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Recommendations</CardTitle>
+                <CardTitle>Rekommendationer</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -381,9 +379,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
           {/* Analysis Results */}
           <Card>
             <CardHeader>
-              <CardTitle>Analysis Results</CardTitle>
+              <CardTitle>Analysresultat</CardTitle>
               <CardDescription>
-                AI analysis results for your query
+                AI-analysresultat för din fråga
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -406,7 +404,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                         )}
                         {company.revenue_growth && (
                           <p className="text-xs text-green-600">
-                            +{(parseFloat(company.revenue_growth) * 100).toFixed(1)}% growth
+                            +{(parseFloat(company.revenue_growth) * 100).toFixed(1)}% tillväxt
                           </p>
                         )}
                       </div>
@@ -415,8 +413,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = "master_anal
                 ))
                 ) : (
                   <div className="p-4 text-center text-gray-500">
-                    <p>No companies found matching your criteria.</p>
-                    <p className="text-sm mt-1">Try broadening your search parameters or select a different data source.</p>
+                    <p>Inga företag hittades som matchar dina kriterier.</p>
+                    <p className="text-sm mt-1">Försök bredda dina sökparametrar eller välj en annan datakälla.</p>
                   </div>
                 )}
               </div>

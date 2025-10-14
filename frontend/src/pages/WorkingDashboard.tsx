@@ -61,8 +61,11 @@ const WorkingDashboard: React.FC = () => {
     { id: 'ai-insights', label: 'AI-insikter', icon: Brain },
     { id: 'export', label: 'Exportera', icon: Download },
     { id: 'scraper', label: 'Importera Data', icon: Database, disabled: true },
-    ...(isAdmin ? [{ id: 'admin', label: 'Adminpanel', icon: Shield }] : []),
   ]
+
+  // Add admin item at the bottom if user is admin
+  const adminItems: MenuItem[] = isAdmin ? [{ id: 'admin', label: 'Admin', icon: Shield }] : []
+  const allMenuItems = [...menuItems, ...adminItems]
 
   const handleSignOut = async () => {
     try {
@@ -333,7 +336,7 @@ const WorkingDashboard: React.FC = () => {
         `}>
           <div className="p-4">
             <nav className="space-y-2">
-              {menuItems.map((item) => {
+              {allMenuItems.map((item) => {
                 const Icon = item.icon
                 const isDisabled = item.disabled
                 return (
