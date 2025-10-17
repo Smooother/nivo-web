@@ -5,7 +5,7 @@ This document summarizes how the agentic targeting pipeline discovers promising 
 ## 1. Agentic Targeting "Search" Pipeline
 
 ### 1.1 Data ingestion & preparation
-- `TargetingDataLoader` validates that the `company_kpis`, `company_accounts`, and `companies_enriched` tables exist in the local SQLite mirror before returning a merged DataFrame of the latest yearly records for each organisation number.【F:backend/agentic_pipeline/data_access.py†L13-L66】
+- `TargetingDataLoader` validates that the `company_kpis`, `company_accounts`, and `companies_enriched` tables exist in the local SQLite mirror before returning a merged DataFrame of the latest yearly records for each organisation number, recording structured `QualityIssue` diagnostics whenever prerequisites are missing.【F:backend/agentic_pipeline/data_access.py†L12-L79】
 - `FeatureEngineer` normalizes column names, derives ratios such as revenue per employee, EBIT per employee, and equity ratio, and reports summary statistics for every numeric feature that will drive clustering and ranking.【F:backend/agentic_pipeline/features.py†L12-L84】
 - `DataQualityChecker` records critical and warning-level issues whenever engineered features are missing or sparsely populated, ensuring the shortlist is accompanied by diagnostic messages.【F:backend/agentic_pipeline/quality.py†L11-L48】
 
@@ -17,8 +17,8 @@ This document summarizes how the agentic targeting pipeline discovers promising 
 - `MarketFinancialAnalyzer` translates revenue, growth, margin, and equity signals into short market, financial, and risk summaries. These engineered narratives become additional context columns on the dataset and flow into later AI prompts.【F:backend/agentic_pipeline/analysis.py†L1-L103】
 
 ### 1.4 Orchestration & persistence
-- `AgenticTargetingPipeline.run()` stitches the steps together: load data, engineer features, check quality, segment, rank, append deterministic summaries, sort by composite score, and produce a shortlist of the top `n_top_companies` (default 30).【F:backend/agentic_pipeline/orchestrator.py†L1-L75】
-- When configured, the pipeline writes CSV/Excel exports, persists shortlist tables, and stores segment centroids through `_persist`, enabling downstream reporting and reproducibility.【F:backend/agentic_pipeline/orchestrator.py†L77-L92】
+- `AgenticTargetingPipeline.run()` stitches the steps together: load data, engineer features, check quality, segment, rank, append deterministic summaries, sort by composite score, and produce a shortlist of the top `n_top_companies` (default 30).【F:backend/agentic_pipeline/orchestrator.py†L31-L75】
+- When configured, the pipeline writes CSV/Excel exports, persists shortlist tables, and stores segment centroids through `_persist`, enabling downstream reporting and reproducibility.【F:backend/agentic_pipeline/orchestrator.py†L78-L92】
 
 ### 1.5 File-system outputs
 - The repository ships historical exports in `outputs/`, including filtered company spreadsheets and generated reports, illustrating how shortlist artefacts can be shared externally.【df4e54†L1-L3】【744769†L1-L1】
@@ -41,7 +41,7 @@ This document summarizes how the agentic targeting pipeline discovers promising 
 - Deep-analysis results render narrative sections, metrics, and recommendations in expandable sections for each company, giving operators rich narrative context alongside structured grades.【F:frontend/src/components/AIAnalysis.tsx†L270-L358】
 
 ### 2.4 Output destinations
-- Spreadsheet exports and Supabase tables make the shortlist portable for commercial teams, while AI run tables back the on-platform history view and any downstream BI dashboards. This dual persistence supports both quick sharing and governed analytics pipelines.【F:backend/agentic_pipeline/orchestrator.py†L77-L92】【F:database/ai_ops_schema.sql†L1-L170】
+- Spreadsheet exports and Supabase tables make the shortlist portable for commercial teams, while AI run tables back the on-platform history view and any downstream BI dashboards. This dual persistence supports both quick sharing and governed analytics pipelines.【F:backend/agentic_pipeline/orchestrator.py†L78-L92】【F:database/ai_ops_schema.sql†L1-L170】
 
 ## 3. Key Takeaways
 - **Search**: deterministic segmentation + ranking narrows the universe before any tokens are spent.

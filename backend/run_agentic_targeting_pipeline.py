@@ -65,7 +65,10 @@ def main() -> None:
     pipeline = AgenticTargetingPipeline(config)
     artifacts = pipeline.run()
 
-    issues = [issue.message for issue in artifacts.quality_issues]
+    issues = [
+        {"level": issue.level, "message": issue.message}
+        for issue in artifacts.quality_issues
+    ]
     output_payload = {"quality_issues": issues, "shortlist_size": len(artifacts.shortlist)}
 
     if args.ai_analysis:
