@@ -12,7 +12,7 @@ from .analysis import MarketFinancialAnalyzer
 from .config import PipelineConfig
 from .data_access import TargetingDataLoader
 from .features import FeatureEngineer
-from .quality import DataQualityChecker
+from .quality import DataQualityChecker, QualityIssue
 from .ranking import CompositeRanker
 from .segmentation import Segmenter
 
@@ -22,7 +22,7 @@ class PipelineArtifacts:
     dataset: pd.DataFrame
     features: pd.DataFrame
     shortlist: pd.DataFrame
-    quality_issues: list
+    quality_issues: list[QualityIssue]
 
 
 class AgenticTargetingPipeline:
@@ -42,10 +42,11 @@ class AgenticTargetingPipeline:
 
         load_result = self.loader.load()
         dataset = load_result.dataset
-        quality_issues = load_result.issues
+        quality_issues = list(load_result.issues)
 
         if dataset.empty:
-            raise RuntimeError("Dataset is empty; cannot proceed with pipeline.")
+            issue_summary = ", ".join(issue.message for issue in quality_issues) or "Dataset is empty"
+            raise RuntimeError(f"Dataset is empty; cannot proceed with pipeline ({issue_summary}).")
 
         engineered = self.feature_engineer.transform(dataset)
         quality_issues.extend(self.quality_checker.run(engineered.features))

@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable
 
 import pandas as pd
 from sqlalchemy import create_engine, inspect
+
+from .quality import QualityIssue
 
 
 REQUIRED_TABLES: Iterable[str] = (
@@ -22,7 +24,7 @@ class DataLoadResult:
     """Container for merged dataset and diagnostics."""
 
     dataset: pd.DataFrame
-    issues: list[str]
+    issues: list[QualityIssue]
 
 
 class TargetingDataLoader:
@@ -46,10 +48,15 @@ class TargetingDataLoader:
         return df.loc[idx].reset_index(drop=True)
 
     def load(self) -> DataLoadResult:
-        issues: list[str] = []
+        issues: list[QualityIssue] = []
         missing = self.validate_tables()
         if missing:
-            issues.append(f"Missing required tables: {', '.join(missing)}")
+            issues.append(
+                QualityIssue(
+                    "critical",
+                    f"Missing required tables: {', '.join(missing)}",
+                )
+            )
             return DataLoadResult(pd.DataFrame(), issues)
 
         kpis = self.load_latest_by_year("company_kpis", ["OrgNr"])
@@ -57,7 +64,12 @@ class TargetingDataLoader:
         enriched = pd.read_sql_table("companies_enriched", self.engine)
 
         if kpis.empty or accounts.empty or enriched.empty:
-            issues.append("One or more source tables are empty.")
+            issues.append(
+                QualityIssue(
+                    "critical",
+                    "One or more source tables are empty.",
+                )
+            )
             return DataLoadResult(pd.DataFrame(), issues)
 
         merged = kpis.merge(accounts, on=["OrgNr", "year"], suffixes=("_kpi", "_acc"))
