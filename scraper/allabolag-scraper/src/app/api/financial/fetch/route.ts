@@ -19,40 +19,27 @@ export async function POST(request: NextRequest) {
     
     console.log('Source job ID:', jobId);
     
-    // Create financial fetching job
-    const financialJobId = uuidv4();
-    const hash = filterHash({ type: 'fetch_financials', timestamp: Date.now() });
-    
-    console.log('Financial job ID:', financialJobId);
-    
-    // Use the same local database as the source job
+    // Work directly with the existing session database
     const localDb = new LocalStagingDB(jobId);
     
-    // Create financial job in local database
-    const now = new Date().toISOString();
-    localDb.insertJob({
-      id: financialJobId,
-      jobType: 'fetch_financials',
-      filterHash: hash,
-      params: { sourceJobId: jobId },
-      status: 'running',
+    // Update the existing job to show Stage 3 is starting
+    localDb.updateJob(jobId, {
       stage: 'stage3_financials',
-      createdAt: now,
-      updatedAt: now
+      status: 'running'
     });
     
-    console.log('Financial job created in local database');
+    console.log('Starting Stage 3 financial data fetch for existing job');
     
     // Start processing in background
-    processFinancialJob(financialJobId, jobId, localDb).catch(async (error) => {
+    processFinancialJob(jobId, localDb).catch(async (error) => {
       console.error('Financial job failed:', error);
-      localDb.updateJob(financialJobId, { 
+      localDb.updateJob(jobId, { 
         status: 'error', 
         lastError: error.message
       });
     });
     
-    return NextResponse.json({ jobId: financialJobId });
+    return NextResponse.json({ jobId: jobId });
   } catch (error) {
     console.error('Error starting financial job:', error);
     return NextResponse.json(
@@ -65,18 +52,38 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processFinancialJob(financialJobId: string, sourceJobId: string, localDb: LocalStagingDB) {
+async function processFinancialJob(jobId: string, localDb: LocalStagingDB) {
   return withSession(async (session) => {
     const buildId = await getBuildId(session);
     const batchSize = 50;
     const concurrency = 3;
     let processedCount = 0;
     
-    console.log(`Starting financial job ${financialJobId} with buildId: ${buildId}`);
+    console.log(`Starting Stage 3 financial data fetch for job ${jobId} with buildId: ${buildId}`);
   
   while (true) {
     // Get batch of companies with resolved company IDs
-    const companyIds = localDb.getCompanyIdsToProcess(sourceJobId, 'pending');
+    // Try different statuses that might exist
+    let companyIds = localDb.getCompanyIdsToProcess(jobId, 'pending');
+    
+    if (companyIds.length === 0) {
+      companyIds = localDb.getCompanyIdsToProcess(jobId, 'resolved');
+    }
+    
+    if (companyIds.length === 0) {
+      // Also try companies marked as "no_financials" since they might actually have data
+      companyIds = localDb.getCompanyIdsToProcess(jobId, 'no_financials');
+    }
+    
+    if (companyIds.length === 0) {
+      // If no company IDs found with specific status, get all company IDs
+      const allCompanyIds = localDb.getCompanyIds(jobId);
+      if (allCompanyIds.length === 0) {
+        console.log('No company IDs found for financial data processing');
+        break;
+      }
+      companyIds = allCompanyIds;
+    }
     
     if (companyIds.length === 0) {
       console.log('No more company IDs to process for financial data');
@@ -96,11 +103,11 @@ async function processFinancialJob(financialJobId: string, sourceJobId: string, 
       const promises = chunk.map(async (companyIdRecord) => {
         try {
           // Get the full company data from the staging_companies table
-          const companyData = localDb.getCompanyByOrgnr(sourceJobId, companyIdRecord.orgnr);
+          const companyData = localDb.getCompanyByOrgnr(jobId, companyIdRecord.orgnr);
           
           if (!companyData) {
             console.log(`No company data found for orgnr ${companyIdRecord.orgnr}`);
-            localDb.updateCompanyIdStatus(sourceJobId, companyIdRecord.orgnr, 'no_company_data');
+            localDb.updateCompanyIdStatus(jobId, companyIdRecord.orgnr, 'no_company_data');
             return;
           }
           
@@ -118,67 +125,32 @@ async function processFinancialJob(financialJobId: string, sourceJobId: string, 
               periodStart: financial.periodStart,
               periodEnd: financial.periodEnd,
               currency: financial.currency || 'SEK',
-              sdi: financial.sdi,
-              dr: financial.dr,
-              ors: financial.ors,
-              ek: financial.ek,
-              adi: financial.adi,
-              adk: financial.adk,
-              adr: financial.adr,
-              ak: financial.ak,
-              ant: financial.ant,
-              fi: financial.fi,
-              fk: financial.fk,
-              gg: financial.gg,
-              kbp: financial.kbp,
-              lg: financial.lg,
-              rg: financial.rg,
-              sap: financial.sap,
-              sed: financial.sed,
-              si: financial.si,
-              sek: financial.sek,
-              sf: financial.sf,
-              sfa: financial.sfa,
-              sge: financial.sge,
-              sia: financial.sia,
-              sik: financial.sik,
-              skg: financial.skg,
-              skgki: financial.skgki,
-              sko: financial.sko,
-              slg: financial.slg,
-              som: financial.som,
-              sub: financial.sub,
-              sv: financial.sv,
-              svd: financial.svd,
-              utr: financial.utr,
-              fsd: financial.fsd,
-              kb: financial.kb,
-              awa: financial.awa,
-              iac: financial.iac,
-              min: financial.min,
+              revenue: financial.revenue,
+              profit: financial.profit,
+              employees: financial.employees,
               be: financial.be,
               tr: financial.tr,
               rawData: financial.rawData,
               validationStatus: 'pending',
               scrapedAt: new Date().toISOString(),
-              jobId: sourceJobId,
+              jobId: jobId,
               updatedAt: new Date().toISOString()
             }));
             
             localDb.insertFinancials(financialsToInsert);
             
             // Update company ID status
-            localDb.updateCompanyIdStatus(sourceJobId, companyIdRecord.orgnr, 'financials_fetched');
+            localDb.updateCompanyIdStatus(jobId, companyIdRecord.orgnr, 'financials_fetched');
             
             console.log(`Fetched ${financialData.length} financial records for company ${companyIdRecord.company_id}`);
           } else {
             console.log(`No financial data found for company ${companyIdRecord.company_id}`);
-            localDb.updateCompanyIdStatus(sourceJobId, companyIdRecord.orgnr, 'no_financials');
+            localDb.updateCompanyIdStatus(jobId, companyIdRecord.orgnr, 'no_financials');
           }
           
         } catch (error) {
           console.error(`Error fetching financials for company ${companyIdRecord.company_id}:`, error);
-          localDb.updateCompanyIdStatus(sourceJobId, companyIdRecord.orgnr, 'error', error.message);
+          localDb.updateCompanyIdStatus(jobId, companyIdRecord.orgnr, 'error', error.message);
         }
       });
       
@@ -195,18 +167,12 @@ async function processFinancialJob(financialJobId: string, sourceJobId: string, 
     }
   }
   
-  // Mark financial job as done
-  localDb.updateJob(financialJobId, { 
+  // Mark job as done
+  localDb.updateJob(jobId, { 
     status: 'done'
   });
   
-  // Update the original segmentation job to show Stage 3 is complete
-  localDb.updateJob(sourceJobId, {
-    stage: 'stage3_financials',
-    status: 'done'
-  });
-  
-    console.log(`Financial job ${financialJobId} completed, processed ${processedCount} companies`);
+  console.log(`Stage 3 financial data fetch for job ${jobId} completed, processed ${processedCount} companies`);
   });
 }
 
@@ -222,12 +188,13 @@ async function fetchCompanyFinancials(buildId: string, companyData: any, company
     
     // Use the real fetchFinancialData function from allabolag.ts
     const { fetchFinancialData } = await import('@/lib/allabolag');
-    const financialData = await fetchFinancialData(buildId, enrichedCompanyData, session);
+    const financialData = await fetchFinancialData(buildId, companyId, session, companyData.companyName, companyData.naceCategories);
     
     console.log(`Fetched ${financialData.length} financial records for company ${companyData.company_name} (${companyData.orgnr})`);
     return financialData;
   } catch (error) {
     console.error(`Error fetching financial data for company ${companyData.company_name} (${companyData.orgnr}):`, error);
-    return [];
+    console.error('Error details:', error.message);
+    throw error;
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import SessionModal from './components/SessionModal';
 
 interface Job {
   id: string;
@@ -100,7 +101,18 @@ export default function Home() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const itemsPerPage = 10;
+
+  // Helper function to map backend job response to frontend format
+  const mapJobResponse = (job: any) => ({
+    ...job,
+    totalCompanies: job.stats?.companies || 0,
+    processedCount: job.stats?.companies || 0,
+    lastPage: 0,
+    errorCount: 0
+  });
 
   // Poll job status
   useEffect(() => {
@@ -111,7 +123,7 @@ export default function Home() {
         const response = await fetch(`/api/segment/status?jobId=${currentJob.id}`);
         if (response.ok) {
           const job = await response.json();
-          setCurrentJob(job);
+          setCurrentJob(mapJobResponse(job));
         }
       } catch (err) {
         console.error('Error polling job status:', err);
@@ -144,7 +156,7 @@ export default function Home() {
       const statusResponse = await fetch(`/api/segment/status?jobId=${jobId}`);
       if (statusResponse.ok) {
         const job = await statusResponse.json();
-        setCurrentJob(job);
+        setCurrentJob(mapJobResponse(job));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -183,11 +195,14 @@ export default function Home() {
           const statusResponse = await fetch(`/api/segment/status?jobId=${currentJob.id}`);
           if (statusResponse.ok) {
             const job = await statusResponse.json();
+            const mappedJob = mapJobResponse(job);
             if (job.status === 'done' && job.stage === 'stage2_enrichment') {
               setCurrentJob(prev => prev ? {
                 ...prev,
                 stage: 'stage2_enrichment',
-                status: 'done'
+                status: 'done',
+                totalCompanies: mappedJob.totalCompanies,
+                processedCount: mappedJob.processedCount
               } : null);
             } else if (job.status === 'running') {
               // Continue polling
@@ -221,7 +236,8 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to start financial data fetch');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to start financial data fetch');
       }
 
       const { jobId: financialJobId } = await response.json();
@@ -239,12 +255,22 @@ export default function Home() {
           const statusResponse = await fetch(`/api/segment/status?jobId=${currentJob.id}`);
           if (statusResponse.ok) {
             const job = await statusResponse.json();
+            const mappedJob = mapJobResponse(job);
             if (job.status === 'done' && job.stage === 'stage3_financials') {
               setCurrentJob(prev => prev ? {
                 ...prev,
                 stage: 'stage3_financials',
-                status: 'done'
+                status: 'done',
+                totalCompanies: mappedJob.totalCompanies,
+                processedCount: mappedJob.processedCount
               } : null);
+            } else if (job.status === 'error') {
+              setCurrentJob(prev => prev ? {
+                ...prev,
+                stage: 'stage3_financials',
+                status: 'error'
+              } : null);
+              setError('Stage 3 failed: ' + (job.lastError || 'Unknown error'));
             } else if (job.status === 'running') {
               // Continue polling
               setTimeout(pollFinancialStatus, 2000);
@@ -427,6 +453,153 @@ export default function Home() {
     return new Intl.NumberFormat('sv-SE').format(num);
   };
 
+  const handleSessionSelect = (sessionId: string) => {
+    setSelectedSessionId(sessionId);
+    // Load session data and switch to validation tab
+    setActiveTab('validation');
+    // Load validation data for the selected session
+    if (sessionId) {
+      handleLoadValidationDataForSession(sessionId);
+    }
+  };
+
+  // Real-time session status polling
+  useEffect(() => {
+    if (!selectedSessionId) return;
+
+    const pollSessionStatus = async () => {
+      try {
+        const response = await fetch(`/api/sessions`);
+        if (response.ok) {
+          const data = await response.json();
+          const currentSession = data.sessions.find((s: any) => s.sessionId === selectedSessionId);
+          if (currentSession) {
+            // Update current job with latest session data
+            setCurrentJob(prev => prev ? {
+              ...prev,
+              status: currentSession.stages.stage2.status === 'completed' ? 'done' : 
+                     currentSession.stages.stage2.status === 'running' ? 'running' : 'pending',
+              stage: currentSession.stages.stage2.status === 'completed' ? 'stage2_enrichment' : 
+                     currentSession.stages.stage2.status === 'running' ? 'stage2_enrichment' : 'stage1_segmentation',
+              totalCompanies: currentSession.totalCompanies,
+              processedCount: currentSession.totalCompanyIds
+            } : null);
+          }
+        }
+      } catch (error) {
+        console.error('Error polling session status:', error);
+      }
+    };
+
+    // Poll every 3 seconds
+    const interval = setInterval(pollSessionStatus, 3000);
+    
+    // Initial poll
+    pollSessionStatus();
+
+    return () => clearInterval(interval);
+  }, [selectedSessionId]);
+
+  const handleLoadValidationDataForSession = async (sessionId: string) => {
+    setValidationLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/validation/data?jobId=${sessionId}`);
+      if (!response.ok) {
+        throw new Error('Failed to load validation data');
+      }
+
+      const data = await response.json();
+      setValidationData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setValidationLoading(false);
+    }
+  };
+
+  const handleStageControl = async (stage: number, action: string) => {
+    if (!selectedSessionId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      let targetUrl = '';
+      if (stage === 2) {
+        targetUrl = `/api/enrich/company-ids?jobId=${selectedSessionId}`;
+      } else if (stage === 3) {
+        targetUrl = `/api/financial/fetch?jobId=${selectedSessionId}`;
+      }
+
+      const response = await fetch(targetUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(`Stage ${stage} ${action} initiated:`, result);
+        
+        // Update current job to show Stage 2 is running
+        if (result.jobId) {
+          setCurrentJob(prev => prev ? {
+            ...prev,
+            id: result.jobId,
+            stage: stage === 2 ? 'stage2_enrichment' : 'stage3_financials',
+            status: 'running'
+          } : null);
+          
+          // Start polling for status updates
+          const pollStatus = async () => {
+            try {
+              const statusResponse = await fetch(`/api/segment/status?jobId=${selectedSessionId}`);
+              if (statusResponse.ok) {
+                const statusData = await statusResponse.json();
+                console.log('Status update:', statusData);
+                
+                // Update current job with latest status
+                setCurrentJob(prev => prev ? {
+                  ...prev,
+                  status: statusData.status,
+                  stage: statusData.stage,
+                  totalCompanies: statusData.stats.companies,
+                  processedCount: statusData.stats.companyIds
+                } : null);
+                
+                // If still running, continue polling
+                if (statusData.status === 'running') {
+                  setTimeout(pollStatus, 2000);
+                } else {
+                  // Job completed, refresh validation data
+                  handleLoadValidationDataForSession(selectedSessionId);
+                }
+              }
+            } catch (error) {
+              console.error('Error polling status:', error);
+            }
+          };
+          
+          // Start polling after a short delay
+          setTimeout(pollStatus, 2000);
+        }
+        
+        // Show success message
+        setError(null);
+      } else {
+        const error = await response.json();
+        setError(`Failed to start stage ${stage}: ${error.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      setError(`Error starting stage ${stage}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStageDisplayName = (stage: string) => {
     switch (stage) {
       case 'stage1_segmentation': return 'Stage 1: Company Search';
@@ -450,84 +623,128 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Multi-Source Web Scraper
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Importera företagsdata från Allabolag.se och andra källor
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={handleTestWorkflow}
-                disabled={testing}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-              >
-                {testing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Testing...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Test Workflow
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => window.open('http://localhost:8080', '_blank')}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Tillbaka till Dashboard
-              </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Apple-style Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            Data Scraper
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Advanced company data extraction from Allabolag.se with intelligent 3-stage processing
+          </p>
+        </div>
+
+        {/* Main Content Card */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+          {/* Header Actions */}
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-gray-600 flex items-center gap-2">
+                  {selectedSessionId ? (
+                    <>
+                      <span>Session: {selectedSessionId.slice(0, 8)}...</span>
+                      {currentJob && (
+                        <div className="flex items-center gap-1">
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            currentJob.status === 'running' ? 'bg-green-500 animate-pulse' :
+                            currentJob.status === 'done' ? 'bg-green-500' :
+                            currentJob.status === 'error' ? 'bg-red-500' :
+                            'bg-gray-400'
+                          }`}></div>
+                          <span className="text-xs capitalize">{currentJob.status}</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    'No session selected'
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsSessionModalOpen(true)}
+                  className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Select Session
+                </button>
+                <button
+                  onClick={handleTestWorkflow}
+                  disabled={testing}
+                  className="flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  {testing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Testing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Test Workflow
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => window.open('http://localhost:8080', '_blank')}
+                  className="flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Dashboard
+                </button>
+              </div>
             </div>
           </div>
+
+          <div className="p-8">
           
-          {/* Tab Navigation */}
-          <div className="border-b border-gray-200 mb-8">
-            <nav className="-mb-px flex space-x-8">
+          {/* Apple-style Tab Navigation */}
+          <div className="mb-8">
+            <div className="bg-gray-100 rounded-2xl p-1 inline-flex">
               <button
                 onClick={() => setActiveTab('scraping')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'scraping'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 Scraping
               </button>
               <button
                 onClick={() => setActiveTab('validation')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'validation'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 Validation
               </button>
               <button
                 onClick={() => setActiveTab('migration')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'migration'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 Migration
               </button>
-            </nav>
+            </div>
           </div>
 
           {/* Error Display */}
@@ -603,15 +820,18 @@ export default function Home() {
           {/* Scraping Tab */}
           {activeTab === 'scraping' && (
             <div className="space-y-6">
-              {/* Filter Form */}
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  Segmentation Filters
-                </h2>
+              {/* Apple-style Filter Form */}
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 border border-gray-200/50">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Segmentation Filters
+                  </h2>
+                  <p className="text-gray-600">Configure your company search criteria</p>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-800 mb-3">
                       Revenue From (Millions SEK)
                     </label>
                     <input
@@ -621,13 +841,13 @@ export default function Home() {
                         ...prev, 
                         revenueFrom: parseInt(e.target.value) || undefined
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 bg-white transition-all duration-200"
                       placeholder="15"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-800 mb-3">
                       Revenue To (Millions SEK)
                     </label>
                     <input
@@ -637,13 +857,13 @@ export default function Home() {
                         ...prev, 
                         revenueTo: parseInt(e.target.value) || undefined
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 bg-white transition-all duration-200"
                       placeholder="150"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-800 mb-3">
                       Profit From (Millions SEK)
                     </label>
                     <input
@@ -653,13 +873,13 @@ export default function Home() {
                         ...prev, 
                         profitFrom: parseInt(e.target.value) || undefined
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 bg-white transition-all duration-200"
                       placeholder="1"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-800 mb-3">
                       Profit To (Millions SEK)
                     </label>
                     <input
@@ -669,14 +889,14 @@ export default function Home() {
                         ...prev, 
                         profitTo: parseInt(e.target.value) || undefined
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 bg-white transition-all duration-200"
                       placeholder="50"
                     />
                   </div>
                 </div>
                 
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mt-6">
+                  <label className="block text-sm font-semibold text-gray-800 mb-3">
                     Company Type
                   </label>
                   <select
@@ -685,19 +905,26 @@ export default function Home() {
                       ...prev, 
                       companyType: e.target.value as 'AB' 
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 bg-white transition-all duration-200"
                   >
                     <option value="AB">AB (Aktiebolag)</option>
                   </select>
                 </div>
                 
-                <div className="mt-6">
+                <div className="mt-8">
                   <button
                     onClick={handleStartScraping}
                     disabled={loading || (currentJob?.status === 'running')}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-6 rounded-xl hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
-                    {loading ? 'Starting...' : 'Start Scraping'}
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                        Starting...
+                      </div>
+                    ) : (
+                      'Start Scraping'
+                    )}
                   </button>
                 </div>
               </div>
@@ -1054,83 +1281,111 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Filter Presets */}
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Quick Presets
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setParams({
-                      revenueFrom: 15,
-                      revenueTo: 150,
-                      profitFrom: 1,
-                      profitTo: 50,
-                      companyType: 'AB',
-                    })}
-                    className="p-3 text-left bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="font-medium text-gray-900">Small-Medium Companies</div>
-                    <div className="text-sm text-gray-600">15-150M SEK revenue, 1M+ SEK profit</div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setParams({
-                      revenueFrom: 100,
-                      revenueTo: 1000,
-                      profitFrom: 10,
-                      profitTo: 200,
-                      companyType: 'AB',
-                    })}
-                    className="p-3 text-left bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="font-medium text-gray-900">Medium-Large Companies</div>
-                    <div className="text-sm text-gray-600">100-1000M SEK revenue, 10M+ SEK profit</div>
-                  </button>
-                </div>
-              </div>
             </div>
           )}
 
           {/* Validation Tab */}
           {activeTab === 'validation' && (
             <div className="space-y-6">
-              {/* Job ID Input */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Load Validation Data</h3>
-                <div className="flex space-x-4">
-                  <input
-                    type="text"
-                    placeholder="Enter Job ID (e.g., 10536458-d121-4964-b3e5-dd0582bcc4d3)"
-                    value={currentJob?.id || ''}
-                    onChange={(e) => {
-                      // Create a temporary job object for validation
-                      if (e.target.value) {
-                        setCurrentJob({
-                          id: e.target.value,
-                          stage: 'stage3_financials',
-                          status: 'done',
-                          processedCount: 0,
-                          totalCompanies: 0,
-                          lastPage: 0,
-                          errorCount: 0
-                        });
-                      } else {
-                        setCurrentJob(null);
-                      }
-                    }}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+              {selectedSessionId ? (
+                <div className="space-y-6">
+                  {/* Session Info */}
+                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-200/50">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">Session: {selectedSessionId.slice(0, 8)}...</h3>
+                        <p className="text-gray-600">Monitor and control your scraping session</p>
+                      </div>
+                      <button
+                        onClick={() => setSelectedSessionId(null)}
+                        className="text-gray-500 hover:text-gray-700 transition-colors"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    {/* Real-time Status Indicator */}
+                    {currentJob && (
+                      <div className="mb-4 p-4 bg-white rounded-xl border border-gray-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-medium text-gray-900">Current Status</h4>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              currentJob.status === 'running' ? 'bg-green-500 animate-pulse' :
+                              currentJob.status === 'done' ? 'bg-green-500' :
+                              currentJob.status === 'error' ? 'bg-red-500' :
+                              'bg-gray-400'
+                            }`}></div>
+                            <span className="text-sm font-medium capitalize">{currentJob.status}</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-600">Stage:</span>
+                            <div className="font-medium">
+                              {currentJob.stage === 'stage2_enrichment' ? 'Stage 2: Company ID Resolution' :
+                               currentJob.stage === 'stage3_financials' ? 'Stage 3: Financial Data' :
+                               currentJob.stage}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Companies:</span>
+                            <div className="font-medium">{currentJob.totalCompanies || 0}</div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Resolved IDs:</span>
+                            <div className="font-medium">{currentJob.processedCount || 0}</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Stage Control Buttons */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <button
+                        onClick={() => handleStageControl(2, 'start')}
+                        className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Start Stage 2: Company ID Resolution
+                      </button>
+                      
+                      <button
+                        onClick={() => handleStageControl(3, 'start')}
+                        className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Start Stage 3: Financial Data Fetch
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Session Selected</h3>
+                  <p className="text-gray-600 mb-4">Select a session from the modal to view and control its progress</p>
                   <button
-                    onClick={handleLoadValidationData}
-                    disabled={validationLoading || !currentJob?.id}
-                    className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                    onClick={() => setIsSessionModalOpen(true)}
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
-                    {validationLoading ? 'Loading...' : 'Load Data'}
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Select Session
                   </button>
                 </div>
-              </div>
+              )}
 
               {/* Compact Status for Validation Tab */}
               {currentJob && (
@@ -1144,11 +1399,11 @@ export default function Home() {
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-blue-600">{validationData ? validationData.summary.total_companies : currentJob.processedCount}</div>
+                      <div className="text-lg font-semibold text-blue-600">{validationData ? validationData.summary?.totalCompanies : currentJob.processedCount}</div>
                       <div className="text-gray-600">Companies</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-green-600">{validationData ? validationData.summary.companies_with_financials : 0}</div>
+                      <div className="text-lg font-semibold text-green-600">{validationData ? validationData.summary?.companiesWithFinancials : 0}</div>
                       <div className="text-gray-600">With Financials</div>
                     </div>
                     <div className="text-center">
@@ -1171,17 +1426,17 @@ export default function Home() {
                     <h3 className="text-lg font-semibold text-blue-900 mb-4">Data Summary</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">{validationData.summary.total_companies}</div>
+                        <div className="text-2xl font-bold text-blue-600">{validationData.summary?.totalCompanies || 0}</div>
                         <div className="text-sm text-blue-700">Total Companies</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">{validationData.summary.companies_with_financials}</div>
+                        <div className="text-2xl font-bold text-green-600">{validationData.summary?.companiesWithFinancials || 0}</div>
                         <div className="text-sm text-green-700">With Financial Data</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-purple-600">
-                          {validationData.summary.year_range.min && validationData.summary.year_range.max 
-                            ? `${validationData.summary.year_range.min}-${validationData.summary.year_range.max}`
+                          {validationData.summary?.yearRange?.min && validationData.summary?.yearRange?.max 
+                            ? `${validationData.summary.yearRange.min}-${validationData.summary.yearRange.max}`
                             : 'N/A'
                           }
                         </div>
@@ -1189,7 +1444,7 @@ export default function Home() {
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-orange-600">
-                          {validationData.companies.reduce((sum, c) => sum + c.financial_years.length, 0)}
+                          {validationData.companies?.reduce((sum, c) => sum + (c.stage3Data?.years?.length || 0), 0) || 0}
                         </div>
                         <div className="text-sm text-orange-700">Total Records</div>
                       </div>
@@ -1245,21 +1500,21 @@ export default function Home() {
                         <tbody className="bg-white divide-y divide-gray-200">
                           {validationData.companies
                             .filter(company => 
-                              company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              company.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                               company.orgnr.includes(searchTerm)
                             )
                             .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                             .map((company) => {
-                              const latestFinancial = company.financial_years[0];
+                              const latestFinancial = company.stage3Data?.years?.[0];
                               const isExpanded = expandedRows.has(company.orgnr);
                               
                               return (
-                                <>
-                                  <tr key={company.orgnr} className="hover:bg-gray-50">
+                                <React.Fragment key={company.orgnr}>
+                                  <tr className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       <div>
-                                        <div className="text-sm font-medium text-gray-900">{company.company_name}</div>
-                                        {company.additional_data.employees && (
+                                        <div className="text-sm font-medium text-gray-900">{company.companyName || 'N/A'}</div>
+                                        {company.additional_data?.employees && (
                                           <div className="text-sm text-gray-500">Employees: {company.additional_data.employees}</div>
                                         )}
                                       </div>
@@ -1268,7 +1523,7 @@ export default function Home() {
                                       {company.orgnr}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                      {company.foundation_year || 'N/A'}
+                                      {company.stage1Data?.foundedYear || 'N/A'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                       {formatCurrency(latestFinancial?.sdi)}
@@ -1277,7 +1532,7 @@ export default function Home() {
                                       {formatCurrency(latestFinancial?.dr)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                      {formatYearBadges(company.financial_years.map(f => f.year))}
+                                      {formatYearBadges(company.stage3Data?.years || [])}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                       <button
@@ -1300,35 +1555,68 @@ export default function Home() {
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                               <div>
                                                 <span className="font-medium">Legal Name:</span>
-                                                <div className="text-gray-600">{company.additional_data.legalName || 'N/A'}</div>
+                                                <div className="text-gray-600">{company.additional_data?.legalName || 'N/A'}</div>
                                               </div>
                                               <div>
                                                 <span className="font-medium">Phone:</span>
-                                                <div className="text-gray-600">{company.additional_data.phone || 'N/A'}</div>
+                                                <div className="text-gray-600">{company.additional_data?.phone || 'N/A'}</div>
                                               </div>
                                               <div>
                                                 <span className="font-medium">Email:</span>
-                                                <div className="text-gray-600">{company.additional_data.email || 'N/A'}</div>
+                                                <div className="text-gray-600">{company.additional_data?.email || 'N/A'}</div>
                                               </div>
                                               <div>
                                                 <span className="font-medium">Homepage:</span>
                                                 <div className="text-gray-600">
-                                                  {company.homepage ? (
-                                                    <a href={company.homepage} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                      {company.homepage}
+                                                  {company.stage1Data?.homepage ? (
+                                                    <a href={company.stage1Data.homepage} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                                      {company.stage1Data.homepage}
                                                     </a>
                                                   ) : 'N/A'}
                                                 </div>
                                               </div>
                                             </div>
-                                            {company.additional_data.domicile && (
+                                            {company.additional_data?.domicile && (
                                               <div className="mt-2 text-sm">
                                                 <span className="font-medium">Location:</span>
                                                 <div className="text-gray-600">
-                                                  {company.additional_data.domicile.municipality}, {company.additional_data.domicile.county}
+                                                  {company.additional_data?.domicile?.municipality}, {company.additional_data?.domicile?.county}
                                                 </div>
                                               </div>
                                             )}
+                                          </div>
+
+                                          {/* Stage 2: Company ID Resolution */}
+                                          <div>
+                                            <h4 className="text-sm font-medium text-gray-900 mb-2">Stage 2: Company ID Resolution</h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                              <div>
+                                                <span className="font-medium">Company ID:</span>
+                                                <div className="text-gray-600">
+                                                  {company.stage2Data?.companyId ? (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                      {company.stage2Data.companyId}
+                                                    </span>
+                                                  ) : (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                      Not resolved
+                                                    </span>
+                                                  )}
+                                                </div>
+                                              </div>
+                                              <div>
+                                                <span className="font-medium">Confidence Score:</span>
+                                                <div className="text-gray-600">
+                                                  {company.stage2Data?.confidence ? (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                      {company.stage2Data.confidence}
+                                                    </span>
+                                                  ) : (
+                                                    <span className="text-gray-500">N/A</span>
+                                                  )}
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
 
                                           {/* Financial Data by Year */}
@@ -1347,14 +1635,14 @@ export default function Home() {
                                                   </tr>
                                                 </thead>
                                                 <tbody>
-                                                  {company.financial_years.map((financial) => (
-                                                    <tr key={financial.year} className="border-b">
-                                                      <td className="py-2 font-medium">{financial.year}</td>
-                                                      <td className="py-2 text-right">{formatCurrency(financial.sdi)}</td>
-                                                      <td className="py-2 text-right">{formatCurrency(financial.dr)}</td>
-                                                      <td className="py-2 text-right">{formatCurrency(financial.ors)}</td>
-                                                      <td className="py-2 text-right">{formatCurrency(financial.ek)}</td>
-                                                      <td className="py-2 text-right">{formatCurrency(financial.fk)}</td>
+                                                  {(company.stage3Data?.years || []).map((year) => (
+                                                    <tr key={year} className="border-b">
+                                                      <td className="py-2 font-medium">{year}</td>
+                                                      <td className="py-2 text-right">N/A</td>
+                                                      <td className="py-2 text-right">N/A</td>
+                                                      <td className="py-2 text-right">N/A</td>
+                                                      <td className="py-2 text-right">N/A</td>
+                                                      <td className="py-2 text-right">N/A</td>
                                                     </tr>
                                                   ))}
                                                 </tbody>
@@ -1365,7 +1653,7 @@ export default function Home() {
                                       </td>
                                     </tr>
                                   )}
-                                </>
+                                </React.Fragment>
                               );
                             })}
                         </tbody>
@@ -1373,8 +1661,8 @@ export default function Home() {
                     </div>
 
                     {/* Pagination */}
-                    {validationData.companies.filter(company => 
-                      company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    {validationData.companies?.filter(company => 
+                      company.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                       company.orgnr.includes(searchTerm)
                     ).length > itemsPerPage && (
                       <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
@@ -1388,7 +1676,7 @@ export default function Home() {
                           </button>
                           <button
                             onClick={() => setCurrentPage(currentPage + 1)}
-                            disabled={currentPage * itemsPerPage >= validationData.companies.length}
+                            disabled={currentPage * itemsPerPage >= validationData.companies?.length || 0}
                             className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                           >
                             Next
@@ -1401,10 +1689,10 @@ export default function Home() {
                               <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span>
                               {' '}to{' '}
                               <span className="font-medium">
-                                {Math.min(currentPage * itemsPerPage, validationData.companies.length)}
+                                {Math.min(currentPage * itemsPerPage, validationData.companies?.length || 0)}
                               </span>
                               {' '}of{' '}
-                              <span className="font-medium">{validationData.companies.length}</span>
+                              <span className="font-medium">{validationData.companies?.length || 0}</span>
                               {' '}results
                             </p>
                           </div>
@@ -1419,7 +1707,7 @@ export default function Home() {
                               </button>
                               <button
                                 onClick={() => setCurrentPage(currentPage + 1)}
-                                disabled={currentPage * itemsPerPage >= validationData.companies.length}
+                                disabled={currentPage * itemsPerPage >= validationData.companies?.length || 0}
                                 className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                               >
                                 Next
@@ -1503,8 +1791,16 @@ export default function Home() {
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
+
+      {/* Session Modal */}
+      <SessionModal
+        isOpen={isSessionModalOpen}
+        onClose={() => setIsSessionModalOpen(false)}
+        onSessionSelect={handleSessionSelect}
+      />
     </div>
   );
 }

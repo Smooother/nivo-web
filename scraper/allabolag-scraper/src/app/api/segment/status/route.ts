@@ -17,9 +17,12 @@ export async function GET(request: NextRequest) {
     
     // Use the local database to get job status
     const localDb = new LocalStagingDB(jobId);
-    const job = localDb.getJob(jobId);
+    let job = localDb.getJob(jobId);
     
+    // If job not found, it might be an enrichment job stored in the source job's database
     if (!job) {
+      // Try to find the job in other databases by checking if it's an enrichment job
+      // For now, we'll return an error, but this could be enhanced to search across databases
       return NextResponse.json(
         { error: 'Job not found' },
         { status: 404 }

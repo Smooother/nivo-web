@@ -19,40 +19,27 @@ export async function POST(request: NextRequest) {
     
     console.log('Source job ID:', jobId);
     
-    // Create enrichment job
-    const enrichmentJobId = uuidv4();
-    const hash = filterHash({ type: 'enrich_company_ids', timestamp: Date.now() });
-    
-    console.log('Enrichment job ID:', enrichmentJobId);
-    
-    // Use the same local database as the source job
+    // Work directly with the existing session database
     const localDb = new LocalStagingDB(jobId);
     
-    // Create enrichment job in local database
-    const now = new Date().toISOString();
-    localDb.insertJob({
-      id: enrichmentJobId,
-      jobType: 'enrich_company_id',
-      filterHash: hash,
-      params: { sourceJobId: jobId },
-      status: 'running',
+    // Update the existing job to show Stage 2 is starting
+    localDb.updateJob(jobId, {
       stage: 'stage2_enrichment',
-      createdAt: now,
-      updatedAt: now
+      status: 'running'
     });
     
-    console.log('Enrichment job created in local database');
+    console.log('Starting Stage 2 enrichment for existing job');
     
     // Start processing in background
-    processEnrichmentJob(enrichmentJobId, jobId, localDb).catch(async (error) => {
+    processEnrichmentJob(jobId, localDb).catch(async (error) => {
       console.error('Enrichment job failed:', error);
-      localDb.updateJob(enrichmentJobId, { 
+      localDb.updateJob(jobId, { 
         status: 'error', 
         lastError: error.message
       });
     });
     
-    return NextResponse.json({ jobId: enrichmentJobId });
+    return NextResponse.json({ jobId: jobId });
   } catch (error) {
     console.error('Error starting enrichment job:', error);
     return NextResponse.json(
@@ -65,46 +52,61 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string, localDb: LocalStagingDB) {
+async function processEnrichmentJob(jobId: string, localDb: LocalStagingDB) {
   return withSession(async (session) => {
     const buildId = await getBuildId(session);
     const batchSize = 10; // Smaller batch size for API calls
     let processedCount = 0;
     
-    console.log(`Starting enrichment job ${enrichmentJobId} with buildId: ${buildId}`);
+    console.log(`Starting Stage 2 enrichment for job ${jobId} with buildId: ${buildId}`);
+    
+    // Get companies from the existing job
+    const companies = localDb.getCompanies(jobId);
+    
+    console.log(`Found ${companies.length} companies to enrich for job ${jobId}`);
     
     while (true) {
-      // Get batch of companies from local database
-      const companies = localDb.getCompaniesToProcess(sourceJobId, 'pending');
+      // Get batch of companies that need company ID resolution
+      // First try to get companies with 'pending' status, then any status
+      let companiesToProcess = localDb.getCompaniesToProcess(jobId, 'pending');
       
-      if (companies.length === 0) {
-        console.log('No more companies to enrich');
-        break;
+      if (companiesToProcess.length === 0) {
+        // If no pending companies, get all companies that don't have resolved company IDs
+        const allCompanies = localDb.getCompanies(jobId);
+        const existingCompanyIds = localDb.getCompanyIds(jobId);
+        const resolvedOrgnrs = new Set(existingCompanyIds.map(ci => ci.orgnr));
+        
+        companiesToProcess = allCompanies.filter(company => !resolvedOrgnrs.has(company.orgnr));
+        
+        if (companiesToProcess.length === 0) {
+          console.log('No more companies to enrich');
+          break;
+        }
       }
       
-      const companiesToEnrich = companies.slice(0, batchSize);
+      const companiesToEnrich = companiesToProcess.slice(0, batchSize);
       console.log(`Processing batch of ${companiesToEnrich.length} companies for company ID resolution`);
       
       // Process each company to resolve its actual company ID
       for (const company of companiesToEnrich) {
         try {
-          console.log(`Resolving company ID for ${company.company_name} (${company.orgnr})`);
+          console.log(`Resolving company ID for ${company.companyName} (${company.orgnr})`);
           
           // Search Allabolag.se directly for the company ID
           try {
-            console.log(`Searching Allabolag.se for company ID: ${company.company_name} (${company.orgnr})`);
+            console.log(`Searching Allabolag.se for company ID: ${company.companyName} (${company.orgnr})`);
             
             // Search for the company using its name to get the real company ID
-            const searchResults = await fetchSearchPage(buildId, company.company_name, session);
+            const searchResults = await fetchSearchPage(buildId, company.companyName, session);
           
           // Extract companies from the correct path in the search results
           const companies = searchResults?.pageProps?.hydrationData?.searchStore?.companies?.companies || 
                            searchResults?.pageProps?.companies || [];
           
-          console.log(`Found ${companies.length} companies in search results for ${company.company_name}`);
+          console.log(`Found ${companies.length} companies in search results for ${company.companyName}`);
           
           // Find the company that matches our orgnr
-          const matchingCompany = companies.find(c => 
+          const matchingCompany = companies.find((c: any) => 
             c.orgnr === company.orgnr || c.organisationNumber === company.orgnr
           );
           
@@ -120,7 +122,7 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
             });
             
             if (realCompanyId) {
-              console.log(`Found company ID: ${realCompanyId} for ${company.company_name} (${company.orgnr})`);
+              console.log(`Found company ID: ${realCompanyId} for ${company.companyName} (${company.orgnr})`);
               
               // Insert the resolved company ID
               const companyIdRecord = {
@@ -129,31 +131,31 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
                 source: 'allabolag_search',
                 confidenceScore: '1.0',
                 scrapedAt: new Date().toISOString(),
-                jobId: sourceJobId,
-                status: 'pending',
+                jobId: jobId,
+                status: 'resolved',
                 updatedAt: new Date().toISOString()
               };
               
               localDb.insertCompanyIds([companyIdRecord]);
-              localDb.updateCompanyStatus(sourceJobId, company.orgnr, 'id_resolved');
+              localDb.updateCompanyStatus(jobId, company.orgnr, 'id_resolved');
             } else {
-              console.log(`Found company but could not extract company ID for ${company.company_name} (${company.orgnr})`);
+              console.log(`Found company but could not extract company ID for ${company.companyName} (${company.orgnr})`);
               console.log('Company data:', JSON.stringify(matchingCompany, null, 2));
-              localDb.updateCompanyStatus(sourceJobId, company.orgnr, 'id_not_found');
+              localDb.updateCompanyStatus(jobId, company.orgnr, 'id_not_found');
             }
           } else {
-            console.log(`No matching company found for ${company.company_name} (${company.orgnr})`);
-            localDb.updateCompanyStatus(sourceJobId, company.orgnr, 'id_not_found');
+            console.log(`No matching company found for ${company.companyName} (${company.orgnr})`);
+            localDb.updateCompanyStatus(jobId, company.orgnr, 'id_not_found');
           }
         } catch (searchError) {
-          console.log(`Error searching Allabolag.se for ${company.company_name} (${company.orgnr}):`, searchError.message);
-          localDb.updateCompanyStatus(sourceJobId, company.orgnr, 'id_not_found');
+          console.log(`Error searching Allabolag.se for ${company.companyName} (${company.orgnr}):`, (searchError as Error).message);
+          localDb.updateCompanyStatus(jobId, company.orgnr, 'id_not_found');
         }
         
         processedCount++;
         
         // Update job progress
-        localDb.updateJob(enrichmentJobId, {
+        localDb.updateJob(jobId, {
           processedCount: processedCount
         });
         
@@ -161,25 +163,19 @@ async function processEnrichmentJob(enrichmentJobId: string, sourceJobId: string
         await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
-        console.error(`Error resolving company ID for ${company.company_name} (${company.orgnr}):`, error);
-        localDb.updateCompanyStatus(sourceJobId, company.orgnr, 'error', error.message);
+        console.error(`Error resolving company ID for ${company.companyName} (${company.orgnr}):`, error);
+        localDb.updateCompanyStatus(jobId, company.orgnr, 'error', (error as Error).message);
         processedCount++;
       }
     }
   }
   
-  // Mark enrichment job as done
-  localDb.updateJob(enrichmentJobId, { 
+  // Mark job as done
+  localDb.updateJob(jobId, { 
     status: 'done'
   });
   
-  // Update the original segmentation job to show Stage 2 is complete
-  localDb.updateJob(sourceJobId, {
-    stage: 'stage2_enrichment',
-    status: 'done'
-  });
-  
-    console.log(`Enrichment job ${enrichmentJobId} completed, processed ${processedCount} companies`);
+  console.log(`Stage 2 enrichment for job ${jobId} completed, processed ${processedCount} companies`);
   });
 }
 

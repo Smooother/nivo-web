@@ -139,24 +139,7 @@ async function processSegmentationJob(jobId: string, params: any, localDb: Local
             continue;
           }
           
-          // Check if company already exists in the main database
-          try {
-            const { exec } = require('child_process');
-            const { promisify } = require('util');
-            const execAsync = promisify(exec);
-            
-            const checkQuery = `sqlite3 /Users/jesper/nivo/allabolag.db "SELECT COUNT(*) FROM companies_enriched WHERE OrgNr = '${normalized.orgnr}';"`;
-            const { stdout } = await execAsync(checkQuery);
-            const exists = parseInt(stdout.trim()) > 0;
-            
-            if (exists) {
-              console.log(`Skipping duplicate company: ${normalized.companyName} (${normalized.orgnr})`);
-              duplicatesSkipped++;
-              continue;
-            }
-          } catch (checkError) {
-            console.log(`Could not check for duplicates for ${normalized.orgnr}, proceeding anyway:`, checkError.message);
-          }
+          // Note: Duplicate checking is handled by the local staging database
           
           companiesToInsert.push({
             orgnr: normalized.orgnr,
