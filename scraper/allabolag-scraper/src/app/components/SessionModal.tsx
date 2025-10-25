@@ -186,50 +186,19 @@ export default function SessionModal({ isOpen, onClose, onSessionSelect }: Sessi
                             Created: {formatDate(session.createdAt)}
                           </p>
                           
-                          {/* Enhanced Progress Display */}
-                          <div className="mt-2 flex items-center gap-4 text-xs">
-                            <div className="flex items-center gap-1">
-                              <span className="text-gray-500">Stage 1:</span>
-                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                                session.stages?.stage1?.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                session.stages?.stage1?.status === 'running' ? 'bg-blue-100 text-blue-800' :
-                                session.stages?.stage1?.status === 'error' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {session.stages?.stage1?.status || 'pending'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-gray-500">Stage 2:</span>
-                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                                session.stages?.stage2?.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                session.stages?.stage2?.status === 'running' ? 'bg-blue-100 text-blue-800' :
-                                session.stages?.stage2?.status === 'error' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {session.stages?.stage2?.status || 'pending'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-gray-500">Stage 3:</span>
-                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                                session.stages?.stage3?.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                session.stages?.stage3?.status === 'running' ? 'bg-blue-100 text-blue-800' :
-                                session.stages?.stage3?.status === 'error' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {session.stages?.stage3?.status || 'pending'}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Data Summary */}
-                          <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
-                            <span>Companies: {session.totalCompanies}</span>
-                            <span>IDs: {session.totalCompanyIds}</span>
-                            <span>Financials: {session.totalFinancials}</span>
-                            <span>Updated: {formatDate(session.updatedAt)}</span>
-                          </div>
+         {/* Clean Status Display */}
+         <div className="mt-2 text-xs text-gray-500">
+           <div className="flex items-center gap-4">
+             <span>Stage 1: {session.stages?.stage1?.status || 'pending'}</span>
+             <span>Stage 2: {session.stages?.stage2?.status || 'pending'}</span>
+             <span>Stage 3: {session.stages?.stage3?.status || 'pending'}</span>
+           </div>
+           <div className="mt-1 flex items-center gap-4">
+             <span>{session.totalCompanies} companies</span>
+             <span>{session.totalCompanyIds} IDs</span>
+             <span>{session.totalFinancials} financials</span>
+           </div>
+         </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {getStatusBadge(session.status)}

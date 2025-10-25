@@ -1,355 +1,523 @@
-# Multi-Source Web Scraper
+# Allabolag Scraper System
 
-A production-ready, multi-source web scraping system with plugin architecture, robust resume capability, and safe staging-to-production data flow.
+A comprehensive 3-stage company data extraction system that scrapes financial and company information from Allabolag.se (Swedish company registry).
 
-## Features
+## 🏗️ System Architecture
 
-- **Multi-Source Support**: Plugin architecture for different data sources (Allabolag, Ratsit, Mrkoll, etc.)
-- **Three-Stage Process**: Segmentation → Company ID Resolution → Financial Data Fetching
-- **Adaptive Rate Limiting**: Automatically adjusts speed to avoid bans while maximizing throughput
-- **Robust Resume Capability**: Can restart from exact point of failure at page OR company level
-- **Safe Data Flow**: Staging → validation → production prevents corrupt data
-- **Night Mode**: Optimized settings for overnight financial data scraping
-- **Audit Trail**: Every scrape job tracked with full metadata and error logging
+### Overview
+The scraper system is built as a Next.js application with a 3-stage processing pipeline:
 
-## Architecture
+1. **Stage 1: Segmentation** - Company search and filtering
+2. **Stage 2: Company ID Resolution** - Resolve actual company IDs from search results
+3. **Stage 3: Financial Data Fetching** - Extract detailed financial information
 
+### Technology Stack
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Node.js
+- **Database**: SQLite (local staging), PostgreSQL (production)
+- **Data Source**: Allabolag.se API
+- **Session Management**: Cookie-based with CSRF protection
+
+### Project Structure
 ```
-scraper/
+scraper/allabolag-scraper/
 ├── src/
-│   ├── providers/
-│   │   ├── base.ts              # Base provider interface
-│   │   ├── allabolag/
-│   │   │   ├── provider.ts      # Allabolag implementation
-│   │   │   ├── segmentation.ts  # Stage 1: Search/filter
-│   │   │   ├── company-ids.ts   # Stage 2: Get canonical IDs
-│   │   │   ├── financials.ts    # Stage 3: Fetch financial data
-│   │   │   └── rate-limiter.ts  # Adaptive rate limiting
-│   │   ├── ratsit/              # Future: Ratsit.se
-│   │   └── mrkoll/              # Future: Mrkoll.se
-│   ├── core/
-│   │   ├── job-manager.ts       # Job orchestration
-│   │   ├── checkpoint.ts        # Resume capability
-│   │   ├── staging.ts           # Staging table operations
-│   │   └── validation.ts        # Data validation before migration
-│   ├── lib/
-│   │   ├── db/
-│   │   │   ├── staging-schema.ts   # Staging tables
-│   │   │   └── production-schema.ts # Production tables
-│   └── config/
-│       └── scraper.config.ts    # Configuration
-├── database/
-│   └── migrations/              # SQL migration files
-└── allabolag-scraper/           # Existing Next.js app
+│   ├── app/
+│   │   ├── api/                    # API endpoints
+│   │   ├── components/             # React components
+│   │   └── page.tsx               # Main UI
+│   └── lib/
+│       ├── allabolag.ts           # Allabolag.se integration
+│       ├── db/
+│       │   └── local-staging.ts   # SQLite database operations
+│       └── hash.ts                # Utility functions
+├── staging/                       # SQLite database files
+└── package.json
 ```
 
-## Three-Stage Scraping Process
+## 🚀 Quick Start
 
-### Stage 1: Segmentation (Company Search)
-- Fetches companies matching revenue/profit filters
-- Stores in `scraper_staging_companies` table
-- Uses existing `/api/segment/start` endpoint
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- VPN connection (required for Allabolag.se access)
 
-### Stage 2: Company ID Resolution
-- Searches by orgnr to get canonical `companyId`
-- Stores in `scraper_staging_company_ids` table
-- Uses existing `/api/enrich/company-ids` endpoint
-
-### Stage 3: Financial Data Fetching (NEW)
-- Fetches financial data from Allabolag API
-- Parses `annualReports` and extracts account codes
-- Stores in `scraper_staging_financials` table
-- Uses new `/api/financial/fetch` endpoint
-
-## Database Schema
-
-### Staging Tables
-- `scraper_staging_jobs` - Job tracking and metadata
-- `scraper_staging_companies` - Company basic information
-- `scraper_staging_company_ids` - Company ID resolution
-- `scraper_staging_financials` - Financial data with validation
-- `scraper_checkpoints` - Resume capability tracking
-- `migration_log` - Migration audit trail
-
-### Production Tables
-- `master_analytics` - Main company analytics
-- `company_accounts_by_id` - Financial account data
-- `company_kpis_by_id` - Calculated KPIs
-
-## Setup
-
-### 1. Environment Variables
+### Installation
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
-
-### 2. Database Migration
-Run the SQL migration to create staging tables:
-```sql
--- Run database/migrations/001_create_staging_tables.sql
-```
-
-### 3. Install Dependencies
-```bash
-cd allabolag-scraper
+cd scraper/allabolag-scraper
 npm install
+npm run dev
 ```
 
-### 4. Start Development Server
+The application will be available at `http://localhost:3000`
+
+### Environment Setup
+Create `.env.local` with:
+```env
+# Optional: For production database
+DATABASE_URL=postgresql://...
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+```
+
+## 📊 Data Flow
+
+### 3-Stage Processing Pipeline
+
+```mermaid
+graph TD
+    A[User Input: Filters] --> B[Stage 1: Segmentation]
+    B --> C[Company Search Results]
+    C --> D[Stage 2: Company ID Resolution]
+    D --> E[Resolved Company IDs]
+    E --> F[Stage 3: Financial Data Fetching]
+    F --> G[Complete Financial Records]
+    G --> H[Data Validation & Export]
+```
+
+### Stage Details
+
+#### Stage 1: Segmentation
+- **Purpose**: Search and filter companies based on criteria
+- **Input**: Revenue range, EBIT range, industry filters
+- **Output**: List of companies with basic information
+- **API**: `/api/segment/start`
+- **Database**: `staging_companies` table
+
+#### Stage 2: Company ID Resolution
+- **Purpose**: Resolve actual company IDs from search results
+- **Input**: Company names and organization numbers
+- **Output**: Mapped company IDs for financial data access
+- **API**: `/api/enrich/company-ids`
+- **Database**: `staging_company_ids` table
+
+#### Stage 3: Financial Data Fetching
+- **Purpose**: Extract detailed financial information
+- **Input**: Resolved company IDs
+- **Output**: Complete financial records (50+ data points per year)
+- **API**: `/api/financial/fetch`
+- **Database**: `staging_financials` table
+
+## 🗄️ Database Schema
+
+### SQLite Staging Database
+Each scraping session creates a separate SQLite database file: `staging/staging_{jobId}.db`
+
+#### Tables
+
+**staging_jobs**
+```sql
+CREATE TABLE staging_jobs (
+  id TEXT PRIMARY KEY,
+  job_type TEXT NOT NULL,
+  status TEXT NOT NULL,
+  stage TEXT NOT NULL,
+  last_page INTEGER DEFAULT 0,
+  processed_count INTEGER DEFAULT 0,
+  total_companies INTEGER DEFAULT 0,
+  error_count INTEGER DEFAULT 0,
+  last_error TEXT,
+  rate_limit_stats TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+```
+
+**staging_companies**
+```sql
+CREATE TABLE staging_companies (
+  id TEXT PRIMARY KEY,
+  orgnr TEXT NOT NULL,
+  company_name TEXT NOT NULL,
+  company_id TEXT,
+  company_id_hint TEXT,
+  homepage TEXT,
+  foundation_year INTEGER,
+  revenue_sek REAL,
+  profit_sek REAL,
+  nace_categories TEXT,
+  segment_name TEXT,
+  status TEXT DEFAULT 'pending',
+  job_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (job_id) REFERENCES staging_jobs (id)
+);
+```
+
+**staging_company_ids**
+```sql
+CREATE TABLE staging_company_ids (
+  id TEXT PRIMARY KEY,
+  orgnr TEXT NOT NULL,
+  company_id TEXT NOT NULL,
+  source TEXT NOT NULL,
+  confidence_score TEXT,
+  scraped_at TEXT NOT NULL,
+  job_id TEXT NOT NULL,
+  status TEXT DEFAULT 'pending',
+  error_message TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (job_id) REFERENCES staging_jobs (id)
+);
+```
+
+**staging_financials**
+```sql
+CREATE TABLE staging_financials (
+  id TEXT PRIMARY KEY,
+  company_id TEXT NOT NULL,
+  orgnr TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  period TEXT NOT NULL,
+  period_start TEXT,
+  period_end TEXT,
+  currency TEXT DEFAULT 'SEK',
+  revenue REAL,
+  profit REAL,
+  employees INTEGER,
+  be REAL,
+  tr REAL,
+  -- 50+ additional financial metrics
+  raw_data TEXT,
+  validation_status TEXT DEFAULT 'pending',
+  scraped_at TEXT NOT NULL,
+  job_id TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (job_id) REFERENCES staging_jobs (id)
+);
+```
+
+## 🔌 API Endpoints
+
+### Core Scraping Endpoints
+
+#### POST `/api/segment/start`
+Start Stage 1: Company segmentation and search
+```json
+{
+  "revenueMin": 100000000,
+  "revenueMax": 101000000,
+  "ebitMin": 3000000,
+  "ebitMax": 5000000,
+  "industry": "technology"
+}
+```
+
+#### POST `/api/enrich/company-ids?jobId={jobId}`
+Start Stage 2: Company ID resolution
+- Resolves company IDs for all companies in the session
+- Updates `staging_company_ids` table
+- Returns: `{"jobId": "session-id"}`
+
+#### POST `/api/financial/fetch?jobId={jobId}`
+Start Stage 3: Financial data fetching
+- Fetches financial data for all resolved company IDs
+- Extracts 50+ financial metrics per year
+- Updates `staging_financials` table
+- Returns: `{"jobId": "session-id"}`
+
+### Status and Monitoring
+
+#### GET `/api/segment/status?jobId={jobId}`
+Get current job status and progress
+```json
+{
+  "id": "job-id",
+  "status": "running",
+  "stage": "stage2_enrichment",
+  "stats": {
+    "companies": 150,
+    "companyIds": 120,
+    "financials": 600
+  }
+}
+```
+
+#### GET `/api/sessions`
+List all scraping sessions
+```json
+{
+  "sessions": [
+    {
+      "sessionId": "uuid",
+      "status": "completed",
+      "totalCompanies": 150,
+      "totalCompanyIds": 120,
+      "totalFinancials": 600,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "stages": {
+        "stage1": {"status": "completed"},
+        "stage2": {"status": "completed"},
+        "stage3": {"status": "completed"}
+      }
+    }
+  ]
+}
+```
+
+#### GET `/api/sessions/{sessionId}/companies`
+Get detailed company data for a session
+```json
+{
+  "companies": [...],
+  "pagination": {
+    "page": 1,
+    "totalPages": 10,
+    "totalItems": 150
+  }
+}
+```
+
+### Monitoring and Control
+
+#### GET `/api/monitoring/dashboard?jobId={jobId}`
+Real-time monitoring dashboard data
+```json
+{
+  "jobId": "session-id",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "status": {
+    "current": "running",
+    "isRunning": true,
+    "isCompleted": false
+  },
+  "progress": {
+    "total": {
+      "companies": 150,
+      "companyIds": 120,
+      "financials": 600
+    },
+    "rates": {
+      "companiesPerMinute": 25.5,
+      "idsPerMinute": 20.0,
+      "financialsPerMinute": 100.0
+    }
+  },
+  "stages": {
+    "stage1": {"completed": 150, "total": 150, "percentage": 100},
+    "stage2": {"completed": 120, "total": 150, "percentage": 80},
+    "stage3": {"completed": 600, "total": 750, "percentage": 80}
+  }
+}
+```
+
+#### POST `/api/monitoring/control`
+Control scraping process (stop/resume/restart)
+```json
+{
+  "jobId": "session-id",
+  "action": "stop" // or "resume" or "restart"
+}
+```
+
+## 🎨 User Interface
+
+### Main Components
+
+#### ScraperInterface (`page.tsx`)
+- **Purpose**: Main application interface
+- **Features**: 
+  - Session selection modal
+  - 3-stage process control
+  - Real-time monitoring dashboard
+  - Data validation and export
+- **Design**: Clean, minimal OpenAI-style interface
+
+#### SessionModal (`components/SessionModal.tsx`)
+- **Purpose**: Session selection and management
+- **Features**:
+  - List all available sessions
+  - Show session status and progress
+  - Clean, minimal design
+- **Usage**: Click "Select Session" to open
+
+### User Flow
+
+1. **Session Selection**: Choose existing session or start new one
+2. **Stage Control**: Use buttons to start Stage 2 and Stage 3
+3. **Monitoring**: Real-time progress tracking
+4. **Validation**: Review extracted data
+5. **Export**: Download results
+
+### Key UI Features
+
+- **Real-time Updates**: 3-second polling for status updates
+- **Progress Tracking**: Visual progress bars and counters
+- **Error Handling**: Clear error messages and recovery options
+- **Responsive Design**: Works on desktop and mobile
+- **Clean Interface**: Minimal colors, focused on functionality
+
+## 🔧 Configuration
+
+### Rate Limiting
+- **Stage 1**: 1 request per 2 seconds
+- **Stage 2**: 1 request per 500ms
+- **Stage 3**: 3 concurrent requests, 200ms delay between batches
+
+### Batch Sizes
+- **Stage 1**: 50 companies per page
+- **Stage 2**: 10 companies per batch
+- **Stage 3**: 50 companies per batch, 3 concurrent
+
+### Session Management
+- **Cookie-based**: Uses `__RequestVerificationToken` for CSRF protection
+- **Build ID**: Fetched dynamically from Allabolag.se
+- **Session Persistence**: Maintains session across requests
+
+## 🧪 Testing
+
+### Manual Testing
+1. **Start Scraper**: `npm run dev`
+2. **Select Session**: Use existing session or create new one
+3. **Test Stages**: Run Stage 2 and Stage 3
+4. **Monitor Progress**: Check real-time updates
+5. **Validate Data**: Review extracted information
+
+### API Testing
+```bash
+# Test Stage 2
+curl -X POST "http://localhost:3000/api/enrich/company-ids?jobId=session-id"
+
+# Test Stage 3
+curl -X POST "http://localhost:3000/api/financial/fetch?jobId=session-id"
+
+# Check status
+curl "http://localhost:3000/api/segment/status?jobId=session-id"
+```
+
+### Test Workflow
+- **Endpoint**: `/api/test-complete-workflow`
+- **Purpose**: End-to-end testing of all stages
+- **Coverage**: Session management, segmentation, financial data
+
+## 🚨 Error Handling
+
+### Common Issues
+
+#### VPN Required
+- **Error**: "Failed to fetch" or network errors
+- **Solution**: Ensure VPN is connected to Swedish IP
+
+#### Rate Limiting
+- **Error**: 429 Too Many Requests
+- **Solution**: System automatically handles with delays
+
+#### Session Expiry
+- **Error**: Invalid session or build ID
+- **Solution**: System automatically refreshes session
+
+#### Database Errors
+- **Error**: SQLite file locked or corrupted
+- **Solution**: Restart application, check file permissions
+
+### Error Recovery
+- **Automatic Retry**: Built-in retry logic for failed requests
+- **Graceful Degradation**: Continues processing other companies
+- **Error Logging**: Detailed error messages in console
+- **Status Updates**: Real-time error reporting in UI
+
+## 📈 Performance
+
+### Scalability
+- **Concurrent Processing**: Up to 3 concurrent requests in Stage 3
+- **Batch Processing**: Efficient batch operations
+- **Memory Management**: Streaming data processing
+- **Database Optimization**: Indexed queries, prepared statements
+
+### Monitoring
+- **Real-time Metrics**: Processing rates, completion estimates
+- **System Health**: Memory usage, uptime tracking
+- **Progress Tracking**: Stage-by-stage progress monitoring
+- **Error Reporting**: Comprehensive error logging
+
+## 🔒 Security
+
+### Data Protection
+- **Local Storage**: SQLite databases stored locally
+- **Session Security**: CSRF token protection
+- **Rate Limiting**: Prevents abuse of external APIs
+- **Error Sanitization**: No sensitive data in error messages
+
+### Access Control
+- **VPN Requirement**: Geographic access restrictions
+- **Session Management**: Secure session handling
+- **API Protection**: Input validation and sanitization
+
+## 🚀 Deployment
+
+### Development
 ```bash
 npm run dev
 ```
 
-## Usage
-
-### 1. Start Scraping
-1. Set filters (revenue, profit, company type)
-2. Click "Start Scraping" to begin Stage 1
-3. Monitor progress in real-time
-
-### 2. Multi-Stage Workflow
-- **Stage 1**: Company search and filtering
-- **Stage 2**: Company ID resolution (automatic after Stage 1)
-- **Stage 3**: Financial data fetching (automatic after Stage 2)
-
-### 3. Data Validation
-- Review validation results (valid, warnings, invalid)
-- Check data quality before migration
-
-### 4. Migration to Production
-- Migrate validated data to production tables
-- Skip duplicates automatically
-- Generate migration report
-
-## Rate Limiting
-
-### Adaptive Rate Limiting
-- Starts with 10 concurrent requests, 100ms delay
-- Automatically adjusts based on success/failure rates
-- Backs off aggressively on 429 (rate limit) responses
-- Gradually speeds up on sustained success
-
-### Night Mode
-- Enabled by default for financial data fetching
-- Runs 10 PM - 6 AM with optimized settings
-- 10 concurrent requests, 200ms delay
-
-## Resume Capability
-
-### Page-Level Checkpointing
-- Resume from last processed page
-- Already implemented in existing system
-
-### Company-Level Checkpointing (NEW)
-- Track each company's status: 'pending', 'id_resolved', 'financials_fetched', 'error'
-- Store checkpoint after every batch (every 50 companies)
-- On resume: Query companies with status != 'financials_fetched' and != 'error'
-
-## Data Validation
-
-### Validation Rules
-- **Required fields**: Company ID, orgnr, year, period
-- **Year range**: 2000 to current year + 1
-- **Revenue validation**: Non-negative, flag zero revenue
-- **Profit validation**: Allow negative (losses)
-- **EBITDA validation**: Flag unrealistic values
-- **Equity validation**: Flag extreme negative equity
-- **Consistency checks**: Flag all-zero metrics, unrealistic ratios
-- **Currency validation**: Expect SEK
-
-### Validation Status
-- `valid` - Passes all checks
-- `warning` - Has warnings but usable
-- `invalid` - Has errors, should not be migrated
-
-## API Endpoints
-
-### Existing Endpoints
-- `POST /api/segment/start` - Start segmentation job
-- `GET /api/segment/status` - Get job status
-- `POST /api/enrich/company-ids` - Start company ID enrichment
-
-### New Endpoints
-- `POST /api/financial/fetch` - Start financial data fetching
-- `GET /api/financial/fetch` - Get financial fetch status
-- `POST /api/staging/validate` - Validate staging data
-- `GET /api/staging/validate` - Get validation preview
-- `POST /api/staging/migrate` - Migrate to production
-- `GET /api/staging/migrate` - Get migration history
-
-## Configuration
-
-### Rate Limiting Config
-```typescript
-export const scraperConfig = {
-  allabolag: {
-    rateLimiting: {
-      stage1: { concurrent: 5, delay: 100 },
-      stage2: { concurrent: 5, delay: 100 },
-      stage3: { 
-        concurrent: 10, 
-        delay: 100,
-        nightMode: {
-          enabled: true,
-          startHour: 22,
-          endHour: 6,
-          concurrent: 10,
-          delay: 200,
-        }
-      },
-    },
-  },
-};
-```
-
-## Adding New Providers
-
-### 1. Create Provider Directory
+### Production
 ```bash
-mkdir src/providers/your-provider
+npm run build
+npm start
 ```
 
-### 2. Implement Provider Interface
-```typescript
-export class YourProvider implements ScraperProvider {
-  name = 'your-provider';
-  
-  async *searchCompanies(filters: SearchFilters): AsyncGenerator<CompanyBasic> {
-    // Implementation
-  }
-  
-  async resolveCompanyId(orgnr: string, companyName?: string): Promise<string | null> {
-    // Implementation
-  }
-  
-  async fetchFinancials(companyId: string): Promise<FinancialData[]> {
-    // Implementation
-  }
-  
-  getRateLimitConfig(): RateLimitConfig {
-    // Return provider-specific config
-  }
-}
+### Environment Variables
+```env
+# Database
+DATABASE_URL=postgresql://user:pass@host:port/db
+
+# Optional: Supabase integration
+SUPABASE_URL=https://project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### 3. Add Configuration
-```typescript
-// In scraper.config.ts
-yourProvider: {
-  rateLimiting: {
-    stage1: { concurrent: 3, delay: 500 },
-  }
-}
-```
+## 📝 Data Export
 
-### 4. Register Provider
-Add to provider registry and update UI selector.
+### Available Formats
+- **CSV**: Company and financial data
+- **JSON**: Complete data with metadata
+- **Excel**: Formatted spreadsheets
 
-## Monitoring and Debugging
+### Export Endpoints
+- **Companies**: `/api/sessions/{sessionId}/companies`
+- **Financial Data**: `/api/validation/data?sessionId={sessionId}`
+- **Complete Export**: Custom export functionality
 
-### Job Status Tracking
-- Real-time progress updates
-- Rate limiting statistics
-- Error tracking and reporting
-- Checkpoint information
+## 🤝 Contributing
 
-### Logs and Debugging
-- Console logs for each stage
-- Error messages with context
-- Rate limiting adjustments
-- Validation results
+### Code Standards
+- **TypeScript**: Strict type checking
+- **ESLint**: Code quality enforcement
+- **Prettier**: Code formatting
+- **Testing**: Comprehensive test coverage
 
-### Performance Metrics
-- Requests per second
-- Success/failure rates
-- Average response times
-- Queue lengths
+### Development Workflow
+1. Create feature branch
+2. Implement changes
+3. Add tests
+4. Update documentation
+5. Submit pull request
 
-## Best Practices
+## 📞 Support
 
-### 1. Scraping Strategy
-- Start with conservative rate limits
-- Monitor for 429 responses
-- Use night mode for large batches
-- Test with small datasets first
+### Troubleshooting
+1. Check VPN connection
+2. Verify server is running
+3. Check browser console for errors
+4. Review API endpoint responses
+5. Check database file permissions
 
-### 2. Data Quality
-- Always validate before migration
-- Review warnings carefully
-- Check for data anomalies
-- Maintain audit trails
-
-### 3. Error Handling
-- Implement proper retry logic
-- Log all errors with context
-- Don't let single failures stop entire jobs
-- Use checkpoints for recovery
-
-### 4. Performance
-- Use batch processing
-- Implement proper indexing
-- Monitor database performance
-- Clean up old staging data
-
-## Troubleshooting
-
-### Common Issues
-
-#### Rate Limiting
-- **Problem**: Getting 429 responses
-- **Solution**: Reduce concurrent requests, increase delay
-
-#### Data Validation Failures
-- **Problem**: High invalid record count
-- **Solution**: Check data source, adjust validation rules
-
-#### Resume Issues
-- **Problem**: Not resuming from correct point
-- **Solution**: Check checkpoint data, verify job status
-
-#### Memory Issues
-- **Problem**: Out of memory during large jobs
-- **Solution**: Reduce batch size, process in smaller chunks
-
-### Debug Commands
+### Common Commands
 ```bash
-# Check job status
-curl "http://localhost:3000/api/segment/status?jobId=your-job-id"
+# Start development server
+npm run dev
 
-# Get validation preview
-curl "http://localhost:3000/api/staging/validate?jobId=your-job-id"
+# Check server status
+curl http://localhost:3000/api/sessions
 
-# Check migration history
-curl "http://localhost:3000/api/staging/migrate?jobId=your-job-id"
+# View logs
+tail -f logs/scraper.log
 ```
 
-## Future Enhancements
+---
 
-### Planned Features
-- [ ] Ratsit.se provider
-- [ ] Mrkoll.se provider
-- [ ] Advanced filtering options
-- [ ] Data export functionality
-- [ ] Scheduled scraping jobs
-- [ ] Webhook notifications
-- [ ] Advanced analytics dashboard
-
-### Performance Improvements
-- [ ] Parallel processing optimization
-- [ ] Database query optimization
-- [ ] Caching layer
-- [ ] CDN integration
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Implement your changes
-4. Add tests
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
+**Last Updated**: January 2024  
+**Version**: 1.0.0  
+**Maintainer**: Development Team

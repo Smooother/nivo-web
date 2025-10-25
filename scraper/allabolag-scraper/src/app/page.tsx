@@ -145,6 +145,7 @@ export default function Home() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [monitoringDashboard, setMonitoringDashboard] = useState<MonitoringDashboard | null>(null);
   const [isMonitoring, setIsMonitoring] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const itemsPerPage = 10;
 
   // Helper function to map backend job response to frontend format
@@ -610,8 +611,12 @@ export default function Home() {
   };
 
   const handleStageControl = async (stage: number, action: string) => {
-    if (!selectedSessionId) return;
+    if (!selectedSessionId) {
+      console.log('No session selected');
+      return;
+    }
 
+    console.log(`Starting Stage ${stage} for session: ${selectedSessionId}`);
     setLoading(true);
     setError(null);
 
@@ -623,6 +628,7 @@ export default function Home() {
         targetUrl = `/api/financial/fetch?jobId=${selectedSessionId}`;
       }
 
+      console.log(`Making request to: ${targetUrl}`);
       const response = await fetch(targetUrl, {
         method: 'POST',
         headers: {
@@ -632,7 +638,12 @@ export default function Home() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(`Stage ${stage} ${action} initiated:`, result);
+        console.log(`Stage ${stage} ${action} initiated successfully:`, result);
+        
+        // Show success message
+        setError(null);
+        setSuccessMessage(`Stage ${stage} started successfully!`);
+        setTimeout(() => setSuccessMessage(null), 3000);
         
         // Update current job to show Stage 2 is running
         if (result.jobId) {
@@ -713,27 +724,22 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Apple-style Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Data Scraper
+        {/* Clean Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-medium text-gray-900 mb-2">
+            Allabolag Scraper
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Advanced company data extraction from Allabolag.se with intelligent 3-stage processing
+          <p className="text-gray-600">
+            Company data extraction and analysis
           </p>
         </div>
 
-        {/* Main Content Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+        {/* Main Content */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           {/* Header Actions */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="text-sm text-gray-600 flex items-center gap-2">
@@ -743,8 +749,8 @@ export default function Home() {
                       {currentJob && (
                         <div className="flex items-center gap-1">
                           <div className={`w-1.5 h-1.5 rounded-full ${
-                            currentJob.status === 'running' ? 'bg-green-500 animate-pulse' :
-                            currentJob.status === 'done' ? 'bg-green-500' :
+                            currentJob.status === 'running' ? 'bg-gray-900' :
+                            currentJob.status === 'done' ? 'bg-gray-600' :
                             currentJob.status === 'error' ? 'bg-red-500' :
                             'bg-gray-400'
                           }`}></div>
@@ -760,39 +766,21 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIsSessionModalOpen(true)}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
                   Select Session
                 </button>
                 <button
                   onClick={handleTestWorkflow}
                   disabled={testing}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="px-4 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {testing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Testing...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Test Workflow
-                    </>
-                  )}
+                  {testing ? 'Testing...' : 'Test Workflow'}
                 </button>
                 <button
                   onClick={() => window.open('http://localhost:8080', '_blank')}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="px-4 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
                   Dashboard
                 </button>
               </div>
@@ -841,6 +829,13 @@ export default function Home() {
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
               <p className="text-red-800">{error}</p>
+            </div>
+          )}
+
+          {/* Success Message Display */}
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+              <p className="text-green-800">{successMessage}</p>
             </div>
           )}
 
@@ -1432,187 +1427,92 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Enhanced Monitoring Dashboard */}
-                    {monitoringDashboard && (
-                      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 border border-green-200/50">
-                        <div className="flex items-center justify-between mb-6">
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900">Real-Time Monitoring</h3>
-                            <p className="text-gray-600">Production-ready monitoring for 10k+ company runs</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${
-                              monitoringDashboard.status.isRunning ? 'bg-green-500 animate-pulse' :
-                              monitoringDashboard.status.isCompleted ? 'bg-green-500' :
-                              monitoringDashboard.status.hasErrors ? 'bg-red-500' :
-                              'bg-gray-400'
-                            }`}></div>
-                            <span className="text-sm font-medium capitalize">
-                              {monitoringDashboard.status.current}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Progress Overview */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                          <div className="bg-white rounded-xl p-4 border border-gray-200">
-                            <h4 className="text-sm font-medium text-gray-700 mb-3">Progress Overview</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Companies:</span>
-                                <span className="font-medium">{monitoringDashboard.progress.total.companies}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Company IDs:</span>
-                                <span className="font-medium">{monitoringDashboard.progress.total.companyIds}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Financial Records:</span>
-                                <span className="font-medium">{monitoringDashboard.progress.total.financials}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="bg-white rounded-xl p-4 border border-gray-200">
-                            <h4 className="text-sm font-medium text-gray-700 mb-3">Processing Rates</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Companies/min:</span>
-                                <span className="font-medium">{monitoringDashboard.progress.rates.companiesPerMinute.toFixed(1)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">IDs/min:</span>
-                                <span className="font-medium">{monitoringDashboard.progress.rates.idsPerMinute.toFixed(1)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Financials/min:</span>
-                                <span className="font-medium">{monitoringDashboard.progress.rates.financialsPerMinute.toFixed(1)}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="bg-white rounded-xl p-4 border border-gray-200">
-                            <h4 className="text-sm font-medium text-gray-700 mb-3">System Health</h4>
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Memory:</span>
-                                <span className="font-medium">{Math.round(monitoringDashboard.systemHealth.memoryUsage.heapUsed / 1024 / 1024)}MB</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Uptime:</span>
-                                <span className="font-medium">{Math.round(monitoringDashboard.systemHealth.uptime / 60)}min</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600">Last Update:</span>
-                                <span className="font-medium text-xs">{new Date(monitoringDashboard.timestamp).toLocaleTimeString()}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Stage Progress Bars */}
-                        <div className="mb-6">
-                          <h4 className="text-sm font-medium text-gray-700 mb-4">Stage Progress</h4>
-                          <div className="space-y-4">
-                            <div>
-                              <div className="flex justify-between text-sm mb-1">
-                                <span className="text-gray-600">Stage 1: Segmentation</span>
-                                <span className="font-medium">{monitoringDashboard.stages.stage1.percentage.toFixed(1)}%</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                  style={{ width: `${Math.min(100, monitoringDashboard.stages.stage1.percentage)}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                            <div>
-                              <div className="flex justify-between text-sm mb-1">
-                                <span className="text-gray-600">Stage 2: Company ID Resolution</span>
-                                <span className="font-medium">{monitoringDashboard.stages.stage2.percentage.toFixed(1)}%</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                                  style={{ width: `${Math.min(100, monitoringDashboard.stages.stage2.percentage)}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                            <div>
-                              <div className="flex justify-between text-sm mb-1">
-                                <span className="text-gray-600">Stage 3: Financial Data</span>
-                                <span className="font-medium">{monitoringDashboard.stages.stage3.percentage.toFixed(1)}%</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                                  style={{ width: `${Math.min(100, monitoringDashboard.stages.stage3.percentage)}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Control Buttons */}
-                        <div className="flex flex-wrap gap-3">
-                          {monitoringDashboard.status.isRunning && (
-                            <button
-                              onClick={() => controlJobProcess(selectedSessionId, 'stop')}
-                              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
-                            >
-                              🛑 Stop Process
-                            </button>
-                          )}
-                          {!monitoringDashboard.status.isRunning && !monitoringDashboard.status.isCompleted && (
-                            <button
-                              onClick={() => controlJobProcess(selectedSessionId, 'resume')}
-                              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
-                            >
-                              ▶️ Resume Process
-                            </button>
-                          )}
-                          <button
-                            onClick={() => controlJobProcess(selectedSessionId, 'restart')}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                          >
-                            🔄 Restart Process
-                          </button>
-                        </div>
-
-                        {/* Recommendations */}
-                        {monitoringDashboard.recommendations.length > 0 && (
-                          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <h5 className="text-sm font-medium text-yellow-800 mb-2">💡 Recommendations</h5>
-                            <ul className="text-sm text-yellow-700 space-y-1">
-                              {monitoringDashboard.recommendations.map((rec, index) => (
-                                <li key={index}>• {rec}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                {/* Clean Monitoring Dashboard */}
+                {monitoringDashboard && (
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-medium text-gray-900">Session Status</h3>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          monitoringDashboard.status.isRunning ? 'bg-gray-900' :
+                          monitoringDashboard.status.isCompleted ? 'bg-gray-600' :
+                          monitoringDashboard.status.hasErrors ? 'bg-red-500' :
+                          'bg-gray-400'
+                        }`}></div>
+                        <span className="text-sm text-gray-600 capitalize">
+                          {monitoringDashboard.status.current}
+                        </span>
                       </div>
-                    )}
+                    </div>
+
+                    {/* Essential Progress Only */}
+                    <div className="grid grid-cols-3 gap-6 mb-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-medium text-gray-900">{monitoringDashboard.progress.total.companies}</div>
+                        <div className="text-sm text-gray-500">Companies</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-medium text-gray-900">{monitoringDashboard.progress.total.companyIds}</div>
+                        <div className="text-sm text-gray-500">Company IDs</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-medium text-gray-900">{monitoringDashboard.progress.total.financials}</div>
+                        <div className="text-sm text-gray-500">Financial Records</div>
+                      </div>
+                    </div>
+
+                    {/* Simple Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Overall Progress</span>
+                        <span>{Math.round((monitoringDashboard.progress.total.financials / (monitoringDashboard.progress.total.companies * 5)) * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div 
+                          className="bg-gray-900 h-1 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, (monitoringDashboard.progress.total.financials / (monitoringDashboard.progress.total.companies * 5)) * 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Minimal Control Buttons */}
+                    <div className="flex gap-2">
+                      {monitoringDashboard.status.isRunning && (
+                        <button
+                          onClick={() => controlJobProcess(selectedSessionId, 'stop')}
+                          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                        >
+                          Stop
+                        </button>
+                      )}
+                      {!monitoringDashboard.status.isRunning && !monitoringDashboard.status.isCompleted && (
+                        <button
+                          onClick={() => controlJobProcess(selectedSessionId, 'resume')}
+                          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                        >
+                          Resume
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
                     
-                    {/* Stage Control Buttons */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Clean Stage Control Buttons */}
+                    <div className="space-y-3">
                       <button
                         onClick={() => handleStageControl(2, 'start')}
-                        className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                        disabled={loading}
+                        className="w-full px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Start Stage 2: Company ID Resolution
+                        {loading ? 'Starting...' : 'Start Stage 2: Company ID Resolution'}
                       </button>
                       
                       <button
                         onClick={() => handleStageControl(3, 'start')}
-                        className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                        disabled={loading}
+                        className="w-full px-4 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Start Stage 3: Financial Data Fetch
+                        {loading ? 'Starting...' : 'Start Stage 3: Financial Data Fetch'}
                       </button>
                     </div>
                   </div>
