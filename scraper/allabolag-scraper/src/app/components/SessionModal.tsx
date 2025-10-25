@@ -12,9 +12,9 @@ interface SessionInfo {
   updatedAt: string;
   filters?: any;
   stages: {
-    stage1: { status: string; completedAt?: string };
-    stage2: { status: string; completedAt?: string };
-    stage3: { status: string; completedAt?: string };
+    stage1: { status: string; completedAt?: string; companies?: number };
+    stage2: { status: string; completedAt?: string; companyIds?: number };
+    stage3: { status: string; completedAt?: string; financials?: number };
   };
 }
 
@@ -178,19 +178,61 @@ export default function SessionModal({ isOpen, onClose, onSessionSelect }: Sessi
                             <div className="w-full h-full rounded-full bg-white scale-50"></div>
                           )}
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-medium text-gray-900">
                             Session {session.sessionId.slice(0, 8)}...
                           </h3>
                           <p className="text-sm text-gray-600">
                             Created: {formatDate(session.createdAt)}
                           </p>
+                          
+                          {/* Enhanced Progress Display */}
+                          <div className="mt-2 flex items-center gap-4 text-xs">
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-500">Stage 1:</span>
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                session.stages?.stage1?.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                session.stages?.stage1?.status === 'running' ? 'bg-blue-100 text-blue-800' :
+                                session.stages?.stage1?.status === 'error' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {session.stages?.stage1?.status || 'pending'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-500">Stage 2:</span>
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                session.stages?.stage2?.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                session.stages?.stage2?.status === 'running' ? 'bg-blue-100 text-blue-800' :
+                                session.stages?.stage2?.status === 'error' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {session.stages?.stage2?.status || 'pending'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-500">Stage 3:</span>
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                session.stages?.stage3?.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                session.stages?.stage3?.status === 'running' ? 'bg-blue-100 text-blue-800' :
+                                session.stages?.stage3?.status === 'error' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {session.stages?.stage3?.status || 'pending'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Data Summary */}
+                          <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
+                            <span>Companies: {session.totalCompanies}</span>
+                            <span>IDs: {session.totalCompanyIds}</span>
+                            <span>Financials: {session.totalFinancials}</span>
+                            <span>Updated: {formatDate(session.updatedAt)}</span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {getStatusBadge(session.status)}
-                          <span className="text-sm text-gray-600">
-                            {session.totalCompanies} companies
-                          </span>
                         </div>
                       </div>
                       <div className="text-right">

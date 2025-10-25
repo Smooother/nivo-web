@@ -6,7 +6,7 @@ import SessionModal from './components/SessionModal';
 interface Job {
   id: string;
   jobType: string;
-  status: 'pending' | 'running' | 'paused' | 'completed' | 'error' | 'done';
+  status: 'pending' | 'running' | 'paused' | 'completed' | 'error' | 'done' | 'stopped';
   stage: 'stage1_segmentation' | 'stage2_enrichment' | 'stage3_financials' | 'validation' | 'migration';
   lastPage: number;
   processedCount: number;
@@ -16,6 +16,46 @@ interface Job {
   rateLimitStats?: any;
   createdAt: string;
   updatedAt: string;
+}
+
+interface MonitoringDashboard {
+  jobId: string;
+  timestamp: string;
+  status: {
+    current: string;
+    stage: string;
+    isRunning: boolean;
+    isCompleted: boolean;
+    hasErrors: boolean;
+  };
+  progress: {
+    total: {
+      companies: number;
+      companyIds: number;
+      financials: number;
+    };
+    rates: {
+      companiesPerMinute: number;
+      idsPerMinute: number;
+      financialsPerMinute: number;
+    };
+    estimates: {
+      elapsedMinutes: number;
+      estimatedRemainingMinutes: number;
+      estimatedCompletionTime: string;
+    };
+  };
+  stages: {
+    stage1: { completed: number; total: number; percentage: number };
+    stage2: { completed: number; total: number; percentage: number };
+    stage3: { completed: number; total: number; percentage: number };
+  };
+  systemHealth: {
+    memoryUsage: { heapUsed: number };
+    uptime: number;
+    lastHeartbeat: string;
+  };
+  recommendations: string[];
 }
 
 interface SegmentationParams {
@@ -103,6 +143,8 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [monitoringDashboard, setMonitoringDashboard] = useState<MonitoringDashboard | null>(null);
+  const [isMonitoring, setIsMonitoring] = useState(false);
   const itemsPerPage = 10;
 
   // Helper function to map backend job response to frontend format
@@ -113,6 +155,44 @@ export default function Home() {
     lastPage: 0,
     errorCount: 0
   });
+
+  // Fetch monitoring dashboard data
+  const fetchMonitoringDashboard = async (jobId: string) => {
+    try {
+      const response = await fetch(`/api/monitoring/dashboard?jobId=${jobId}`);
+      if (response.ok) {
+        const dashboard = await response.json();
+        setMonitoringDashboard(dashboard);
+        return dashboard;
+      }
+    } catch (error) {
+      console.error('Error fetching monitoring dashboard:', error);
+    }
+    return null;
+  };
+
+  // Control job process (stop, resume, etc.)
+  const controlJobProcess = async (jobId: string, action: 'stop' | 'resume' | 'restart') => {
+    try {
+      const response = await fetch('/api/monitoring/control', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId, action })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Refresh monitoring data
+          await fetchMonitoringDashboard(jobId);
+          return result;
+        }
+      }
+    } catch (error) {
+      console.error(`Error ${action}ing job:`, error);
+    }
+    return null;
+  };
 
   // Poll job status
   useEffect(() => {
@@ -463,15 +543,20 @@ export default function Home() {
     }
   };
 
-  // Real-time session status polling
+  // Real-time session status polling with enhanced monitoring
   useEffect(() => {
     if (!selectedSessionId) return;
 
     const pollSessionStatus = async () => {
       try {
-        const response = await fetch(`/api/sessions`);
-        if (response.ok) {
-          const data = await response.json();
+        // Fetch both session data and monitoring dashboard
+        const [sessionResponse, dashboardResponse] = await Promise.all([
+          fetch(`/api/sessions`),
+          fetch(`/api/monitoring/dashboard?jobId=${selectedSessionId}`)
+        ]);
+
+        if (sessionResponse.ok) {
+          const data = await sessionResponse.json();
           const currentSession = data.sessions.find((s: any) => s.sessionId === selectedSessionId);
           if (currentSession) {
             // Update current job with latest session data
@@ -485,6 +570,11 @@ export default function Home() {
               processedCount: currentSession.totalCompanyIds
             } : null);
           }
+        }
+
+        if (dashboardResponse.ok) {
+          const dashboard = await dashboardResponse.json();
+          setMonitoringDashboard(dashboard);
         }
       } catch (error) {
         console.error('Error polling session status:', error);
@@ -1339,6 +1429,167 @@ export default function Home() {
                             <div className="font-medium">{currentJob.processedCount || 0}</div>
                           </div>
                         </div>
+                      </div>
+                    )}
+
+                    {/* Enhanced Monitoring Dashboard */}
+                    {monitoringDashboard && (
+                      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 border border-green-200/50">
+                        <div className="flex items-center justify-between mb-6">
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900">Real-Time Monitoring</h3>
+                            <p className="text-gray-600">Production-ready monitoring for 10k+ company runs</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${
+                              monitoringDashboard.status.isRunning ? 'bg-green-500 animate-pulse' :
+                              monitoringDashboard.status.isCompleted ? 'bg-green-500' :
+                              monitoringDashboard.status.hasErrors ? 'bg-red-500' :
+                              'bg-gray-400'
+                            }`}></div>
+                            <span className="text-sm font-medium capitalize">
+                              {monitoringDashboard.status.current}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Overview */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                          <div className="bg-white rounded-xl p-4 border border-gray-200">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3">Progress Overview</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Companies:</span>
+                                <span className="font-medium">{monitoringDashboard.progress.total.companies}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Company IDs:</span>
+                                <span className="font-medium">{monitoringDashboard.progress.total.companyIds}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Financial Records:</span>
+                                <span className="font-medium">{monitoringDashboard.progress.total.financials}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-white rounded-xl p-4 border border-gray-200">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3">Processing Rates</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Companies/min:</span>
+                                <span className="font-medium">{monitoringDashboard.progress.rates.companiesPerMinute.toFixed(1)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">IDs/min:</span>
+                                <span className="font-medium">{monitoringDashboard.progress.rates.idsPerMinute.toFixed(1)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Financials/min:</span>
+                                <span className="font-medium">{monitoringDashboard.progress.rates.financialsPerMinute.toFixed(1)}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-white rounded-xl p-4 border border-gray-200">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3">System Health</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Memory:</span>
+                                <span className="font-medium">{Math.round(monitoringDashboard.systemHealth.memoryUsage.heapUsed / 1024 / 1024)}MB</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Uptime:</span>
+                                <span className="font-medium">{Math.round(monitoringDashboard.systemHealth.uptime / 60)}min</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600">Last Update:</span>
+                                <span className="font-medium text-xs">{new Date(monitoringDashboard.timestamp).toLocaleTimeString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Stage Progress Bars */}
+                        <div className="mb-6">
+                          <h4 className="text-sm font-medium text-gray-700 mb-4">Stage Progress</h4>
+                          <div className="space-y-4">
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-gray-600">Stage 1: Segmentation</span>
+                                <span className="font-medium">{monitoringDashboard.stages.stage1.percentage.toFixed(1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${Math.min(100, monitoringDashboard.stages.stage1.percentage)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-gray-600">Stage 2: Company ID Resolution</span>
+                                <span className="font-medium">{monitoringDashboard.stages.stage2.percentage.toFixed(1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${Math.min(100, monitoringDashboard.stages.stage2.percentage)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-gray-600">Stage 3: Financial Data</span>
+                                <span className="font-medium">{monitoringDashboard.stages.stage3.percentage.toFixed(1)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${Math.min(100, monitoringDashboard.stages.stage3.percentage)}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Control Buttons */}
+                        <div className="flex flex-wrap gap-3">
+                          {monitoringDashboard.status.isRunning && (
+                            <button
+                              onClick={() => controlJobProcess(selectedSessionId, 'stop')}
+                              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                            >
+                              🛑 Stop Process
+                            </button>
+                          )}
+                          {!monitoringDashboard.status.isRunning && !monitoringDashboard.status.isCompleted && (
+                            <button
+                              onClick={() => controlJobProcess(selectedSessionId, 'resume')}
+                              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                            >
+                              ▶️ Resume Process
+                            </button>
+                          )}
+                          <button
+                            onClick={() => controlJobProcess(selectedSessionId, 'restart')}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          >
+                            🔄 Restart Process
+                          </button>
+                        </div>
+
+                        {/* Recommendations */}
+                        {monitoringDashboard.recommendations.length > 0 && (
+                          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <h5 className="text-sm font-medium text-yellow-800 mb-2">💡 Recommendations</h5>
+                            <ul className="text-sm text-yellow-700 space-y-1">
+                              {monitoringDashboard.recommendations.map((rec, index) => (
+                                <li key={index}>• {rec}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
                     

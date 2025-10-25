@@ -158,7 +158,7 @@ async function processFinancialJob(jobId: string, localDb: LocalStagingDB) {
       processedCount += chunk.length;
       
       // Update job progress
-      localDb.updateJob(financialJobId, {
+      localDb.updateJob(jobId, {
         processedCount: processedCount
       });
       
@@ -178,7 +178,7 @@ async function processFinancialJob(jobId: string, localDb: LocalStagingDB) {
 
 async function fetchCompanyFinancials(buildId: string, companyData: any, companyId: string, session: any) {
   try {
-    console.log(`Fetching financial data for company ${companyData.company_name} (${companyData.orgnr}) - Company ID: ${companyId}`);
+    console.log(`Fetching financial data for company ${companyData.companyName} (${companyData.orgnr}) - Company ID: ${companyId}`);
     
     // Add the companyId to the companyData
     const enrichedCompanyData = {
@@ -190,10 +190,10 @@ async function fetchCompanyFinancials(buildId: string, companyData: any, company
     const { fetchFinancialData } = await import('@/lib/allabolag');
     const financialData = await fetchFinancialData(buildId, companyId, session, companyData.companyName, companyData.naceCategories);
     
-    console.log(`Fetched ${financialData.length} financial records for company ${companyData.company_name} (${companyData.orgnr})`);
+    console.log(`Fetched ${financialData.length} financial records for company ${companyData.companyName} (${companyData.orgnr})`);
     return financialData;
   } catch (error) {
-    console.error(`Error fetching financial data for company ${companyData.company_name} (${companyData.orgnr}):`, error);
+    console.error(`Error fetching financial data for company ${companyData.companyName} (${companyData.orgnr}):`, error);
     console.error('Error details:', error.message);
     throw error;
   }
