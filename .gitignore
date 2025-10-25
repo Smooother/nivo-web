@@ -78,6 +78,9 @@ logs/
 temp/
 tmp/
 
+# Generated presentations
+outputs/*.pptx
+
 # Node.js (for frontend)
 frontend/node_modules/
 frontend/.next/
