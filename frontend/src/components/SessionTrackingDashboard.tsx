@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { 
-  RefreshCw, 
-  Database, 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
-  ExternalLink,
+import {
+  RefreshCw,
+  Database,
+  CheckCircle,
+  Clock,
+  AlertCircle,
   Play,
-  Pause,
   RotateCcw,
   Eye,
-  Download,
-  Filter,
-  TrendingUp,
-  Building2,
-  DollarSign,
-  Users,
   Settings,
-  Timer
+  Timer,
+  Activity,
+  PauseCircle,
+  PlayCircle,
+  StopCircle,
+  ActivitySquare,
+  BarChart2,
+  AlertTriangle,
+  ArrowRight,
+  CalendarClock
 } from 'lucide-react';
 
 interface SessionInfo {
@@ -60,6 +61,63 @@ interface SessionInfo {
   };
 }
 
+interface MonitoringStageProgress {
+  completed: number;
+  total: number;
+  percentage: number;
+  ratePerMinute?: number;
+  etaMinutes?: number;
+  lastUpdated?: string;
+}
+
+interface MonitoringData {
+  jobId: string;
+  timestamp: string;
+  status: {
+    current: string;
+    isRunning: boolean;
+    isCompleted: boolean;
+  };
+  progress?: {
+    total?: {
+      companies?: number;
+      companyIds?: number;
+      financials?: number;
+    };
+    rates?: {
+      companiesPerMinute?: number;
+      idsPerMinute?: number;
+      financialsPerMinute?: number;
+    };
+    etaMinutes?: number;
+    estimatedCompletionTime?: string;
+  };
+  stages?: {
+    stage1?: MonitoringStageProgress;
+    stage2?: MonitoringStageProgress;
+    stage3?: MonitoringStageProgress;
+  };
+  errors?: {
+    total?: number;
+    byStage?: {
+      stage1?: number;
+      stage2?: number;
+      stage3?: number;
+    };
+    byType?: Record<string, number>;
+    recent?: Array<{
+      id: string;
+      companyName?: string;
+      orgnr?: string;
+      stage: 'stage1' | 'stage2' | 'stage3';
+      errorType: string;
+      message: string;
+      occurredAt: string;
+      retryable?: boolean;
+    }>;
+  };
+}
+
 interface SessionTrackingDashboardProps {
   autoRefresh?: boolean;
   refreshInterval?: number;
@@ -80,6 +138,10 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
   const [sessionDetails, setSessionDetails] = useState<SessionInfo | null>(null);
   const [enableAutoRefresh, setEnableAutoRefresh] = useState(autoRefresh);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [monitoringData, setMonitoringData] = useState<MonitoringData | null>(null);
+  const [monitoringLoading, setMonitoringLoading] = useState(false);
+  const [processActionLoading, setProcessActionLoading] = useState<null | 'pause' | 'resume' | 'stop' | 'restart'>(null);
+  const [retryingErrorId, setRetryingErrorId] = useState<string | null>(null);
 
   const fetchSessions = async () => {
     try {
@@ -116,9 +178,10 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
     try {
       const response = await fetch(`http://localhost:3000/api/sessions/${sessionId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setSessionDetails(data.session);
+        await fetchMonitoringData(sessionId);
       } else {
         console.error('Failed to fetch session details:', data.error);
       }
@@ -127,14 +190,37 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
     }
   };
 
+  const fetchMonitoringData = async (sessionId: string) => {
+    try {
+      setMonitoringLoading(true);
+      const response = await fetch(`http://localhost:3000/api/monitoring/dashboard?jobId=${sessionId}`);
+      if (!response.ok) {
+        throw new Error(`Monitoring request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMonitoringData(data);
+    } catch (error) {
+      console.error('Error fetching monitoring data:', error);
+      setMonitoringData(null);
+    } finally {
+      setMonitoringLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSessions();
-    
+
     if (enableAutoRefresh) {
-      const interval = setInterval(fetchSessions, refreshInterval);
+      const interval = setInterval(() => {
+        fetchSessions();
+        if (selectedSession) {
+          fetchSessionDetails(selectedSession);
+        }
+      }, refreshInterval);
       return () => clearInterval(interval);
     }
-  }, [enableAutoRefresh, refreshInterval]);
+  }, [enableAutoRefresh, refreshInterval, selectedSession]);
 
   useEffect(() => {
     if (selectedSession) {
@@ -204,6 +290,135 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
     }
   };
 
+  const handleProcessControl = async (action: 'pause' | 'resume' | 'stop' | 'restart') => {
+    if (!selectedSession) return;
+
+    try {
+      setProcessActionLoading(action);
+      const response = await fetch('http://localhost:3000/api/monitoring/control', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jobId: selectedSession,
+          action,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data?.success === false) {
+        throw new Error(data?.error || `Failed to ${action} job ${selectedSession}`);
+      }
+
+      await fetchSessionDetails(selectedSession);
+    } catch (error) {
+      console.error(`Error executing ${action}:`, error);
+    } finally {
+      setProcessActionLoading(null);
+    }
+  };
+
+  const handleRetryError = async (errorId: string) => {
+    if (!selectedSession) return;
+
+    try {
+      setRetryingErrorId(errorId);
+      const response = await fetch(`http://localhost:3000/api/sessions/${selectedSession}/errors/${errorId}/retry`, {
+        method: 'POST',
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data?.success === false) {
+        throw new Error(data?.error || 'Retry request failed');
+      }
+
+      await fetchMonitoringData(selectedSession);
+      await fetchSessionDetails(selectedSession);
+    } catch (error) {
+      console.error('Error retrying failure:', error);
+    } finally {
+      setRetryingErrorId(null);
+    }
+  };
+
+  const getStageDisplayName = (stage: 'stage1' | 'stage2' | 'stage3') => {
+    switch (stage) {
+      case 'stage1':
+        return 'Stage 1: Segmentation';
+      case 'stage2':
+        return 'Stage 2: Company IDs';
+      case 'stage3':
+        return 'Stage 3: Financials';
+      default:
+        return stage;
+    }
+  };
+
+  const formatPercentage = (value?: number) => {
+    if (value === undefined || Number.isNaN(value)) {
+      return '—';
+    }
+    return `${Math.round(value)}%`;
+  };
+
+  const getSessionStage = (stage: 'stage1' | 'stage2' | 'stage3') => {
+    if (!sessionDetails) return undefined;
+    return sessionDetails.stages[stage];
+  };
+
+  const stageMetrics = useMemo(() => {
+    return [
+      {
+        key: 'stage1' as const,
+        label: 'Stage 1: Segmentation',
+        progress: monitoringData?.stages?.stage1?.percentage ?? sessionDetails?.progress?.stage1Progress,
+        completed: monitoringData?.stages?.stage1?.completed ?? sessionDetails?.totalCompanies,
+        total: monitoringData?.stages?.stage1?.total ?? sessionDetails?.totalCompanies,
+        rate: monitoringData?.progress?.rates?.companiesPerMinute,
+        eta: monitoringData?.stages?.stage1?.etaMinutes,
+      },
+      {
+        key: 'stage2' as const,
+        label: 'Stage 2: Company IDs',
+        progress: monitoringData?.stages?.stage2?.percentage ?? sessionDetails?.progress?.stage2Progress,
+        completed: monitoringData?.stages?.stage2?.completed ?? sessionDetails?.totalCompanyIds,
+        total: monitoringData?.stages?.stage2?.total ?? sessionDetails?.totalCompanies,
+        rate: monitoringData?.progress?.rates?.idsPerMinute,
+        eta: monitoringData?.stages?.stage2?.etaMinutes,
+      },
+      {
+        key: 'stage3' as const,
+        label: 'Stage 3: Financials',
+        progress: monitoringData?.stages?.stage3?.percentage ?? sessionDetails?.progress?.stage3Progress,
+        completed: monitoringData?.stages?.stage3?.completed ?? sessionDetails?.totalFinancials,
+        total: monitoringData?.stages?.stage3?.total ?? sessionDetails?.totalCompanyIds,
+        rate: monitoringData?.progress?.rates?.financialsPerMinute,
+        eta: monitoringData?.stages?.stage3?.etaMinutes,
+      },
+    ];
+  }, [monitoringData, sessionDetails]);
+
+  const isRunning = monitoringData?.status?.isRunning ?? sessionDetails?.status === 'active';
+  const isCompleted = monitoringData?.status?.isCompleted ?? sessionDetails?.status === 'completed';
+  const estimatedMinutesRemaining = monitoringData?.progress?.etaMinutes;
+  const estimatedCompletionTime = monitoringData?.progress?.estimatedCompletionTime;
+  const formattedEta = useMemo(() => {
+    if (estimatedMinutesRemaining === undefined || estimatedMinutesRemaining === null) {
+      return '—';
+    }
+
+    if (estimatedMinutesRemaining < 60) {
+      return `~${Math.max(1, Math.round(estimatedMinutesRemaining))} min`;
+    }
+
+    const hours = Math.floor(estimatedMinutesRemaining / 60);
+    const minutes = Math.round(estimatedMinutesRemaining % 60);
+    return `~${hours}h ${minutes}m`;
+  }, [estimatedMinutesRemaining]);
+
   const handleStageControl = async (stage: number, action: string) => {
     if (!selectedSession) return;
     
@@ -231,26 +446,6 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
       }
     } catch (error) {
       console.error(`Error ${action}ing stage ${stage}:`, error);
-    }
-  };
-
-  const getEstimatedTime = (session: SessionInfo) => {
-    const totalCompanies = session.totalCompanies;
-    if (totalCompanies === 0) return 'Unknown';
-    
-    // Rough estimates based on processing rates
-    const stage1Time = Math.ceil(totalCompanies / 100); // 100 companies per minute
-    const stage2Time = Math.ceil(totalCompanies / 200); // 200 companies per minute  
-    const stage3Time = Math.ceil(totalCompanies / 50);  // 50 companies per minute
-    
-    const totalMinutes = stage1Time + stage2Time + stage3Time;
-    
-    if (totalMinutes < 60) {
-      return `~${totalMinutes} minutes`;
-    } else {
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      return `~${hours}h ${minutes}m`;
     }
   };
 
@@ -450,81 +645,402 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
                   {/* Session Details */}
                   {selectedSession === session.sessionId && sessionDetails && (
-                    <div className="mt-4 pt-4 border-t">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <h4 className="font-medium text-sm mb-2">Stage 1: Segmentation</h4>
-                          <div className="text-sm text-gray-600">
-                            <div>Status: {sessionDetails.stages.stage1.status}</div>
-                            <div>Companies: {sessionDetails.totalCompanies}</div>
-                            {sessionDetails.stages.stage1.completedAt && (
-                              <div>Completed: {formatDate(sessionDetails.stages.stage1.completedAt)}</div>
+                    <div className="mt-4 pt-4 border-t space-y-6">
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500">
+                            <ActivitySquare className="h-3 w-3" />
+                            <span>
+                              Last update:{' '}
+                              {monitoringData?.timestamp
+                                ? new Date(monitoringData.timestamp).toLocaleString('sv-SE')
+                                : formatDate(sessionDetails.updatedAt)}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                              {getStatusIcon(monitoringData?.status?.current || sessionDetails.status)}
+                              <span className="capitalize">
+                                {(monitoringData?.status?.current || sessionDetails.status || '').replace(/_/g, ' ')}
+                              </span>
+                            </div>
+                            {getStatusBadge(sessionDetails.status)}
+                          </div>
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <CalendarClock className="h-4 w-4 text-muted-foreground" />
+                              ETA: {formattedEta}
+                            </span>
+                            {estimatedCompletionTime && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                Est. completion{' '}
+                                {new Date(estimatedCompletionTime).toLocaleString('sv-SE')}
+                              </span>
                             )}
+                            <span className="flex items-center gap-1">
+                              <Activity className="h-4 w-4 text-muted-foreground" />
+                              Overall progress {formatPercentage(sessionDetails.progress?.overallProgress)}
+                            </span>
                           </div>
                         </div>
-                        <div>
-                          <h4 className="font-medium text-sm mb-2">Stage 2: Enrichment</h4>
-                          <div className="text-sm text-gray-600">
-                            <div>Status: {sessionDetails.stages.stage2.status}</div>
-                            <div>Company IDs: {sessionDetails.totalCompanyIds}</div>
-                            {sessionDetails.stages.stage2.completedAt && (
-                              <div>Completed: {formatDate(sessionDetails.stages.stage2.completedAt)}</div>
-                            )}
-                          </div>
-                          {sessionDetails.stages.stage1.status === 'completed' && sessionDetails.stages.stage2.status === 'pending' && (
+
+                        <div className="flex flex-wrap gap-2">
+                          {isRunning && !isCompleted && (
                             <Button
+                              variant="outline"
                               size="sm"
-                              onClick={() => handleStageControl(2, 'start')}
-                              className="mt-2 flex items-center gap-1"
+                              onClick={() => handleProcessControl('pause')}
+                              disabled={processActionLoading !== null}
+                              className="flex items-center gap-2"
                             >
-                              <Play className="h-3 w-3" />
-                              Start Stage 2
+                              {processActionLoading === 'pause' ? (
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <PauseCircle className="h-4 w-4" />
+                              )}
+                              Pause
                             </Button>
                           )}
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-sm mb-2">Stage 3: Financials</h4>
-                          <div className="text-sm text-gray-600">
-                            <div>Status: {sessionDetails.stages.stage3.status}</div>
-                            <div>Financial Records: {sessionDetails.totalFinancials}</div>
-                            {sessionDetails.stages.stage3.completedAt && (
-                              <div>Completed: {formatDate(sessionDetails.stages.stage3.completedAt)}</div>
-                            )}
-                          </div>
-                          {sessionDetails.stages.stage2.status === 'completed' && sessionDetails.stages.stage3.status === 'pending' && (
+
+                          {!isRunning && !isCompleted && (
                             <Button
                               size="sm"
-                              onClick={() => handleStageControl(3, 'start')}
-                              className="mt-2 flex items-center gap-1"
+                              onClick={() => handleProcessControl('resume')}
+                              disabled={processActionLoading !== null}
+                              className="flex items-center gap-2"
                             >
-                              <Play className="h-3 w-3" />
-                              Start Stage 3
+                              {processActionLoading === 'resume' ? (
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <PlayCircle className="h-4 w-4" />
+                              )}
+                              Resume
                             </Button>
                           )}
+
+                          {!isCompleted && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleProcessControl('stop')}
+                              disabled={processActionLoading !== null}
+                              className="flex items-center gap-2"
+                            >
+                              {processActionLoading === 'stop' ? (
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <StopCircle className="h-4 w-4" />
+                              )}
+                              Stop
+                            </Button>
+                          )}
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleProcessControl('restart')}
+                            disabled={processActionLoading !== null}
+                            className="flex items-center gap-2"
+                          >
+                            {processActionLoading === 'restart' ? (
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <RotateCcw className="h-4 w-4" />
+                            )}
+                            Restart
+                          </Button>
                         </div>
                       </div>
-                      
-                      {/* Performance Info */}
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Timer className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800">Performance Estimate</span>
+
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                            <BarChart2 className="h-4 w-4" />
+                            Stage performance
+                          </div>
+                          {monitoringLoading ? (
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              Updating metrics...
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              {stageMetrics.map((stage) => {
+                                const stageInfo = getSessionStage(stage.key);
+                                const canTriggerStage = stage.key === 'stage2'
+                                  ? getSessionStage('stage1')?.status === 'completed'
+                                  : stage.key === 'stage3'
+                                    ? getSessionStage('stage2')?.status === 'completed'
+                                    : false;
+                                return (
+                                  <Card key={stage.key} className="border-gray-200">
+                                    <CardHeader className="pb-2">
+                                      <CardTitle className="text-sm font-semibold text-gray-900">
+                                        {stage.label}
+                                      </CardTitle>
+                                      <CardDescription className="flex items-center gap-2">
+                                        {getStageBadge(stage.label, stageInfo?.status || 'pending')}
+                                        <span className="text-xs text-gray-500">
+                                          {stageInfo?.status?.toUpperCase() || 'PENDING'}
+                                        </span>
+                                      </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                      <div>
+                                        <Progress value={stage.progress ?? 0} className="mb-2" />
+                                        <div className="flex items-center justify-between text-xs text-gray-600">
+                                          <span>{formatPercentage(stage.progress)}</span>
+                                          <span>
+                                            {formatNumber(stage.completed ?? 0)} /{' '}
+                                            {stage.total ? formatNumber(stage.total) : '—'}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="grid grid-cols-1 gap-2 text-xs text-gray-600">
+                                        <div className="flex items-center justify-between">
+                                          <span>Rate</span>
+                                          <span className="font-medium text-gray-900">
+                                            {stage.rate ? `${stage.rate.toFixed(1)}/min` : '—'}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                          <span>ETA</span>
+                                          <span className="font-medium text-gray-900">
+                                            {stage.eta ? `${Math.round(stage.eta)} min` : '—'}
+                                          </span>
+                                        </div>
+                                        {stageInfo?.completedAt && (
+                                          <div className="flex items-center justify-between">
+                                            <span>Completed</span>
+                                            <span>{formatDate(stageInfo.completedAt)}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      {stageInfo?.status === 'pending' && stage.key !== 'stage1' && canTriggerStage && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => handleStageControl(stage.key === 'stage2' ? 2 : 3, 'start')}
+                                          className="w-full flex items-center justify-center gap-2"
+                                        >
+                                          <Play className="h-3 w-3" />
+                                          Start {stage.label.split(':')[0]}
+                                        </Button>
+                                      )}
+                                    </CardContent>
+                                  </Card>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                        <div className="text-sm text-blue-700">
-                          <div>Estimated total time: {getEstimatedTime(sessionDetails)}</div>
-                          <div>Companies: {sessionDetails.totalCompanies} | 
-                               Stage 2: {sessionDetails.totalCompanyIds} | 
-                               Stage 3: {sessionDetails.totalFinancials}</div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card>
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-sm font-semibold">Throughput & timing</CardTitle>
+                              <CardDescription>Real-time processing rates</CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <div className="text-xs uppercase text-gray-500">Stage 1</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                  {monitoringData?.progress?.rates?.companiesPerMinute
+                                    ? `${monitoringData.progress.rates.companiesPerMinute.toFixed(1)}`
+                                    : '—'}
+                                </div>
+                                <div className="text-xs text-gray-500">companies / min</div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase text-gray-500">Stage 2</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                  {monitoringData?.progress?.rates?.idsPerMinute
+                                    ? `${monitoringData.progress.rates.idsPerMinute.toFixed(1)}`
+                                    : '—'}
+                                </div>
+                                <div className="text-xs text-gray-500">IDs / min</div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase text-gray-500">Stage 3</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                  {monitoringData?.progress?.rates?.financialsPerMinute
+                                    ? `${monitoringData.progress.rates.financialsPerMinute.toFixed(1)}`
+                                    : '—'}
+                                </div>
+                                <div className="text-xs text-gray-500">records / min</div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-sm font-semibold">Session totals</CardTitle>
+                              <CardDescription>Processed entities across stages</CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <div className="text-xs uppercase text-gray-500">Companies</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                  {formatNumber(sessionDetails.totalCompanies)}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase text-gray-500">Company IDs</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                  {formatNumber(sessionDetails.totalCompanyIds)}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs uppercase text-gray-500">Financials</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                  {formatNumber(sessionDetails.totalFinancials)}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
                         </div>
                       </div>
-                      
+
+                      {monitoringData?.errors && (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                            <AlertTriangle className="h-4 w-4 text-red-500" />
+                            Error monitoring
+                          </div>
+
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <Card>
+                              <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-semibold text-gray-900">Active errors</CardTitle>
+                                <CardDescription>Issues requiring attention</CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="text-3xl font-bold text-red-600">
+                                  {monitoringData.errors.total ?? 0}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">Across all stages</p>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-semibold text-gray-900">By stage</CardTitle>
+                                <CardDescription>Distribution of failures</CardDescription>
+                              </CardHeader>
+                              <CardContent className="space-y-2 text-sm">
+                                {(['stage1', 'stage2', 'stage3'] as const).map((stage) => (
+                                  <div key={stage} className="flex items-center justify-between text-gray-600">
+                                    <span className="flex items-center gap-2">
+                                      <Badge variant="outline" className="text-xs">
+                                        {getStageDisplayName(stage)}
+                                      </Badge>
+                                    </span>
+                                    <span className="font-medium text-gray-900">
+                                      {monitoringData.errors?.byStage?.[stage] ?? 0}
+                                    </span>
+                                  </div>
+                                ))}
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-semibold text-gray-900">By type</CardTitle>
+                                <CardDescription>Top error categories</CardDescription>
+                              </CardHeader>
+                              <CardContent className="space-y-2 text-sm text-gray-600">
+                                {monitoringData.errors.byType &&
+                                  Object.entries(monitoringData.errors.byType)
+                                    .sort((a, b) => b[1] - a[1])
+                                    .slice(0, 4)
+                                    .map(([type, count]) => (
+                                      <div key={type} className="flex items-center justify-between">
+                                        <span className="capitalize">{type.replace(/_/g, ' ')}</span>
+                                        <span className="font-medium text-gray-900">{count}</span>
+                                      </div>
+                                    ))}
+                                {(!monitoringData.errors.byType || Object.keys(monitoringData.errors.byType).length === 0) && (
+                                  <div className="text-xs text-gray-400">No error data available</div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          </div>
+
+                          {monitoringData.errors.recent && monitoringData.errors.recent.length > 0 && (
+                            <Card>
+                              <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-semibold text-gray-900">Recent errors</CardTitle>
+                                <CardDescription>Latest retryable failures</CardDescription>
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                {monitoringData.errors.recent.map((error) => (
+                                  <div
+                                    key={error.id}
+                                    className="flex flex-col gap-2 rounded-lg border border-gray-200 p-3 md:flex-row md:items-center md:justify-between"
+                                  >
+                                    <div className="space-y-1">
+                                      <div className="font-medium text-gray-900">
+                                        {error.companyName || 'Unknown company'}
+                                        {error.orgnr && (
+                                          <span className="ml-2 font-mono text-xs text-gray-500">{error.orgnr}</span>
+                                        )}
+                                      </div>
+                                      <div className="text-sm text-gray-600">
+                                        {error.message}
+                                      </div>
+                                      <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1">
+                                          <Badge variant="outline" className="text-xs">
+                                            {getStageDisplayName(error.stage)}
+                                          </Badge>
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                          <AlertCircle className="h-3 w-3" />
+                                          {error.errorType.replace(/_/g, ' ')}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                          <Clock className="h-3 w-3" />
+                                          {new Date(error.occurredAt).toLocaleString('sv-SE')}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    {error.retryable !== false && (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleRetryError(error.id)}
+                                        disabled={retryingErrorId === error.id}
+                                        className="mt-2 md:mt-0"
+                                      >
+                                        {retryingErrorId === error.id ? (
+                                          <RefreshCw className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <ArrowRight className="h-4 w-4 mr-1" />
+                                        )}
+                                        Retry
+                                      </Button>
+                                    )}
+                                  </div>
+                                ))}
+                              </CardContent>
+                            </Card>
+                          )}
+                        </div>
+                      )}
+
                       {sessionDetails.filters && (
-                        <div className="mt-4">
-                          <h4 className="font-medium text-sm mb-2">Filters Applied</h4>
-                          <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                            <pre>{JSON.stringify(sessionDetails.filters, null, 2)}</pre>
-                          </div>
-                        </div>
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-semibold">Filters applied</CardTitle>
+                            <CardDescription>Source criteria for this session</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <pre className="text-xs text-gray-600 bg-gray-50 p-3 rounded-lg overflow-x-auto">
+                              {JSON.stringify(sessionDetails.filters, null, 2)}
+                            </pre>
+                          </CardContent>
+                        </Card>
                       )}
                     </div>
                   )}
